@@ -2,11 +2,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Patrick_Hand } from 'next/font/google';
 import { api } from '@/lib/api';
-import { SupplierCard } from '@/components/supplier-card';
-import { ReviewCard } from '@/components/review-card';
-import { GuideCard } from '@/components/guide-card';
-import { FaqAccordion } from '@/components/faq-accordion';
-import { SectionHeading } from '@/components/section-heading';
+// import { SupplierCard } from '@/components/supplier-card';
+// import { ReviewCard } from '@/components/review-card';
+// import { GuideCard } from '@/components/guide-card';
+// import { FaqAccordion } from '@/components/faq-accordion';
+// import { SectionHeading } from '@/components/section-heading';
 
 const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
@@ -35,13 +35,13 @@ export default async function HomePage() {
       {/* Quick actions bar */}
       <QuickActionsBar />
 
+      {/* Two feature blocks with images - full width */}
+      <TwoUpFeatures />
+
+      {/* Dark guide strip - full width */}
+      <GuideStrip leadGuide={leadGuide} />
+
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        {/* Two feature blocks with images */}
-        <TwoUpFeatures />
-
-        {/* Dark guide strip */}
-        <GuideStrip leadGuide={leadGuide} />
-
         {/* Compact cards row (like the 5 tiny cards) */}
         <MiniCards categories={data.categories} />
 
@@ -58,41 +58,38 @@ export default async function HomePage() {
 /* --------------------------- HERO (light, centered) --------------------------- */
 function HeroSection() {
   return (
-    <section className="border-b border-slate-200 bg-white">
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* light blue panel like the mock */}
-        <div className="rounded-3xl bg-[#cfe0ff] p-8 sm:p-12">
-          <h1
-            className={`${hand.className} text-center text-3xl sm:text-4xl md:text-5xl leading-snug text-slate-900`}
-          >
-            Find Trusted Wholesale Liquidation Suppliers Near You
-          </h1>
+    <section className="border-b border-slate-200 bg-[#cfe0ff]">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:py-12 lg:py-14 sm:px-6 lg:px-8">
+        <h1
+          className={`${hand.className} text-center text-3xl sm:text-4xl md:text-5xl leading-snug text-slate-900`}
+        >
+          Find Trusted Wholesale Liquidation Suppliers Near You
+        </h1>
 
-          <p className="mt-3 text-center text-sm sm:text-base text-slate-700">
-            Discover Trusted Wholesale Suppliers offering truckloads and pallets in your area
-          </p>
+        <p className="mt-3 text-center text-sm sm:text-base text-slate-700">
+          Discover Trusted Wholesale Suppliers offering truckloads and pallets in your area
+        </p>
 
-          {/* pill search bar */}
-          <form action="/suppliers" method="get" className="mx-auto mt-6 max-w-xl">
-            <div className="relative">
-              <input
-                type="search"
-                name="search"
-                placeholder="Search suppliers, categories, or keywords"
-                className="h-11 w-full rounded-full border border-slate-300 bg-white px-12 text-sm text-slate-900 placeholder:text-slate-400 shadow-[inset_0_-2px_0_0_rgba(0,0,0,0.1)] focus:outline-none focus:ring-2 focus:ring-slate-600"
-              />
-              <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-slate-400">
-                🔍
-              </span>
-              <button
-                type="submit"
-                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700"
-              >
-                Search
-              </button>
-            </div>
-          </form>
-        </div>
+        {/* pill search bar */}
+        <form action="/suppliers" method="get" className="mx-auto mt-6 max-w-xl">
+          <div className="relative">
+            <input
+              type="search"
+              name="search"
+              placeholder="Search suppliers, categories, or keywords"
+              className="h-11 w-full rounded-full border border-slate-300 bg-white px-12 text-sm text-slate-900 placeholder:text-slate-400 shadow-[inset_0_-2px_0_0_rgba(0,0,0,0.1)] focus:outline-none focus:ring-2 focus:ring-slate-600"
+            />
+            <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-slate-400">
+              🔍
+            </span>
+            <button
+              type="submit"
+              className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700"
+            >
+              Search
+            </button>
+          </div>
+        </form>
       </div>
     </section>
   );
@@ -107,12 +104,12 @@ function QuickActionsBar() {
   ];
   return (
     <section className="bg-slate-900">
-      <div className="mx-auto flex w-full flex-col gap-3 px-2 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="mx-auto flex w-full flex-col gap-3 px-6 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-24 lg:px-30">
         {items.map((it) => (
           <Link
             key={it.href}
             href={it.href}
-            className={`${hand.className} inline-flex items-center justify-center rounded-xl bg-slate-800 px-8 py-4 text-xl font-semibold text-white ring-1 ring-white/10 hover:bg-slate-700 flex-1 sm:flex-none`}
+            className={`${hand.className} inline-flex items-center justify-center rounded-xl bg-slate-800 px-16 py-8 text-xl font-semibold text-white ring-1 ring-white/10 hover:bg-slate-700 flex-1 sm:flex-none`}
           >
             {it.label}
           </Link>
@@ -130,9 +127,18 @@ function TrendingHandSuppliers({ suppliers }: { suppliers: SupplierSummaryList }
         Trending Wholesale Suppliers Near You
       </h2>
 
-      <p className="mt-2 text-center text-xs text-slate-600">
-        Find wholesale lots of returns, overstock and mixed merchandise by the pallet or truckload.
-      </p>
+      <div className="mt-2 relative">
+        <p className="text-center text-xs text-slate-600">
+          Find wholesale lots of returns, overstock and mixed merchandise by the pallet or truckload.
+        </p>
+        
+        <a
+          href="/suppliers"
+          className={`${hand.className} hidden sm:inline-flex items-center gap-2 text-sm text-slate-800 hover:underline underline-offset-4 absolute right-0 top-1/2 -translate-y-1/2`}
+        >
+          Explore all →
+        </a>
+      </div>
 
       <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {suppliers.slice(0, 4).map((s) => (
@@ -173,14 +179,7 @@ function TrendingHandSuppliers({ suppliers }: { suppliers: SupplierSummaryList }
         ))}
       </div>
 
-      <div className="mt-4 flex items-center justify-end pr-1">
-        <a
-          href="/suppliers"
-          className={`${hand.className} inline-flex items-center gap-2 text-sm text-slate-800 hover:underline underline-offset-4`}
-        >
-          Explore all →
-        </a>
-      </div>
+      
     </section>
   );
 }
@@ -271,13 +270,14 @@ function HandOutlineButton({
 /* --------------------------- TWO IMAGE FEATURES ------------------------------ */
 function TwoUpFeatures() {
   return (
-    <section className="grid gap-4 py-6 md:grid-cols-2">
+    <section className="mx-auto max-w-[95vw] px-4 sm:px-6 lg:px-8">
+      <div className="grid gap-4 py-6 md:grid-cols-2">
       {/* LEFT CARD — image on top, text below */}
       <article className="overflow-hidden rounded-[18px] border-2 border-slate-900/80 bg-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)]">
         <div className="relative h-64 w-full">
           <Image
-            src="/images/feature-desk.jpg" // swap to your asset
-            alt=""
+            src="/feature-desk.png"
+            alt="Liquidation warehouse desk"
             fill
             className="object-cover"
             priority
@@ -297,7 +297,7 @@ function TwoUpFeatures() {
       </article>
 
       {/* RIGHT CARD — text on top, image on bottom (alternating) */}
-      <article className="overflow-hidden rounded-[18px] border-2 border-slate-900/80 bg-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] grid grid-rows-[auto_1fr]">
+      <article className="overflow-hidden rounded-[18px] border-2 border-slate-900/80 bg-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] flex flex-col">
         <div className="p-5">
           <h3 className={`${hand.className} text-2xl text-slate-900`}>Read real reviews from buyers</h3>
           <p className={`${hand.className} mt-3 text-[15px] leading-6 text-slate-800`}>
@@ -306,15 +306,16 @@ function TwoUpFeatures() {
           </p>
           <HandPrimaryButton href="/suppliers?search=review" className="mt-4">Browse</HandPrimaryButton>
         </div>
-        <div className="relative h-64 w-full">
+        <div className="relative flex-1 w-full min-h-[16rem]">
           <Image
-            src="/images/feature-family.jpg" // swap to your asset
-            alt=""
+            src="/feature-family.png"
+            alt="Family business liquidation"
             fill
             className="object-cover"
           />
         </div>
       </article>
+      </div>
     </section>
   );
 }
@@ -325,7 +326,7 @@ function GuideStrip({ leadGuide }: { leadGuide?: GuideList[number] }) {
   const title = leadGuide?.title ?? 'How to find a legitimate liquidation supplier in 2025';
 
   return (
-    <section className="my-4 overflow-hidden rounded-[18px] border-2 border-slate-900/70 bg-[#4b4b4b] text-center text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)]">
+    <section className="overflow-hidden bg-[#4b4b4b] text-center text-white">
       <div className="px-4 py-10">
         <h3 className={`${hand.className} text-2xl sm:text-3xl`}>{title}</h3>
         <HandOutlineButton href={href} className="mt-6">Read Article</HandOutlineButton>
