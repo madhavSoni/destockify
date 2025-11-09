@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { DM_Sans } from 'next/font/google';
+import { DM_Sans, Patrick_Hand } from 'next/font/google';
 import './globals.css';
 
 const dmSans = DM_Sans({
@@ -8,6 +8,8 @@ const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
 });
+
+const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
 const NAV_LINKS = [
   { href: '/suppliers', label: 'Suppliers' },
@@ -53,52 +55,43 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 function SiteHeader() {
   return (
-    <header className="border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="inline-flex items-center gap-2 text-xl font-semibold tracking-tight text-slate-900">
-            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-slate-900 text-sm font-semibold text-white">
-              D
-            </span>
-            Destockify
-          </Link>
-          <span className="hidden rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium uppercase tracking-wide text-emerald-700 md:inline-flex">
-            Trusted wholesale network
+    <header className="border-b border-slate-200 bg-white">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        {/* Left: logo (unchanged) */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900"
+        >
+          {/* If you have a real svg logo, drop it here */}
+          <span className="sr-only">Destockify</span>
+          <span aria-hidden className="select-none">
+            <span className="font-black">Destock</span>
+            <span className="font-black text-[#3b82f6]">ify</span>
           </span>
-        </div>
+        </Link>
 
-        <nav className="flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-full px-3 py-1 transition hover:bg-slate-100 hover:text-slate-900"
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link
-            href="/liquidation-companies"
-            className="rounded-full px-3 py-1 transition hover:bg-slate-100 hover:text-slate-900"
-          >
-            Directory
+        {/* Right: handwritten nav */}
+        <nav
+          className={`${hand.className} flex items-center gap-6 text-lg text-slate-900`}
+          aria-label="Primary"
+        >
+          <Link href="/suppliers" className="hover:opacity-80">
+            Buyers
           </Link>
-        </nav>
+          <Link href="/list-your-business" className="hover:opacity-80">
+            Sellers
+          </Link>
+          <Link href="/login" className="hover:opacity-80">
+            Login
+          </Link>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href="/guides/how-to-vet-liquidation-suppliers-2025"
-            className="text-sm font-medium text-slate-600 transition hover:text-slate-900"
-          >
-            Buyer toolkit
-          </Link>
           <Link
             href="/list-your-business"
-            className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"
+            className="rounded-full bg-[#2f6feb] px-4 py-2 text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-1px] hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] transition"
           >
-            List your business
+            List your Business
           </Link>
-        </div>
+        </nav>
       </div>
     </header>
   );
