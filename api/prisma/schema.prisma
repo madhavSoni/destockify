@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Supplier {
+  id               Int                @id @default(autoincrement())
+  name             String
+  slug             String             @unique
+  shortDescription String?
+  description      String?
+  website          String?
+  phone            String?
+  email            String?
+  heroImage        String?
+  logoImage        String?
+  averageRating    Float?             @default(0)
+  reviewCount      Int                @default(0)
+  trustScore       Int?               @default(0)
+  minimumOrder     String?
+  leadTime         String?
+  specialties      String[]          @default([])
+  certifications   String[]          @default([])
+  badges           String[]          @default([])
+  logisticsNotes   String?
+  pricingNotes     String?
+  homeRank         Int?               @default(0)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  regionId         Int?
+
+  region        Region?             @relation(fields: [regionId], references: [id])
+  categories    SupplierCategory[]
+  lotSizes      SupplierLotSize[]
+  reviews       Review[]
+  testimonials  Testimonial[]
+  resources     SupplierResource[]
+}
+
+model Category {
+  id          Int                 @id @default(autoincrement())
+  name        String
+  slug        String              @unique
+  headline    String?
+  description String?
+  icon        String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  suppliers SupplierCategory[]
+  guides    GuideCategory[]
+}
+
+model SupplierCategory {
+  supplierId Int
+  categoryId Int
+
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@id([supplierId, categoryId])
+}
+
+model Region {
+  id            Int        @id @default(autoincrement())
+  name          String
+  slug          String     @unique
+  headline      String?
+  description   String?
+  stateCode     String?
+  marketStats   Json?
+  mapImage      String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  suppliers Supplier[]
+}
+
+model LotSize {
+  id          Int                @id @default(autoincrement())
+  name        String
+  slug        String             @unique
+  headline    String?
+  description String?
+  minUnits    Int?
+  maxUnits    Int?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  suppliers SupplierLotSize[]
+}
+
+model SupplierLotSize {
+  supplierId Int
+  lotSizeId  Int
+
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+  lotSize  LotSize  @relation(fields: [lotSizeId], references: [id])
+
+  @@id([supplierId, lotSizeId])
+}
+
+model Review {
+  id                Int      @id @default(autoincrement())
+  supplierId        Int
+  title             String
+  author            String
+  company           String?
+  ratingOverall     Float
+  ratingAccuracy    Float?
+  ratingLogistics   Float?
+  ratingValue       Float?
+  ratingCommunication Float?
+  highlights        String[]         @default([])
+  body              String
+  publishedAt       DateTime @default(now())
+
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+
+  @@index([supplierId, publishedAt])
+}
+
+model Testimonial {
+  id          Int      @id @default(autoincrement())
+  supplierId  Int
+  quote       String
+  author      String
+  role        String?
+  company     String?
+  publishedAt DateTime @default(now())
+
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+
+  @@index([supplierId, publishedAt])
+}
+
+model SupplierResource {
+  id          Int      @id @default(autoincrement())
+  supplierId  Int
+  title       String
+  type        String
+  url         String?
+  description String?
+  order       Int      @default(0)
+
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+
+  @@index([supplierId, order])
+}
+
+model Guide {
+  id          Int             @id @default(autoincrement())
+  title       String
+  slug        String          @unique
+  intro       String?
+  heroImage   String?
+  excerpt     String?
+  sections    Json?
+  publishedAt DateTime?       @default(now())
+  isFeatured  Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  categories GuideCategory[]
+}
+
+model GuideCategory {
+  guideId    Int
+  categoryId Int
+
+  guide    Guide    @relation(fields: [guideId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@id([guideId, categoryId])
+}
+
+model Faq {
+  id        Int      @id @default(autoincrement())
+  question  String
+  answer    String
+  category  String?
+  order     Int      @default(0)
+  audience  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
