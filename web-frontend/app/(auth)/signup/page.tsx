@@ -1,17 +1,21 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Patrick_Hand } from 'next/font/google';
 import { useState } from 'react';
+import { api } from '@/lib/api';
 
 const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
 export default function SignupPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const firstName = formData.get('firstName') as string;
@@ -61,10 +65,27 @@ export default function SignupPage() {
 
     setErrors(newErrors);
 
-    // If no errors, form is valid
     if (Object.keys(newErrors).length === 0) {
-      console.log('Form is valid!', { firstName, lastName, email, password });
-      // Here you would normally submit to backend
+      setIsLoading(true);
+      try {
+        const result = await api.auth.signup({
+          firstName,
+          lastName,
+          email,
+          password,
+        });
+
+        console.log('Signup successful!', result);
+        
+        // Show success message or redirect to verify email page
+        alert('Signup successful! Please check your email to verify your account.');
+        router.push('/login');
+      } catch (error: any) {
+        console.error('Signup failed:', error);
+        setErrors({ general: error.message || 'Failed to sign up. Please try again.' });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
   return (
@@ -234,10 +255,16 @@ export default function SignupPage() {
             {/* Submit button */}
             <button
               type="submit"
-              className={`${hand.className} w-full h-14 rounded-2xl bg-[#2f6feb] text-white text-lg font-semibold shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+              disabled={isLoading}
+              className={`${hand.className} w-full h-14 rounded-2xl bg-[#2f6feb] text-white text-lg font-semibold shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0`}
             >
-              Create Account
+              {isLoading ? 'Creating Account...' : 'Create Account'}
             </button>
+
+            {/* General error message */}
+            {errors.general && (
+              <p className="mt-3 text-sm text-red-600 text-center">{errors.general}</p>
+            )}
           </form>
 
           {/* Login link */}

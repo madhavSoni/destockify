@@ -1,16 +1,20 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Patrick_Hand } from 'next/font/google';
 import { useState } from 'react';
+import { api } from '@/lib/api';
 
 const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
@@ -32,10 +36,36 @@ export default function LoginPage() {
 
     setErrors(newErrors);
 
-    // If no errors, form is valid
     if (Object.keys(newErrors).length === 0) {
-      console.log('Login form is valid!', { email });
-      // Here you would normally submit to backend
+      setIsLoading(true);
+      try {
+        const result = await api.auth.login({
+          email,
+          password,
+        });
+
+        console.log('Login successful!', result);
+        
+        // Store auth token in localStorage
+        if (result.authToken) {
+          localStorage.setItem('authToken', result.authToken);
+          localStorage.setItem('user', JSON.stringify({
+            id: result.id,
+            firstName: result.firstName,
+            lastName: result.lastName,
+            email: result.email,
+            isVerified: result.isVerified,
+          }));
+        }
+
+        // Redirect to home page
+        router.push('/');
+      } catch (error: any) {
+        console.error('Login failed:', error);
+        setErrors({ general: error.message || 'Failed to login. Please try again.' });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
   return (
@@ -131,10 +161,16 @@ export default function LoginPage() {
             {/* Submit button */}
             <button
               type="submit"
-              className={`${hand.className} w-full h-14 rounded-2xl bg-[#2f6feb] text-white text-lg font-semibold shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+              disabled={isLoading}
+              className={`${hand.className} w-full h-14 rounded-2xl bg-[#2f6feb] text-white text-lg font-semibold shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0`}
             >
-              Sign In
+              {isLoading ? 'Signing In...' : 'Sign In'}
             </button>
+
+            {/* General error message */}
+            {errors.general && (
+              <p className="mt-3 text-sm text-red-600 text-center">{errors.general}</p>
+            )}
           </form>
 
           {/* Sign up link */}

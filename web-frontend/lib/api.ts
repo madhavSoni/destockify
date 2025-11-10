@@ -1,10 +1,11 @@
-import 'server-only';
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080/api';
 
 type FetchOptions = {
   revalidate?: number;
   cache?: RequestCache;
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  body?: string;
+  headers?: HeadersInit;
 };
 
 function buildQueryString(params?: Record<string, unknown>) {
@@ -40,16 +41,24 @@ function buildQueryString(params?: Record<string, unknown>) {
 }
 
 async function fetchFromApi<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
-  const { revalidate = 60, cache } = options;
+  const { revalidate = 60, cache, method = 'GET', body, headers = {} } = options;
+
+  const fetchHeaders: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...headers,
+  };
 
   const response = await fetch(`${API_URL}${endpoint}`, {
-    next: { revalidate },
-    cache: cache ?? 'force-cache',
+    method,
+    headers: fetchHeaders,
+    body,
+    next: method === 'GET' ? { revalidate } : undefined,
+    cache: method === 'GET' ? (cache ?? 'force-cache') : 'no-store',
   });
 
   if (!response.ok) {
-    const message = await response.text();
-    throw new Error(`API request failed (${response.status}): ${message || response.statusText}`);
+    const errorData = await response.json().catch(() => ({ message: response.statusText }));
+    throw new Error(errorData.message || `API request failed ${response.status}: ${response.statusText}`);
   }
 
   if (response.status === 204) {
@@ -257,6 +266,28 @@ export type HomepagePayload = {
   faqs: FaqItem[];
 };
 
+export type SignupPayload = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+};
+
+export type LoginPayload = {
+  email: string;
+  password: string;
+};
+
+export type AuthResponse = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  isVerified?: boolean;
+  authToken?: string;
+  verificationToken?: string;
+};
+
 export const api = {
   home: {
     get: () => fetchFromApi<HomepagePayload>('/home', { revalidate: 30 }),
@@ -279,5 +310,19 @@ export const api = {
   },
   faq: {
     list: (audience?: string) => fetchFromApi<FaqItem[]>(`/faq${audience ? `?audience=${audience}` : ''}`, { revalidate: 600 }),
+  },
+  auth: {
+    signup: (payload: SignupPayload) =>
+      fetchFromApi<AuthResponse>('/auth/signup', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        cache: 'no-store',
+      }),
+    login: (payload: LoginPayload) =>
+      fetchFromApi<AuthResponse>('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        cache: 'no-store',
+      }),
   },
 };
