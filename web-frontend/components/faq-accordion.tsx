@@ -1,4 +1,7 @@
 import type { FaqItem } from '@/lib/api';
+import { Patrick_Hand } from 'next/font/google';
+
+const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
 export function FaqAccordion({ faqs }: { faqs: FaqItem[] }) {
   return (
@@ -10,14 +13,14 @@ export function FaqAccordion({ faqs }: { faqs: FaqItem[] }) {
         >
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-left">
             <div>
-              <div className="text-sm font-semibold text-slate-900">{faq.question}</div>
-              {faq.category && <div className="text-xs uppercase tracking-wide text-slate-400">{faq.category}</div>}
+              <div className={`${hand.className} text-base font-semibold text-xl text-slate-900`}>{faq.question}</div>
+              {faq.category && <div className="text-sm uppercase tracking-wide text-slate-400">{faq.category}</div>}
             </div>
             <span className="ml-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition group-open:rotate-45">
               +
             </span>
           </summary>
-          <div className="mt-4 text-sm text-slate-600 leading-relaxed">
+          <div className={`${hand.className} mt-4 text-base text-slate-700 leading-relaxed`}>
             {faq.answer}
           </div>
         </details>
