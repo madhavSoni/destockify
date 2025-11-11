@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { DM_Sans } from 'next/font/google';
 import './globals.css';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { SiteHeader } from '@/components/site-header';
 
 const dmSans = DM_Sans({
   variable: '--font-dm-sans',
@@ -34,53 +36,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${dmSans.variable} bg-slate-50 text-slate-900 antialiased`}>
-        <div className="flex min-h-screen flex-col">
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </div>
+        <AuthProvider>
+          <div className="flex min-h-screen flex-col">
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </div>
+        </AuthProvider>
       </body>
     </html>
-  );
-}
-
-function SiteHeader() {
-  return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-xl font-extrabold tracking-tight text-slate-900"
-        >
-          <span className="sr-only">Destockify</span>
-          <span aria-hidden className="select-none">
-            <span className="font-extrabold">Destock</span>
-            <span className="font-extrabold text-blue-600">ify</span>
-          </span>
-        </Link>
-
-        {/* Nav (Zillow-like typography & hover) */}
-        <nav className="flex items-center gap-7 text-[15px] font-medium tracking-tight" aria-label="Primary">
-          <Link className="text-slate-800 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm px-1 py-0.5" href="/suppliers">
-            Buyers
-          </Link>
-          <Link className="text-slate-800 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm px-1 py-0.5" href="/list-your-business">
-            Sellers
-          </Link>
-          <Link className="text-slate-800 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm px-1 py-0.5" href="/login">
-            Login
-          </Link>
-
-          <Link
-            href="/list-your-business"
-            className="ml-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-          >
-            List your Business
-          </Link>
-        </nav>
-      </div>
-    </header>
   );
 }
 
