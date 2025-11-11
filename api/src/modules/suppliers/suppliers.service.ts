@@ -18,8 +18,12 @@ const supplierSummaryInclude = {
 const supplierDetailInclude = {
   ...supplierSummaryInclude,
   reviews: {
-    orderBy: { publishedAt: 'desc' },
+    where: { isApproved: true },
+    orderBy: { approvedAt: 'desc' },
     take: 10,
+    include: {
+      customer: true,
+    },
   },
   testimonials: {
     orderBy: { publishedAt: 'desc' },
@@ -265,12 +269,12 @@ export async function getSupplierDetail(slug: string) {
 
   const recentReviews = supplier.reviews.slice(0, 4).map((review: (typeof supplier.reviews)[number]) => ({
     title: review.title,
-    author: review.author,
-    company: review.company,
+    author: `${review.customer.firstName} ${review.customer.lastName}`,
+    company: null,
     ratingOverall: review.ratingOverall,
     highlights: review.highlights,
     body: review.body,
-    publishedAt: review.publishedAt,
+    publishedAt: review.approvedAt?.toISOString() || review.createdAt.toISOString(),
   }));
 
   const testimonials = supplier.testimonials.map((testimonial: (typeof supplier.testimonials)[number]) => ({
@@ -319,6 +323,7 @@ export async function getSupplierDetail(slug: string) {
 
   return {
     supplier: {
+      id: supplier.id,
       slug: supplier.slug,
       name: supplier.name,
       shortDescription: supplier.shortDescription,

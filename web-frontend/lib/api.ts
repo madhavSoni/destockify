@@ -165,6 +165,7 @@ export type FaqItem = {
 
 export type SupplierDetailResponse = {
   supplier: {
+    id: number;
     slug: string;
     name: string;
     shortDescription?: string | null;
@@ -297,6 +298,70 @@ export type ProfileResponse = {
   createdAt: string;
 };
 
+export type CreateReviewPayload = {
+  supplierId: number;
+  title?: string;
+  ratingOverall: number;
+  ratingAccuracy?: number;
+  ratingLogistics?: number;
+  ratingValue?: number;
+  ratingCommunication?: number;
+  highlights?: string[];
+  body: string;
+  images?: string[];
+};
+
+export type UpdateReviewPayload = {
+  title?: string;
+  ratingOverall?: number;
+  ratingAccuracy?: number;
+  ratingLogistics?: number;
+  ratingValue?: number;
+  ratingCommunication?: number;
+  highlights?: string[];
+  body?: string;
+  images?: string[];
+};
+
+export type ReviewResponse = {
+  id: number;
+  supplierId: number;
+  customerId: number;
+  title?: string | null;
+  ratingOverall: number;
+  ratingAccuracy?: number | null;
+  ratingLogistics?: number | null;
+  ratingValue?: number | null;
+  ratingCommunication?: number | null;
+  highlights: string[];
+  body: string;
+  images: string[];
+  isApproved: boolean;
+  moderationNotes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  approvedAt?: string | null;
+  customer: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  supplier: {
+    id: number;
+    name: string;
+    slug: string;
+    logoImage?: string | null;
+  };
+};
+
+export type MyReviewsResponse = ReviewResponse[];
+
+export type ReviewActionResponse = {
+  message: string;
+  review?: ReviewResponse;
+};
+
 export const api = {
   home: {
     get: () => fetchFromApi<HomepagePayload>('/home', { revalidate: 30 }),
@@ -354,6 +419,64 @@ export const api = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        cache: 'no-store',
+      }),
+  },
+  reviews: {
+    // Customer: Create a new review
+    create: (payload: CreateReviewPayload, token: string) =>
+      fetchFromApi<ReviewActionResponse>('/reviews', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Customer: Get all my reviews
+    getMyReviews: (token: string) =>
+      fetchFromApi<MyReviewsResponse>('/reviews/my-reviews', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Customer: Update my review
+    update: (reviewId: number, payload: UpdateReviewPayload, token: string) =>
+      fetchFromApi<ReviewActionResponse>(`/reviews/${reviewId}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Customer: Delete my review
+    delete: (reviewId: number, token: string) =>
+      fetchFromApi<ReviewActionResponse>(`/reviews/${reviewId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Approve a review
+    approve: (reviewId: number) =>
+      fetchFromApi<ReviewActionResponse>(`/reviews/${reviewId}/approve`, {
+        method: 'POST',
+        cache: 'no-store',
+      }),
+    // Admin: Unapprove a review
+    unapprove: (reviewId: number, moderationNotes?: string) =>
+      fetchFromApi<ReviewActionResponse>(`/reviews/${reviewId}/unapprove`, {
+        method: 'POST',
+        body: JSON.stringify({ moderationNotes }),
+        cache: 'no-store',
+      }),
+    // Admin: Delete any review permanently
+    adminDelete: (reviewId: number) =>
+      fetchFromApi<ReviewActionResponse>(`/reviews/${reviewId}/admin`, {
+        method: 'DELETE',
         cache: 'no-store',
       }),
   },

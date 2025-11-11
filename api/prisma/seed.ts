@@ -809,11 +809,67 @@ async function main() {
   await prisma.testimonial.deleteMany();
   await prisma.review.deleteMany();
   await prisma.supplier.deleteMany();
+  await prisma.customer.deleteMany();
   await prisma.category.deleteMany();
   await prisma.lotSize.deleteMany();
   await prisma.region.deleteMany();
   await prisma.guide.deleteMany();
   await prisma.faq.deleteMany();
+
+  console.log('👥 Creating verified customers...');
+  const customerRecords = await Promise.all([
+    prisma.customer.create({
+      data: {
+        firstName: 'Tanya',
+        lastName: 'Smith',
+        email: 'tanya.s@example.com',
+        passwordHash: '$argon2id$v=19$m=65536,t=3,p=4$dummyhash1',
+        isVerified: true,
+        zipCode: '30318',
+      },
+    }),
+    prisma.customer.create({
+      data: {
+        firstName: 'Miguel',
+        lastName: 'Rodriguez',
+        email: 'miguel.r@example.com',
+        passwordHash: '$argon2id$v=19$m=65536,t=3,p=4$dummyhash2',
+        isVerified: true,
+        zipCode: '78701',
+      },
+    }),
+    prisma.customer.create({
+      data: {
+        firstName: 'James',
+        lastName: 'Peterson',
+        email: 'james.p@example.com',
+        passwordHash: '$argon2id$v=19$m=65536,t=3,p=4$dummyhash3',
+        isVerified: true,
+        zipCode: '60606',
+      },
+    }),
+    prisma.customer.create({
+      data: {
+        firstName: 'Linda',
+        lastName: 'Martinez',
+        email: 'linda.m@example.com',
+        passwordHash: '$argon2id$v=19$m=65536,t=3,p=4$dummyhash4',
+        isVerified: true,
+        zipCode: '90001',
+      },
+    }),
+    prisma.customer.create({
+      data: {
+        firstName: 'David',
+        lastName: 'Chen',
+        email: 'david.c@example.com',
+        passwordHash: '$argon2id$v=19$m=65536,t=3,p=4$dummyhash5',
+        isVerified: true,
+        zipCode: '94102',
+      },
+    }),
+  ]);
+  const customerIds = customerRecords.map((c) => c.id);
 
   console.log('🪴 Seeding reference tables...');
   const categoryRecords = await Promise.all(
@@ -898,11 +954,10 @@ async function main() {
 
     if (supplierSeed.reviews.length > 0) {
       await prisma.review.createMany({
-        data: supplierSeed.reviews.map((review) => ({
+        data: supplierSeed.reviews.map((review, index) => ({
           supplierId: supplierRecord.id,
+          customerId: customerIds[index % customerIds.length], // Rotate through customers
           title: review.title,
-          author: review.author,
-          company: review.company,
           ratingOverall: review.ratingOverall,
           ratingAccuracy: review.ratingAccuracy,
           ratingLogistics: review.ratingLogistics,
@@ -910,7 +965,10 @@ async function main() {
           ratingCommunication: review.ratingCommunication,
           highlights: review.highlights,
           body: review.body,
-          publishedAt: review.publishedAt,
+          images: [], // Empty for now, can add sample images later
+          isApproved: true, // Approve seed reviews by default
+          createdAt: review.publishedAt,
+          approvedAt: review.publishedAt,
         })),
       });
     }
