@@ -53,12 +53,12 @@ function HeroSection() {
         <div className="relative inline-block w-full">
           <div className="absolute left-1/2 top-1/2 -z-10 h-48 w-[90%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-blue-100 via-blue-200 to-blue-100 opacity-60 blur-2xl sm:w-[85%] md:h-56 md:w-[80%]" />
           <h1 className="relative text-center text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
-            Rentals. Loads. Suppliers. Reviews.
+            Find Trusted Wholesale Liquidation Suppliers Near You
           </h1>
         </div>
 
         <p className="mx-auto mt-4 max-w-3xl text-center text-base leading-7 text-slate-700 sm:text-lg">
-          Find vetted liquidation suppliers and source pallets or truckloads with confidence.
+          Discover trusted wholesale suppliers offering truckloads and pallets in your area.
         </p>
 
         {/* Search */}

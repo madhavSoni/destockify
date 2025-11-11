@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { DM_Sans } from 'next/font/google';
 import { Providers } from '@/components/providers';
+import { SiteHeader } from '@/components/site-header';
 import './globals.css';
 
 const dmSans = DM_Sans({
@@ -44,46 +45,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Providers>
       </body>
     </html>
-  );
-}
-
-function SiteHeader() {
-  return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-xl font-extrabold tracking-tight text-slate-900"
-        >
-          <span className="sr-only">Destockify</span>
-          <span aria-hidden className="select-none">
-            <span className="font-extrabold">Destock</span>
-            <span className="font-extrabold text-blue-600">ify</span>
-          </span>
-        </Link>
-
-        {/* Nav (Zillow-like typography & hover) */}
-        <nav className="flex items-center gap-7 text-[15px] font-medium tracking-tight" aria-label="Primary">
-          <Link className="text-slate-800 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm px-1 py-0.5" href="/suppliers">
-            Buyers
-          </Link>
-          <Link className="text-slate-800 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm px-1 py-0.5" href="/list-your-business">
-            Sellers
-          </Link>
-          <Link className="text-slate-800 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm px-1 py-0.5" href="/login">
-            Login
-          </Link>
-
-          <Link
-            href="/list-your-business"
-            className="ml-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-          >
-            List your Business
-          </Link>
-        </nav>
-      </div>
-    </header>
   );
 }
 

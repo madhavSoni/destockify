@@ -2,11 +2,8 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Patrick_Hand } from 'next/font/google';
 import { useState, Suspense } from 'react';
 import { api } from '@/lib/api';
-
-const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -21,7 +18,7 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-start justify-center px-4 pt-12 pb-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <div className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-[6px_7px_0_0_rgba(2,6,23,0.85)] p-8 sm:p-10 animate-in fade-in duration-500">
             <div className="text-center">
@@ -30,15 +27,15 @@ function ResetPasswordForm() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <h1 className={`${hand.className} text-3xl sm:text-4xl text-slate-900 mb-3`}>
+              <h1 className="font-black text-3xl sm:text-4xl text-slate-900 mb-3">
                 Invalid Reset Link
               </h1>
-              <p className={`${hand.className} text-base text-slate-600 mb-6`}>
+              <p className="font-medium text-base text-slate-600 mb-6">
                 This password reset link is invalid or has expired.
               </p>
               <Link
                 href="/forgot-password"
-                className={`${hand.className} inline-block px-6 py-3 rounded-2xl bg-[#2f6feb] text-white text-base font-semibold shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200`}
+                className="font-bold inline-block px-6 py-3 rounded-2xl bg-[#2f6feb] text-white text-base shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200"
               >
                 Request New Link
               </Link>
@@ -87,7 +84,7 @@ function ResetPasswordForm() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-start justify-center px-4 pt-12 pb-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <div className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-[6px_7px_0_0_rgba(2,6,23,0.85)] p-8 sm:p-10 animate-in fade-in duration-500">
             <div className="text-center">
@@ -96,15 +93,15 @@ function ResetPasswordForm() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h1 className={`${hand.className} text-3xl sm:text-4xl text-slate-900 mb-3`}>
+              <h1 className="font-black text-3xl sm:text-4xl text-slate-900 mb-3">
                 Password Reset Successful!
               </h1>
-              <p className={`${hand.className} text-base text-slate-600 mb-6`}>
+              <p className="font-medium text-base text-slate-600 mb-6">
                 Your password has been successfully reset. You can now sign in with your new password.
               </p>
               <Link
                 href="/login"
-                className={`${hand.className} inline-block px-6 py-3 rounded-2xl bg-[#2f6feb] text-white text-base font-semibold shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200`}
+                className="font-bold inline-block px-6 py-3 rounded-2xl bg-[#2f6feb] text-white text-base shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200"
               >
                 Go to Login
               </Link>
@@ -116,21 +113,21 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-start justify-center px-4 pt-12 pb-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-[6px_7px_0_0_rgba(2,6,23,0.85)] p-8 sm:p-10 animate-in fade-in duration-500">
           <div className="text-center mb-6">
-            <h1 className={`${hand.className} text-4xl sm:text-5xl text-slate-900 mb-1`}>
+            <h1 className="font-black text-4xl sm:text-5xl text-slate-900 mb-1">
               Reset Password
             </h1>
-            <p className={`${hand.className} text-base text-slate-600`}>
+            <p className="font-medium text-base text-slate-600">
               Enter your new password below
             </p>
           </div>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="password" className={`${hand.className} block text-base text-slate-900 mb-1.5 font-semibold`}>
+              <label htmlFor="password" className="block text-sm font-bold text-slate-900 mb-1.5">
                 New Password
               </label>
               <div className="relative">
@@ -139,12 +136,13 @@ function ResetPasswordForm() {
                   id="password"
                   name="password"
                   placeholder="Enter new password"
-                  className={`w-full h-12 px-4 pr-12 rounded-2xl border-2 ${errors.password ? 'border-red-500' : 'border-slate-300'} bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm`}
+                  className={`w-full h-14 px-4 pr-12 rounded-2xl border-2 ${errors.password ? 'border-red-500' : 'border-slate-900/80'} bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-600 transition-all duration-200 shadow-sm`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none focus:text-slate-600 transition-colors p-1"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,12 +157,14 @@ function ResetPasswordForm() {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <div className="mt-2 rounded-xl bg-red-50 border-2 border-red-200 p-3">
+                  <p className="text-sm font-medium text-red-600">{errors.password}</p>
+                </div>
               )}
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className={`${hand.className} block text-base text-slate-900 mb-1.5 font-semibold`}>
+              <label htmlFor="confirmPassword" className="block text-sm font-bold text-slate-900 mb-1.5">
                 Confirm New Password
               </label>
               <div className="relative">
@@ -173,12 +173,13 @@ function ResetPasswordForm() {
                   id="confirmPassword"
                   name="confirmPassword"
                   placeholder="Confirm new password"
-                  className={`w-full h-12 px-4 pr-12 rounded-2xl border-2 ${errors.confirmPassword ? 'border-red-500' : 'border-slate-300'} bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm`}
+                  className={`w-full h-14 px-4 pr-12 rounded-2xl border-2 ${errors.confirmPassword ? 'border-red-500' : 'border-slate-900/80'} bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-600 transition-all duration-200 shadow-sm`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none focus:text-slate-600 transition-colors p-1"
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                 >
                   {showConfirmPassword ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,28 +194,32 @@ function ResetPasswordForm() {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+                <div className="mt-2 rounded-xl bg-red-50 border-2 border-red-200 p-3">
+                  <p className="text-sm font-medium text-red-600">{errors.confirmPassword}</p>
+                </div>
               )}
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className={`${hand.className} w-full h-14 rounded-2xl bg-[#2f6feb] text-white text-lg font-semibold shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0`}
+              className="font-bold w-full h-14 rounded-2xl bg-[#2f6feb] text-white text-lg shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
               {isLoading ? 'Resetting...' : 'Reset Password'}
             </button>
 
             {errors.general && (
-              <p className="mt-3 text-sm text-red-600 text-center">{errors.general}</p>
+              <div className="mt-3 rounded-xl bg-red-50 border-2 border-red-200 p-3">
+                <p className="text-sm font-medium text-red-600 text-center">{errors.general}</p>
+              </div>
             )}
           </form>
 
-          <div className={`${hand.className} text-center mt-5 text-base text-slate-600`}>
+          <div className="font-medium text-center mt-5 text-base text-slate-600">
             Remember your password?{' '}
             <Link
               href="/login"
-              className="text-blue-600 hover:text-blue-700 font-semibold hover:underline underline-offset-2 transition-colors"
+              className="text-blue-600 hover:text-blue-700 font-bold hover:underline underline-offset-2 transition-colors"
             >
               Back to login
             </Link>
@@ -228,8 +233,8 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-slate-600">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
+        <div className="font-medium text-slate-600">Loading...</div>
       </div>
     }>
       <ResetPasswordForm />

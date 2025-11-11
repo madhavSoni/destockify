@@ -2,11 +2,8 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Patrick_Hand } from 'next/font/google';
 import { useState, useEffect, Suspense } from 'react';
 import { api } from '@/lib/api';
-
-const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
@@ -38,17 +35,17 @@ function VerifyEmailContent() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-start justify-center px-4 pt-12 pb-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <div className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-[6px_7px_0_0_rgba(2,6,23,0.85)] p-8 sm:p-10 animate-in fade-in duration-500">
             <div className="text-center">
               <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 border-2 border-slate-900/80">
                 <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
               </div>
-              <h1 className={`${hand.className} text-3xl sm:text-4xl text-slate-900 mb-3`}>
+              <h1 className="font-black text-3xl sm:text-4xl text-slate-900 mb-3">
                 Verifying Email...
               </h1>
-              <p className={`${hand.className} text-base text-slate-600`}>
+              <p className="font-medium text-base text-slate-600">
                 Please wait while we verify your email address
               </p>
             </div>
@@ -60,7 +57,7 @@ function VerifyEmailContent() {
 
   if (status === 'success') {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-start justify-center px-4 pt-12 pb-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <div className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-[6px_7px_0_0_rgba(2,6,23,0.85)] p-8 sm:p-10 animate-in fade-in duration-500">
             <div className="text-center">
@@ -69,15 +66,15 @@ function VerifyEmailContent() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h1 className={`${hand.className} text-3xl sm:text-4xl text-slate-900 mb-3`}>
+              <h1 className="font-black text-3xl sm:text-4xl text-slate-900 mb-3">
                 Email Verified!
               </h1>
-              <p className={`${hand.className} text-base text-slate-600 mb-6`}>
+              <p className="font-medium text-base text-slate-600 mb-6">
                 Your email has been successfully verified. You can now sign in to your account.
               </p>
               <Link
                 href="/login"
-                className={`${hand.className} inline-block px-6 py-3 rounded-2xl bg-[#2f6feb] text-white text-base font-semibold shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200`}
+                className="font-bold inline-block px-6 py-3 rounded-2xl bg-[#2f6feb] text-white text-base shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200"
               >
                 Go to Login
               </Link>
@@ -89,7 +86,7 @@ function VerifyEmailContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-start justify-center px-4 pt-12 pb-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-[6px_7px_0_0_rgba(2,6,23,0.85)] p-8 sm:p-10 animate-in fade-in duration-500">
           <div className="text-center">
@@ -98,22 +95,22 @@ function VerifyEmailContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-            <h1 className={`${hand.className} text-3xl sm:text-4xl text-slate-900 mb-3`}>
+            <h1 className="font-black text-3xl sm:text-4xl text-slate-900 mb-3">
               Verification Failed
             </h1>
-            <p className={`${hand.className} text-base text-slate-600 mb-6`}>
+            <p className="font-medium text-base text-slate-600 mb-6">
               {message}
             </p>
             <div className="space-y-3">
               <Link
                 href="/signup"
-                className={`${hand.className} inline-block px-6 py-3 rounded-2xl bg-[#2f6feb] text-white text-base font-semibold shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200`}
+                className="font-bold inline-block px-6 py-3 rounded-2xl bg-[#2f6feb] text-white text-base shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200"
               >
                 Sign Up Again
               </Link>
-              <div className={`${hand.className} text-sm text-slate-600`}>
+              <div className="font-medium text-sm text-slate-600">
                 or{' '}
-                <Link href="/login" className="text-blue-600 hover:text-blue-700 font-semibold hover:underline underline-offset-2">
+                <Link href="/login" className="text-blue-600 hover:text-blue-700 font-bold hover:underline underline-offset-2">
                   Go to Login
                 </Link>
               </div>
@@ -128,8 +125,8 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-slate-600">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
+        <div className="font-medium text-slate-600">Loading...</div>
       </div>
     }>
       <VerifyEmailContent />
