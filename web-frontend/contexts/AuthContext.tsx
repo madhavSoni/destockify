@@ -76,18 +76,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isVerified: response.isVerified || false,
     };
 
-    setAuthToken(response.authToken);
-    setUser(userData);
-
+    // Only save to localStorage, don't update state
+    // This prevents the navbar from updating before navigation
     localStorage.setItem('authToken', response.authToken);
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const logout = () => {
-    setUser(null);
-    setAuthToken(null);
+    // Only clear localStorage, don't update state
+    // This prevents the navbar from updating before reload
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
+    
+    // Refresh the current page to show logged out state
+    window.location.reload();
   };
 
   const refreshUser = async () => {

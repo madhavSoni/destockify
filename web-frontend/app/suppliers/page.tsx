@@ -42,11 +42,11 @@ export default async function SuppliersPage({
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <div className="mb-8 rounded-3xl border-2 border-slate-900/80 bg-gradient-to-br from-blue-500 to-blue-600 p-8 sm:p-12">
-          <h1 className="font-black text-3xl sm:text-4xl lg:text-5xl text-white mb-4">
+        <div className="mb-8 rounded-lg border border-slate-200 bg-gradient-to-br from-blue-500 to-blue-600 p-8 sm:p-12">
+          <h1 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-white mb-4">
             Find Trusted Suppliers Near You
           </h1>
-          <p className="font-medium text-lg text-blue-50 max-w-3xl">
+          <p className="font-normal text-lg text-blue-50 max-w-3xl">
             Browse hundreds of verified liquidators and wholesalers across the United States. Connect with suppliers offering returned, overstock, and brand new merchandise.
           </p>
         </div>
@@ -55,8 +55,8 @@ export default async function SuppliersPage({
         <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
           {/* Sidebar Filters */}
           <aside className="space-y-6">
-            <div className="rounded-2xl border-2 border-slate-900/80 bg-white p-6">
-              <h3 className="font-black text-xl text-slate-900 mb-4">Filter by State</h3>
+            <div className="rounded-lg border border-slate-200 bg-white p-6">
+              <h3 className="font-semibold text-lg text-slate-900 mb-4">Filter by State</h3>
               
               <form method="get" className="space-y-4">
                 <input type="hidden" name="search" defaultValue={filters.search} />
@@ -66,32 +66,32 @@ export default async function SuppliersPage({
                   {regions.map((r) => (
                     <label
                       key={r.slug}
-                      className="flex items-center gap-3 p-2 rounded-xl hover:bg-blue-50 cursor-pointer transition-colors group"
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors group"
                     >
                       <input
                         type="radio"
                         name="region"
                         value={r.slug}
                         defaultChecked={filters.region === r.slug}
-                        className="h-5 w-5 rounded border-2 border-slate-900/80 text-blue-600 focus:ring-4 focus:ring-blue-200 cursor-pointer"
+                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                       />
-                      <span className="font-medium text-sm text-slate-900 group-hover:text-blue-600">
+                      <span className="font-normal text-sm text-slate-700 group-hover:text-blue-600">
                         {r.name}
                       </span>
                     </label>
                   ))}
                 </div>
 
-                <div className="pt-4 border-t-2 border-slate-200 flex flex-col gap-2">
+                <div className="pt-4 border-t border-slate-200 flex flex-col gap-2">
                   <button
                     type="submit"
-                    className="w-full font-bold rounded-xl bg-blue-600 px-4 py-3 text-white ring-2 ring-slate-900/80 hover:translate-y-[-1px] hover:bg-blue-700 active:translate-y-0 transition-all duration-200"
+                    className="w-full font-semibold rounded-lg bg-blue-600 px-4 py-2.5 text-white hover:bg-blue-700 transition-colors duration-200"
                   >
                     Apply Filter
                   </button>
                   <Link
                     href="/suppliers"
-                    className="w-full text-center font-medium text-sm text-slate-600 hover:text-slate-900 py-2 hover:underline underline-offset-2"
+                    className="w-full text-center font-normal text-sm text-slate-600 hover:text-slate-900 py-2 hover:underline underline-offset-2"
                   >
                     Clear Filter
                   </Link>
@@ -118,14 +118,14 @@ export default async function SuppliersPage({
                 <Link
                   key={s.slug}
                   href={`/suppliers/${s.slug}`}
-                  className="group block overflow-hidden rounded-2xl border-2 border-slate-900/80 bg-white hover:translate-y-[-1px] transition-all duration-200"
+                  className="group block overflow-hidden rounded-lg border border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm transition-all duration-200"
                 >
                   {/* Header with gradient */}
-                  <div className="relative h-32 bg-gradient-to-br from-blue-400 to-blue-500 border-b-2 border-slate-900/80">
+                  <div className="relative h-32 bg-gradient-to-br from-blue-50 to-blue-100 border-b border-slate-200">
                     {/* Company Name Badge */}
                     <div className="absolute inset-0 flex items-center justify-center p-4">
-                      <div className="bg-white rounded-xl px-6 py-3 border-2 border-slate-900/80 max-w-full">
-                        <div className="font-black text-base text-slate-900 text-center truncate">
+                      <div className="bg-white rounded-lg px-5 py-2.5 border border-slate-200 max-w-full">
+                        <div className="font-semibold text-base text-slate-900 text-center truncate">
                           {s.name}
                         </div>
                       </div>
@@ -134,7 +134,7 @@ export default async function SuppliersPage({
                     {/* Verified Badge */}
                     {s.averageRating && s.averageRating >= 4 && (
                       <div className="absolute top-3 right-3">
-                        <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold border-2 border-slate-900/80">
+                        <div className="bg-green-500 text-white px-2.5 py-1 rounded-full text-xs font-medium border border-green-600">
                           ✓ Verified
                         </div>
                       </div>
