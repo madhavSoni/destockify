@@ -9,6 +9,7 @@ type User = {
   lastName: string;
   email: string;
   isVerified: boolean;
+  createdAt: string;
 };
 
 type AuthContextType = {
@@ -74,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       lastName: response.lastName,
       email: response.email,
       isVerified: response.isVerified || false,
+      createdAt: response.createdAt || new Date().toISOString(),
     };
 
     // Only save to localStorage, don't update state

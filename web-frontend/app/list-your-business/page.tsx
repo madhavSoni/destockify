@@ -3,7 +3,7 @@ import { SectionHeading } from '@/components/section-heading';
 
 export default function ListYourBusinessPage() {
   return (
-    <div className="bg-slate-50">
+    <div className="bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="For Suppliers"
@@ -12,7 +12,7 @@ export default function ListYourBusinessPage() {
           align="center"
         />
 
-        <div className="mt-8 space-y-6 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="mt-8 space-y-6 rounded-lg border border-slate-200 bg-white p-8">
           <div className="space-y-2 text-sm text-slate-600">
             <p>Destockify reviews every supplier application for:</p>
             <ul className="list-inside list-disc space-y-1">
@@ -23,22 +23,20 @@ export default function ListYourBusinessPage() {
             </ul>
           </div>
 
-          <a
-            href="https://forms.gle/your-destockify-supplier-form"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
+          <Link
+            href="/submit-listing"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
           >
             Start supplier application →
-          </a>
+          </Link>
 
           <p className="text-xs text-slate-500">
-            Prefer a conversation first? Email <a className="underline" href="mailto:suppliers@destockify.com">suppliers@destockify.com</a> with your company details and our marketplace team will schedule a 30 minute call.
+            Prefer a conversation first? Email <a className="underline hover:text-blue-600" href="mailto:suppliers@destockify.com">suppliers@destockify.com</a> with your company details and our marketplace team will schedule a 30 minute call.
           </p>
         </div>
 
-        <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-600 shadow-sm">
-          Already listed? <Link href="/contact" className="underline">Contact the Destockify team</Link> to update your profile, promote upcoming loads, or share buyer wins.
+        <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6 text-sm text-slate-600">
+          Already listed? <Link href="/contact" className="underline hover:text-blue-600">Contact the Destockify team</Link> to update your profile, promote upcoming loads, or share buyer wins.
         </div>
       </div>
     </div>

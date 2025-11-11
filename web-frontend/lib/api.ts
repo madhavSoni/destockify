@@ -285,6 +285,7 @@ export type AuthResponse = {
   lastName: string;
   email: string;
   isVerified?: boolean;
+  createdAt?: string;
   authToken?: string;
   verificationToken?: string;
 };
@@ -360,6 +361,93 @@ export type MyReviewsResponse = ReviewResponse[];
 export type ReviewActionResponse = {
   message: string;
   review?: ReviewResponse;
+};
+
+// Submission types
+export type CreateSubmissionPayload = {
+  companyName: string;
+  companyAddress: string;
+  contactEmail: string;
+  contactPhone?: string;
+  website?: string;
+  description: string;
+  logoUrl?: string;
+  bannerUrl?: string;
+  hoursOfOperation?: {
+    monday?: { open: string; close: string };
+    tuesday?: { open: string; close: string };
+    wednesday?: { open: string; close: string };
+    thursday?: { open: string; close: string };
+    friday?: { open: string; close: string };
+    saturday?: { open: string; close: string };
+    sunday?: { open: string; close: string };
+  };
+  socialMedia?: {
+    instagram?: string;
+    facebook?: string;
+    tiktok?: string;
+    twitter?: string;
+    youtube?: string;
+    other?: string;
+  };
+  ownershipDocuments?: string[];
+  notes?: string;
+};
+
+export type UpdateSubmissionPayload = Partial<CreateSubmissionPayload>;
+
+export type SubmissionResponse = {
+  id: number;
+  customerId: number;
+  companyName: string;
+  companyAddress: string;
+  contactEmail: string;
+  contactPhone?: string | null;
+  website?: string | null;
+  description: string;
+  logoUrl?: string | null;
+  bannerUrl?: string | null;
+  hoursOfOperation?: any;
+  socialMedia?: any;
+  ownershipDocuments: string[];
+  notes?: string | null;
+  status: string;
+  adminNotes?: string | null;
+  reviewedBy?: number | null;
+  reviewedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  customer: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+};
+
+export type MySubmissionsResponse = SubmissionResponse[];
+
+export type AllSubmissionsResponse = {
+  submissions: SubmissionResponse[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export type ApproveSubmissionResponse = {
+  submission: SubmissionResponse;
+  supplier: {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string | null;
+    website?: string | null;
+    phone?: string | null;
+    email?: string | null;
+    logoImage?: string | null;
+    heroImage?: string | null;
+  };
 };
 
 export const api = {
@@ -476,6 +564,87 @@ export const api = {
     // Admin: Delete any review permanently
     adminDelete: (reviewId: number) =>
       fetchFromApi<ReviewActionResponse>(`/reviews/${reviewId}/admin`, {
+        method: 'DELETE',
+        cache: 'no-store',
+      }),
+  },
+  submissions: {
+    // Customer: Create a new submission
+    create: (payload: CreateSubmissionPayload, token: string) =>
+      fetchFromApi<SubmissionResponse>('/submissions', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Customer: Get all my submissions
+    getMySubmissions: (token: string) =>
+      fetchFromApi<MySubmissionsResponse>('/submissions/my-submissions', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Customer: Get single submission by ID
+    getById: (id: number, token: string) =>
+      fetchFromApi<SubmissionResponse>(`/submissions/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Customer: Update my submission
+    update: (id: number, payload: UpdateSubmissionPayload, token: string) =>
+      fetchFromApi<SubmissionResponse>(`/submissions/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Customer: Delete my submission
+    delete: (id: number, token: string) =>
+      fetchFromApi<{ message: string }>(`/submissions/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Get all submissions with filters
+    getAllAdmin: (status?: string, page?: number, limit?: number) => {
+      const params = new URLSearchParams();
+      if (status) params.append('status', status);
+      if (page) params.append('page', page.toString());
+      if (limit) params.append('limit', limit.toString());
+      
+      return fetchFromApi<AllSubmissionsResponse>(
+        `/submissions/admin/all?${params.toString()}`,
+        {
+          cache: 'no-store',
+        }
+      );
+    },
+    // Admin: Approve submission
+    approve: (id: number, adminNotes?: string) =>
+      fetchFromApi<ApproveSubmissionResponse>(`/submissions/${id}/approve`, {
+        method: 'POST',
+        body: JSON.stringify({ adminNotes }),
+        cache: 'no-store',
+      }),
+    // Admin: Reject submission
+    reject: (id: number, adminNotes: string) =>
+      fetchFromApi<SubmissionResponse>(`/submissions/${id}/reject`, {
+        method: 'POST',
+        body: JSON.stringify({ adminNotes }),
+        cache: 'no-store',
+      }),
+    // Admin: Delete any submission
+    adminDelete: (id: number) =>
+      fetchFromApi<{ message: string }>(`/submissions/${id}/admin`, {
         method: 'DELETE',
         cache: 'no-store',
       }),

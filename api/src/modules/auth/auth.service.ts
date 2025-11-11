@@ -100,6 +100,7 @@ export async function login(payload: { email: string; password: string }) {
     lastName: customer.lastName,
     email: customer.email,
     isVerified: customer.isVerified,
+    createdAt: customer.createdAt.toISOString(),
     authToken,
   };
 }
