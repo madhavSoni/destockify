@@ -1,6 +1,7 @@
+// app/layout.tsx
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { DM_Sans, Patrick_Hand } from 'next/font/google';
+import { DM_Sans } from 'next/font/google';
 import './globals.css';
 
 const dmSans = DM_Sans({
@@ -8,16 +9,6 @@ const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
 });
-
-const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
-
-const NAV_LINKS = [
-  { href: '/suppliers', label: 'Suppliers' },
-  { href: '/categories', label: 'Categories' },
-  { href: '/locations', label: 'Locations' },
-  { href: '/lot-sizes', label: 'Lot sizes' },
-  { href: '/guides', label: 'Guides' },
-];
 
 export const metadata: Metadata = {
   title: 'Destockify | Wholesale Liquidation Supplier Directory',
@@ -55,39 +46,35 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 function SiteHeader() {
   return (
-    <header className="border-b border-slate-200 bg-white">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        {/* Left: logo (unchanged) */}
+    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Logo */}
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900"
+          className="inline-flex items-center gap-2 text-xl font-extrabold tracking-tight text-slate-900"
         >
-          {/* If you have a real svg logo, drop it here */}
           <span className="sr-only">Destockify</span>
           <span aria-hidden className="select-none">
-            <span className="font-black">Destock</span>
-            <span className="font-black text-[#3b82f6]">ify</span>
+            <span className="font-extrabold">Destock</span>
+            <span className="font-extrabold text-blue-600">ify</span>
           </span>
         </Link>
 
-        {/* Right: handwritten nav */}
-        <nav
-          className={`${hand.className} flex items-center gap-6 text-lg text-slate-900`}
-          aria-label="Primary"
-        >
-          <Link href="/suppliers" className="hover:opacity-80">
+        {/* Nav (Zillow-like typography & hover) */}
+        <nav className="flex items-center gap-7 text-[15px] font-medium tracking-tight" aria-label="Primary">
+          <Link className="text-slate-800 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm px-1 py-0.5" href="/suppliers">
             Buyers
           </Link>
-          <Link href="/list-your-business" className="hover:opacity-80">
+          <Link className="text-slate-800 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm px-1 py-0.5" href="/list-your-business">
             Sellers
           </Link>
-          <Link href="/login" className="hover:opacity-80">
+          <Link className="text-slate-800 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm px-1 py-0.5" href="/login">
             Login
           </Link>
 
           <Link
             href="/list-your-business"
-            className="rounded-full bg-[#2f6feb] px-4 py-2 text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-1px] hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] transition"
+            className="ml-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             List your Business
           </Link>
@@ -101,57 +88,39 @@ function SiteFooter() {
   return (
     <footer className="border-t border-slate-200 bg-white">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-12 sm:px-6 lg:flex-row lg:items-start lg:justify-between lg:px-8">
-        <div className="max-w-md space-y-4">
+        <div className="max-w-md space-y-3">
           <Link href="/" className="text-lg font-semibold text-slate-900">
             Destockify
           </Link>
-          <p className="text-sm text-slate-600">
-            Your guide to trusted liquidation and wholesale pallet suppliers. We verify sourcing, highlight buyer
-            wins, and help you scale without surprises.
+          <p className="text-sm leading-6 text-slate-600">
+            Your guide to trusted liquidation and wholesale pallet suppliers. We verify sourcing, highlight buyer wins,
+            and help you scale without surprises.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-8 text-sm text-slate-600 sm:grid-cols-3">
+
+        <div className="grid grid-cols-2 gap-10 text-sm text-slate-700 sm:grid-cols-3">
           <div className="space-y-2">
             <p className="font-semibold text-slate-900">Marketplace</p>
-            <Link href="/suppliers" className="block hover:text-slate-900">
-              Supplier directory
-            </Link>
-            <Link href="/categories" className="block hover:text-slate-900">
-              Categories
-            </Link>
-            <Link href="/locations" className="block hover:text-slate-900">
-              Locations
-            </Link>
-            <Link href="/lot-sizes" className="block hover:text-slate-900">
-              Lot sizes
-            </Link>
+            <Link href="/suppliers" className="block hover:text-blue-700">Supplier directory</Link>
+            <Link href="/categories" className="block hover:text-blue-700">Categories</Link>
+            <Link href="/locations" className="block hover:text-blue-700">Locations</Link>
+            <Link href="/lot-sizes" className="block hover:text-blue-700">Lot sizes</Link>
           </div>
           <div className="space-y-2">
             <p className="font-semibold text-slate-900">Resources</p>
-            <Link href="/guides" className="block hover:text-slate-900">
-              Buyer guides
-            </Link>
-            <Link href="/suppliers?search=export" className="block hover:text-slate-900">
-              Export programs
-            </Link>
-            <Link href="/suppliers?search=contract" className="block hover:text-slate-900">
-              Contract loads
-            </Link>
+            <Link href="/guides" className="block hover:text-blue-700">Buyer guides</Link>
+            <Link href="/suppliers?search=export" className="block hover:text-blue-700">Export programs</Link>
+            <Link href="/suppliers?search=contract" className="block hover:text-blue-700">Contract loads</Link>
           </div>
           <div className="space-y-2">
             <p className="font-semibold text-slate-900">Company</p>
-            <Link href="/list-your-business" className="block hover:text-slate-900">
-              Become a partner
-            </Link>
-            <Link href="/contact" className="block hover:text-slate-900">
-              Contact
-            </Link>
-            <Link href="/privacy" className="block hover:text-slate-900">
-              Privacy
-            </Link>
+            <Link href="/list-your-business" className="block hover:text-blue-700">Become a partner</Link>
+            <Link href="/contact" className="block hover:text-blue-700">Contact</Link>
+            <Link href="/privacy" className="block hover:text-blue-700">Privacy</Link>
           </div>
         </div>
       </div>
+
       <div className="border-t border-slate-100 py-4 text-center text-xs text-slate-500">
         © {new Date().getFullYear()} Destockify. Built for liquidation buyers.
       </div>
