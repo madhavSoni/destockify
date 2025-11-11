@@ -61,7 +61,7 @@ export function TrendingSuppliersRail({
               key={s.slug}
               href={`/suppliers/${s.slug}`}
               data-card
-              className={`group relative w-[320px] shrink-0 snap-start overflow-hidden rounded-2xl border-2 border-slate-900/80 bg-white shadow-sm transition-all duration-200 hover:shadow-md hover:translate-y-[-1px] ${
+              className={`group relative w-[320px] shrink-0 snap-start overflow-hidden rounded-2xl border-2 border-slate-900/80 bg-white transition-all duration-200 hover:translate-y-[-1px] ${
                 i === suppliers.slice(0, 8).length - 1 ? 'mr-16' : ''
               }`}
             >
@@ -69,7 +69,7 @@ export function TrendingSuppliersRail({
               <div className="relative h-32 bg-gradient-to-br from-blue-400 to-blue-500 border-b-2 border-slate-900/80">
                 {/* Company Name Badge */}
                 <div className="absolute inset-0 flex items-center justify-center p-4">
-                  <div className="bg-white rounded-xl px-6 py-3 shadow-lg border-2 border-slate-900/80 max-w-full">
+                  <div className="bg-white rounded-xl px-6 py-3 border-2 border-slate-900/80 max-w-full">
                     <div className="font-black text-base text-slate-900 text-center truncate">
                       {s.name}
                     </div>

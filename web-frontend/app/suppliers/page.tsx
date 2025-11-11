@@ -42,7 +42,7 @@ export default async function SuppliersPage({
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <div className="mb-8 rounded-3xl border-2 border-slate-900/80 bg-gradient-to-br from-blue-500 to-blue-600 p-8 sm:p-12 shadow-[6px_7px_0_0_rgba(2,6,23,0.85)]">
+        <div className="mb-8 rounded-3xl border-2 border-slate-900/80 bg-gradient-to-br from-blue-500 to-blue-600 p-8 sm:p-12">
           <h1 className="font-black text-3xl sm:text-4xl lg:text-5xl text-white mb-4">
             Find Trusted Suppliers Near You
           </h1>
@@ -55,7 +55,7 @@ export default async function SuppliersPage({
         <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
           {/* Sidebar Filters */}
           <aside className="space-y-6">
-            <div className="rounded-2xl border-2 border-slate-900/80 bg-white p-6 shadow-[4px_5px_0_0_rgba(2,6,23,0.85)]">
+            <div className="rounded-2xl border-2 border-slate-900/80 bg-white p-6">
               <h3 className="font-black text-xl text-slate-900 mb-4">Filter by State</h3>
               
               <form method="get" className="space-y-4">
@@ -85,7 +85,7 @@ export default async function SuppliersPage({
                 <div className="pt-4 border-t-2 border-slate-200 flex flex-col gap-2">
                   <button
                     type="submit"
-                    className="w-full font-bold rounded-xl bg-blue-600 px-4 py-3 text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] hover:bg-blue-700 active:translate-y-0 transition-all duration-200"
+                    className="w-full font-bold rounded-xl bg-blue-600 px-4 py-3 text-white ring-2 ring-slate-900/80 hover:translate-y-[-1px] hover:bg-blue-700 active:translate-y-0 transition-all duration-200"
                   >
                     Apply Filter
                   </button>
@@ -118,13 +118,13 @@ export default async function SuppliersPage({
                 <Link
                   key={s.slug}
                   href={`/suppliers/${s.slug}`}
-                  className="group block overflow-hidden rounded-2xl border-2 border-slate-900/80 bg-white shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:translate-y-[-2px] transition-all duration-200"
+                  className="group block overflow-hidden rounded-2xl border-2 border-slate-900/80 bg-white hover:translate-y-[-1px] transition-all duration-200"
                 >
                   {/* Header with gradient */}
                   <div className="relative h-32 bg-gradient-to-br from-blue-400 to-blue-500 border-b-2 border-slate-900/80">
                     {/* Company Name Badge */}
                     <div className="absolute inset-0 flex items-center justify-center p-4">
-                      <div className="bg-white rounded-xl px-6 py-3 shadow-lg border-2 border-slate-900/80 max-w-full">
+                      <div className="bg-white rounded-xl px-6 py-3 border-2 border-slate-900/80 max-w-full">
                         <div className="font-black text-base text-slate-900 text-center truncate">
                           {s.name}
                         </div>
@@ -134,7 +134,7 @@ export default async function SuppliersPage({
                     {/* Verified Badge */}
                     {s.averageRating && s.averageRating >= 4 && (
                       <div className="absolute top-3 right-3">
-                        <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold border-2 border-slate-900/80 shadow-sm">
+                        <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold border-2 border-slate-900/80">
                           ✓ Verified
                         </div>
                       </div>

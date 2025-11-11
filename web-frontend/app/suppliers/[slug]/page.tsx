@@ -63,7 +63,7 @@ function SupplierHeader({
   const count = reviewSummary.count ?? 0;
 
   return (
-    <section className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-[6px_7px_0_0_rgba(2,6,23,0.85)] overflow-hidden">
+    <section className="rounded-3xl border-2 border-slate-900/80 bg-white overflow-hidden">
       {/* Hero Image */}
       {supplier.heroImage && (
         <div className="relative h-56 w-full border-b-2 border-slate-900/80">
@@ -75,7 +75,7 @@ function SupplierHeader({
         {/* Logo and Name */}
         <div className="flex items-start gap-6">
           {supplier.logoImage && (
-            <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl border-2 border-slate-900/80 bg-white shadow-lg">
+            <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl border-2 border-slate-900/80 bg-white">
               <Image src={supplier.logoImage} alt="" fill className="object-contain p-3" />
             </div>
           )}
@@ -128,7 +128,7 @@ function SupplierHeader({
                 href={supplier.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl border-2 border-slate-900/80 bg-white px-5 py-3 font-bold text-slate-900 shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] hover:translate-y-[-2px] hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] transition-all duration-200"
+                className="inline-flex items-center gap-2 rounded-xl border-2 border-slate-900/80 bg-white px-5 py-3 font-bold text-slate-900 hover:translate-y-[-1px] transition-all duration-200"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
@@ -139,7 +139,7 @@ function SupplierHeader({
             {supplier.phone && (
               <a
                 href={`tel:${supplier.phone}`}
-                className="inline-flex items-center gap-2 rounded-xl border-2 border-slate-900/80 bg-blue-600 px-5 py-3 font-bold text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] hover:translate-y-[-2px] hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] hover:bg-blue-700 transition-all duration-200"
+                className="inline-flex items-center gap-2 rounded-xl border-2 border-slate-900/80 bg-blue-600 px-5 py-3 font-bold text-white hover:translate-y-[-1px] hover:bg-blue-700 transition-all duration-200"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -158,7 +158,7 @@ function SupplierHeader({
 
 function SupplierOverview({ supplier }: { supplier: SupplierDetail['supplier'] }) {
   return (
-    <section className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-lg p-6 sm:p-8">
+    <section className="rounded-3xl border-2 border-slate-900/80 bg-white p-6 sm:p-8">
       <h2 className="font-black text-3xl text-slate-900 mb-6">About</h2>
       
       <div className="space-y-6">
@@ -169,13 +169,13 @@ function SupplierOverview({ supplier }: { supplier: SupplierDetail['supplier'] }
         {/* Key Details Grid */}
         <div className="grid gap-4 sm:grid-cols-2">
           {supplier.minimumOrder && (
-            <div className="rounded-2xl border-2 border-slate-900/80 bg-gradient-to-br from-blue-50 to-blue-100 p-5 shadow-sm">
+            <div className="rounded-2xl border-2 border-slate-900/80 bg-gradient-to-br from-blue-50 to-blue-100 p-5">
               <div className="text-sm font-bold text-blue-600 mb-2">Minimum Order</div>
               <div className="text-2xl font-black text-slate-900">{supplier.minimumOrder}</div>
             </div>
           )}
           {supplier.leadTime && (
-            <div className="rounded-2xl border-2 border-slate-900/80 bg-gradient-to-br from-purple-50 to-purple-100 p-5 shadow-sm">
+            <div className="rounded-2xl border-2 border-slate-900/80 bg-gradient-to-br from-purple-50 to-purple-100 p-5">
               <div className="text-sm font-bold text-purple-600 mb-2">Lead Time</div>
               <div className="text-2xl font-black text-slate-900">{supplier.leadTime}</div>
             </div>
@@ -252,14 +252,14 @@ function SupplierSidebar({ supplier }: { supplier: SupplierDetail['supplier'] })
     <aside className="space-y-6 sticky top-6">
       {/* Categories */}
       {supplier.categories.length > 0 && (
-        <div className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-lg p-6">
+        <div className="rounded-3xl border-2 border-slate-900/80 bg-white p-6">
           <h3 className="font-black text-2xl text-slate-900 mb-5">Categories</h3>
           <div className="space-y-2.5">
             {supplier.categories.map((category) => (
               <Link
                 key={category.slug}
                 href={`/categories/${category.slug}`}
-                className="group block rounded-xl border-2 border-slate-900/80 bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-3.5 text-sm font-bold text-slate-900 hover:from-blue-50 hover:to-blue-100 hover:text-blue-700 hover:border-blue-500 hover:translate-y-[-2px] hover:shadow-md transition-all shadow-sm"
+                className="group block rounded-xl border-2 border-slate-900/80 bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-3.5 text-sm font-bold text-slate-900 hover:from-blue-50 hover:to-blue-100 hover:text-blue-700 hover:border-blue-500 hover:translate-y-[-1px] transition-all"
               >
                 <span className="flex items-center justify-between">
                   {category.name}
@@ -275,13 +275,13 @@ function SupplierSidebar({ supplier }: { supplier: SupplierDetail['supplier'] })
 
       {/* Lot Sizes */}
       {supplier.lotSizes && supplier.lotSizes.length > 0 && (
-        <div className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-lg p-6">
+        <div className="rounded-3xl border-2 border-slate-900/80 bg-white p-6">
           <h3 className="font-black text-2xl text-slate-900 mb-5">Lot Sizes</h3>
           <div className="space-y-2.5">
             {supplier.lotSizes.map((lotSize) => (
               <div
                 key={lotSize.slug}
-                className="flex items-center justify-between rounded-xl border-2 border-slate-900/80 bg-gradient-to-br from-purple-50 to-purple-100 px-4 py-3.5 shadow-sm"
+                className="flex items-center justify-between rounded-xl border-2 border-slate-900/80 bg-gradient-to-br from-purple-50 to-purple-100 px-4 py-3.5"
               >
                 <span className="text-sm font-bold text-purple-900">{lotSize.name}</span>
                 <span className="inline-flex items-center gap-1 rounded-lg bg-green-500 px-2.5 py-1 text-xs font-bold text-white">
@@ -297,7 +297,7 @@ function SupplierSidebar({ supplier }: { supplier: SupplierDetail['supplier'] })
       )}
 
       {/* Contact Card */}
-      <div className="rounded-3xl border-2 border-slate-900/80 bg-gradient-to-br from-blue-600 to-blue-700 p-6 text-white shadow-lg">
+      <div className="rounded-3xl border-2 border-slate-900/80 bg-gradient-to-br from-blue-600 to-blue-700 p-6 text-white">
         <h3 className="font-black text-2xl mb-3">Ready to Order?</h3>
         <p className="text-sm font-medium text-blue-100 mb-5">
           Contact {supplier.name} to discuss your wholesale needs
