@@ -41,7 +41,7 @@ export default async function HomePage() {
 /* --------------------------- HERO --------------------------- */
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden border-b border-slate-200 bg-white">
+    <section className="relative overflow-hidden border-b border-slate-200 bg-blue-600">
       {/* Blue bubbles behind headline */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-1/2 top-10 h-80 w-80 -translate-x-1/2 rounded-full bg-blue-400/25 blur-3xl" />
@@ -51,13 +51,13 @@ function HeroSection() {
 
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <div className="relative inline-block w-full">
-          <div className="absolute left-1/2 top-1/2 -z-10 h-48 w-[90%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-blue-100 via-blue-200 to-blue-100 opacity-60 blur-2xl sm:w-[85%] md:h-56 md:w-[80%]" />
-          <h1 className="relative text-center text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
+          <div className="absolute left-1/2 top-1/2 -z-10 h-48 w-[90%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-blue-400 via-blue-500 to-blue-400 opacity-40 blur-2xl sm:w-[85%] md:h-56 md:w-[80%]" />
+          <h1 className="relative text-center text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
             Find Trusted Wholesale Liquidation Suppliers Near You
           </h1>
         </div>
 
-        <p className="mx-auto mt-4 max-w-3xl text-center text-base leading-7 text-slate-700 sm:text-lg">
+        <p className="mx-auto mt-4 max-w-3xl text-center text-base leading-7 text-blue-50 sm:text-lg">
           Discover trusted wholesale suppliers offering truckloads and pallets in your area.
         </p>
 
@@ -68,12 +68,12 @@ function HeroSection() {
               type="search"
               name="search"
               placeholder="Search suppliers, categories, or keywords"
-              className="h-14 w-full rounded-full border border-slate-300 bg-white pl-14 pr-28 text-base text-slate-900 shadow-md placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20"
+              className="h-14 w-full rounded-full border-2 border-white/30 bg-white pl-14 pr-28 text-base text-slate-900 shadow-lg placeholder:text-slate-500 focus:border-white focus:outline-none focus:ring-4 focus:ring-white/30"
             />
             <span className="pointer-events-none absolute inset-y-0 left-5 flex items-center text-slate-500 text-xl">🔍</span>
             <button
               type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/30"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/30"
             >
               Search
             </button>

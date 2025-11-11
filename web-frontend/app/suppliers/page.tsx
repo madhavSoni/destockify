@@ -1,9 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { api } from '@/lib/api';
-import { Patrick_Hand } from 'next/font/google';
-
-const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
 export default async function SuppliersPage({
   searchParams,
@@ -42,175 +39,193 @@ export default async function SuppliersPage({
   if (nextCursor) nextParams.set('cursor', String(nextCursor));
 
   return (
-    <div className="bg-white">
-      <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-        {/* Hero spacer (blue box) */}
-        <div className="mb-6 rounded-[18px] border-2 border-slate-900/80 bg-[#cfe0ff] p-10 shadow-[3px_4px_0_0_rgba(2,6,23,0.85)]" />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+      <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Hero Section */}
+        <div className="mb-8 rounded-3xl border-2 border-slate-900/80 bg-gradient-to-br from-blue-500 to-blue-600 p-8 sm:p-12 shadow-[6px_7px_0_0_rgba(2,6,23,0.85)]">
+          <h1 className="font-black text-3xl sm:text-4xl lg:text-5xl text-white mb-4">
+            Find Trusted Suppliers Near You
+          </h1>
+          <p className="font-medium text-lg text-blue-50 max-w-3xl">
+            Browse hundreds of verified liquidators and wholesalers across the United States. Connect with suppliers offering returned, overstock, and brand new merchandise.
+          </p>
+        </div>
 
-        {/* Title + description */}
-        <h1 className={`${hand.className} text-2xl sm:text-3xl text-slate-900`}>
-          Browse Hundreds of Liquidators, Wholesalers and more Near You
-        </h1>
-        <p className={`${hand.className} mt-2 max-w-3xl text-[15px] leading-6 text-slate-800`}>
-          The largest b2b directory of returned, overstock and brand new merchandise. Browse Hundreds of Liquidators,
-          Wholesalers and more Near You. Browse Hundreds of Liquidators, Wholesalers and more Near You.
-        </p>
-
-        {/* Main grid: Filters + Cards */}
-        <div className="mt-6 grid gap-6 md:grid-cols-[250px_minmax(0,1fr)]">
-          {/* Sidebar filters (hand-drawn look) */}
-          <aside className="space-y-8">
-            <div>
-              <h3 className={`${hand.className} text-xl text-slate-900`}>Filters</h3>
-            </div>
-
-            {/* Supplier Type (visual only) */}
-            <fieldset className="space-y-2">
-              <legend className={`${hand.className} text-lg text-slate-900`}>Supplier Type</legend>
-              <label className={`${hand.className} flex items-center gap-2 text-[15px]`}>
-                <input type="radio" className="h-4 w-4 rounded border-2 border-slate-900/80" name="noop-type" />
-                Liquidation
-              </label>
-              <label className={`${hand.className} flex items-center gap-2 text-[15px]`}>
-                <input type="radio" className="h-4 w-4 rounded border-2 border-slate-900/80" name="noop-type" />
-                Wholesale
-              </label>
-            </fieldset>
-
-            {/* Categories quick grid */}
-            <form method="get" className="space-y-4">
-              <input type="hidden" name="search" defaultValue={filters.search} />
-              <fieldset className="space-y-2">
-                <legend className={`${hand.className} text-lg text-slate-900`}>Top Categories</legend>
-                <div className="grid grid-cols-2 gap-2">
-                  {categories.slice(0, 4).map((c) => (
-                    <label key={c.slug} className={`${hand.className} flex items-center gap-2 text-[14px]`}>
+        {/* Main Grid: Filters + Cards */}
+        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+          {/* Sidebar Filters */}
+          <aside className="space-y-6">
+            <div className="rounded-2xl border-2 border-slate-900/80 bg-white p-6 shadow-[4px_5px_0_0_rgba(2,6,23,0.85)]">
+              <h3 className="font-black text-xl text-slate-900 mb-4">Filter by State</h3>
+              
+              <form method="get" className="space-y-4">
+                <input type="hidden" name="search" defaultValue={filters.search} />
+                
+                {/* States List */}
+                <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                  {regions.map((r) => (
+                    <label
+                      key={r.slug}
+                      className="flex items-center gap-3 p-2 rounded-xl hover:bg-blue-50 cursor-pointer transition-colors group"
+                    >
                       <input
                         type="radio"
-                        name="category"
-                        value={c.slug}
-                        defaultChecked={filters.category === c.slug}
-                        className="h-4 w-4 rounded border-2 border-slate-900/80"
+                        name="region"
+                        value={r.slug}
+                        defaultChecked={filters.region === r.slug}
+                        className="h-5 w-5 rounded border-2 border-slate-900/80 text-blue-600 focus:ring-4 focus:ring-blue-200 cursor-pointer"
                       />
-                      {c.name}
+                      <span className="font-medium text-sm text-slate-900 group-hover:text-blue-600">
+                        {r.name}
+                      </span>
                     </label>
                   ))}
                 </div>
-                <Link href="/categories" className={`${hand.className} inline-flex items-center text-[14px] text-blue-700`}>→ See All</Link>
-              </fieldset>
 
-              {/* Regions */}
-              <fieldset className="mt-4 space-y-2">
-                <legend className={`${hand.className} text-lg text-slate-900`}>Location</legend>
-                {regions.slice(0, 5).map((r) => (
-                  <label key={r.slug} className={`${hand.className} flex items-center gap-2 text-[14px]`}>
-                    <input
-                      type="radio"
-                      name="region"
-                      value={r.slug}
-                      defaultChecked={filters.region === r.slug}
-                      className="h-4 w-4 rounded border-2 border-slate-900/80"
-                    />
-                    {r.name}
-                  </label>
-                ))}
-                <Link href="/locations" className={`${hand.className} inline-flex items-center text-[14px] text-blue-700`}>→ See All</Link>
-              </fieldset>
-
-              {/* Lot size (small) */}
-              <fieldset className="mt-4 space-y-2">
-                <legend className={`${hand.className} text-lg text-slate-900`}>Lot Size</legend>
-                {lotSizes.slice(0, 3).map((lot) => (
-                  <label key={lot.slug} className={`${hand.className} flex items-center gap-2 text-[14px]`}>
-                    <input
-                      type="radio"
-                      name="lot-size"
-                      value={lot.slug}
-                      defaultChecked={filters.lotSize === lot.slug}
-                      className="h-4 w-4 rounded border-2 border-slate-900/80"
-                    />
-                    {lot.name}
-                  </label>
-                ))}
-              </fieldset>
-
-              <button
-                type="submit"
-                className={`${hand.className} mt-3 inline-flex items-center justify-center rounded-[12px] bg-slate-900 px-4 py-2 text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] hover:translate-y-[-1px]`}
-              >
-                Apply Filters
-              </button>
-              <Link href="/suppliers" className={`${hand.className} ml-3 text-[14px] text-slate-700 hover:underline`}>Clear all</Link>
-            </form>
+                <div className="pt-4 border-t-2 border-slate-200 flex flex-col gap-2">
+                  <button
+                    type="submit"
+                    className="w-full font-bold rounded-xl bg-blue-600 px-4 py-3 text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] hover:bg-blue-700 active:translate-y-0 transition-all duration-200"
+                  >
+                    Apply Filter
+                  </button>
+                  <Link
+                    href="/suppliers"
+                    className="w-full text-center font-medium text-sm text-slate-600 hover:text-slate-900 py-2 hover:underline underline-offset-2"
+                  >
+                    Clear Filter
+                  </Link>
+                </div>
+              </form>
+            </div>
           </aside>
 
-          {/* Cards area */}
+          {/* Cards Section */}
           <section>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {result.items.map((s, idx) => (
-                <a
+            {/* Results Count */}
+            <div className="mb-6">
+              <p className="font-bold text-lg text-slate-900">
+                {result.items.length} Suppliers Found
+                {filters.region && regions.find(r => r.slug === filters.region) && (
+                  <span className="font-medium text-slate-600"> in {regions.find(r => r.slug === filters.region)?.name}</span>
+                )}
+              </p>
+            </div>
+
+            {/* Cards Grid */}
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {result.items.map((s) => (
+                <Link
                   key={s.slug}
                   href={`/suppliers/${s.slug}`}
-                  className="group block overflow-hidden rounded-[18px] border-2 border-slate-900/80 bg-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)]"
+                  className="group block overflow-hidden rounded-2xl border-2 border-slate-900/80 bg-white shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:translate-y-[-2px] transition-all duration-200"
                 >
-                  {/* ribbon */}
-                  <div className="relative h-28 bg-slate-50">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="h-14 w-28 rounded-md bg-white ring-1 ring-slate-200 text-center text-slate-800 font-semibold grid place-items-center">
-                        {s.name.length > 12 ? s.name.slice(0, 12) + '…' : s.name}
+                  {/* Header with gradient */}
+                  <div className="relative h-32 bg-gradient-to-br from-blue-400 to-blue-500 border-b-2 border-slate-900/80">
+                    {/* Company Name Badge */}
+                    <div className="absolute inset-0 flex items-center justify-center p-4">
+                      <div className="bg-white rounded-xl px-6 py-3 shadow-lg border-2 border-slate-900/80 max-w-full">
+                        <div className="font-black text-base text-slate-900 text-center truncate">
+                          {s.name}
+                        </div>
                       </div>
                     </div>
-                    {/* Trusted ribbon (just for flair) */}
-                    <div className="absolute right-[-45px] top-3 rotate-45 rounded bg-[#8bb7ff] px-10 py-1 text-xs font-semibold text-slate-900 shadow">
-                      Trusted
+                    
+                    {/* Verified Badge */}
+                    {s.averageRating && s.averageRating >= 4 && (
+                      <div className="absolute top-3 right-3">
+                        <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold border-2 border-slate-900/80 shadow-sm">
+                          ✓ Verified
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card Content */}
+                  <div className="p-4 space-y-3">
+                    {/* Location */}
+                    <div className="flex items-start gap-2">
+                      <svg className="w-5 h-5 text-slate-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <div className="font-medium text-sm text-slate-700">
+                        {s.region?.name || 'United States'}
+                      </div>
+                    </div>
+
+                    {/* Rating */}
+                    {s.averageRating && s.averageRating > 0 && (
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <svg
+                              key={i}
+                              className={`w-4 h-4 ${i < Math.round(s.averageRating!) ? 'text-yellow-400' : 'text-slate-300'}`}
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          ))}
+                        </div>
+                        <span className="font-bold text-sm text-slate-900">
+                          {s.averageRating.toFixed(1)}
+                        </span>
+                        <span className="font-medium text-xs text-slate-500">
+                          ({s.reviewCount} {s.reviewCount === 1 ? 'review' : 'reviews'})
+                        </span>
+                      </div>
+                    )}
+
+                    {/* View Details Button */}
+                    <div className="pt-2">
+                      <div className="font-bold text-sm text-blue-600 group-hover:text-blue-700 flex items-center gap-1">
+                        View Details
+                        <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
-                  <div className="border-t-2 border-slate-900/80 bg-white p-3">
-                    <div className="text-sm font-semibold text-slate-900">{s.name}</div>
-                    <div className={`${hand.className} mt-1 text-[12px] leading-4 text-slate-700`}>
-                      {s.region?.name ?? s.region?.stateCode ?? '154 Trenton St, WY, 82822'}
-                    </div>
-                  </div>
-                </a>
+                </Link>
               ))}
             </div>
 
-            {/* Pagination look (numbers) */}
-            <div className="mt-10 flex items-center justify-center gap-4">
-              <button className="text-slate-700">{'<'}</button>
-              <div className={`${hand.className} flex items-center gap-3 text-[16px]`}>
-                <span className="underline underline-offset-4">1</span>
-                <span>2</span>
-                <span>3</span>
-                <span>4</span>
-                <span>5</span>
-                <span>…</span>
-                <span>50</span>
+            {/* Pagination */}
+            {nextCursor && (
+              <div className="mt-10 flex justify-center">
+                <Link
+                  href={`/suppliers?${nextParams.toString()}`}
+                  className="font-bold rounded-xl bg-blue-600 px-8 py-3 text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] hover:bg-blue-700 active:translate-y-0 transition-all duration-200"
+                >
+                  Load More Suppliers
+                </Link>
               </div>
-              {/* Hooked to your real cursor for forward navigation */}
-              {nextCursor ? (
-                <Link href={`/suppliers?${nextParams.toString()}`} className="text-slate-700">{'>'}</Link>
-              ) : (
-                <span className="text-slate-400">{'>'}</span>
-              )}
-            </div>
+            )}
           </section>
         </div>
 
         {/* Bottom CTA */}
-        <section className="mt-12">
-          <div className="mx-auto max-w-4xl rounded-[22px] border-2 border-slate-900/80 bg-[#3b3b3b] p-6 text-white shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] sm:p-8">
-            <h3 className={`${hand.className} text-3xl`}>List your Business</h3>
-            <p className={`${hand.className} mt-3 text-lg leading-7`}>
-              Get seen by 1M People looking for
-              <br /> Merchandise from top suppliers
-            </p>
-            <Link
-              href="/list-your-business"
-              className={`${hand.className} mt-5 inline-flex items-center justify-center rounded-[14px] bg-[#2f6feb] px-5 py-2 text-lg text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-1px] transition`}
-            >
-              Get Started
-            </Link>
+        <section className="mt-16">
+          <div className="mx-auto max-w-4xl rounded-3xl border-2 border-slate-900/80 bg-gradient-to-br from-slate-800 to-slate-900 p-8 sm:p-12 text-white shadow-[6px_7px_0_0_rgba(2,6,23,0.85)]">
+            <div className="text-center">
+              <h3 className="font-black text-3xl sm:text-4xl mb-4">
+                List Your Business
+              </h3>
+              <p className="font-medium text-lg text-slate-200 mb-8 max-w-2xl mx-auto">
+                Get discovered by thousands of buyers looking for quality merchandise from trusted suppliers across the United States.
+              </p>
+              <Link
+                href="/list-your-business"
+                className="inline-flex items-center justify-center font-bold rounded-xl bg-blue-600 px-8 py-4 text-lg text-white shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-blue-700 active:translate-y-0 transition-all duration-200"
+              >
+                Get Started Today
+                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
           </div>
         </section>
       </div>

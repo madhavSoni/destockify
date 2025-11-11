@@ -55,50 +55,78 @@ export function TrendingSuppliersRail({
         <div
           ref={railRef}
           className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          style={{
-            WebkitMaskImage:
-              'linear-gradient(90deg, transparent 0, black 24px, black calc(100% - 24px), transparent 100%)',
-            maskImage:
-              'linear-gradient(90deg, transparent 0, black 24px, black calc(100% - 24px), transparent 100%)',
-          }}
         >
           {suppliers.slice(0, 8).map((s, i) => (
             <Link
               key={s.slug}
               href={`/suppliers/${s.slug}`}
               data-card
-              className={`group relative w-[320px] shrink-0 snap-start overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md ${
+              className={`group relative w-[320px] shrink-0 snap-start overflow-hidden rounded-2xl border-2 border-slate-900/80 bg-white shadow-sm transition-all duration-200 hover:shadow-md hover:translate-y-[-1px] ${
                 i === suppliers.slice(0, 8).length - 1 ? 'mr-16' : ''
               }`}
             >
-              <div className="relative h-40 w-full bg-slate-100">
-                <Image
-                  src={s.heroImage || '/placeholders/supplier.jpg'}
-                  alt=""
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute right-3 top-3 flex gap-2">
-                  {(s.lotSizes?.map((ls) => ls.name) ?? ['Pallets'])
-                    .slice(0, 2)
-                    .map((b) => (
-                      <span
-                        key={b}
-                        className="rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-slate-800 shadow"
-                      >
-                        {b}
-                      </span>
-                    ))}
+              {/* Header with gradient */}
+              <div className="relative h-32 bg-gradient-to-br from-blue-400 to-blue-500 border-b-2 border-slate-900/80">
+                {/* Company Name Badge */}
+                <div className="absolute inset-0 flex items-center justify-center p-4">
+                  <div className="bg-white rounded-xl px-6 py-3 shadow-lg border-2 border-slate-900/80 max-w-full">
+                    <div className="font-black text-base text-slate-900 text-center truncate">
+                      {s.name}
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="p-4">
-                <div className="line-clamp-1 text-base font-semibold text-slate-900 group-hover:text-blue-700">
-                  {s.name}
+              {/* Card Content */}
+              <div className="p-4 space-y-3">
+                {/* Location */}
+                <div className="flex items-start gap-2">
+                  <svg className="w-5 h-5 text-slate-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <div className="font-medium text-sm text-slate-700">
+                    {s.region?.name ?? s.region?.stateCode ?? 'United States'}
+                  </div>
                 </div>
-                <div className="mt-1 text-sm text-slate-600">
-                  {s.region?.name ?? s.region?.stateCode ?? 'United States'}
-                </div>
+
+                {/* Rating */}
+                {s.averageRating && s.averageRating > 0 && (
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, idx) => (
+                        <svg
+                          key={idx}
+                          className={`w-4 h-4 ${idx < Math.round(s.averageRating!) ? 'text-yellow-400' : 'text-slate-300'}`}
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
+                    <span className="font-semibold text-sm text-slate-900">
+                      {s.averageRating.toFixed(1)}
+                    </span>
+                    {s.reviewCount && s.reviewCount > 0 && (
+                      <span className="text-xs text-slate-600">({s.reviewCount})</span>
+                    )}
+                  </div>
+                )}
+
+                {/* Lot Sizes */}
+                {s.lotSizes && s.lotSizes.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {s.lotSizes.slice(0, 2).map((ls) => (
+                      <span
+                        key={ls.slug}
+                        className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 border border-blue-200"
+                      >
+                        {ls.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </Link>
           ))}
