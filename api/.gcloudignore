@@ -1,0 +1,8 @@
+# Exclude these from Cloud Build upload
+node_modules/
+.git/
+.env*
+*.log
+.DS_Store
+# Note: dist/ will be built during gcp-build, so we exclude the local one
+dist/
