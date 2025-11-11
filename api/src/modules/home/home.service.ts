@@ -20,9 +20,16 @@ export async function getHomepageContent() {
         })
         .then((records) => records as SupplierSummaryPayload[]),
       prisma.review.findMany({
-        orderBy: { publishedAt: 'desc' },
+        where: { isApproved: true },
+        orderBy: { approvedAt: 'desc' },
         take: 5,
         include: {
+          customer: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
           supplier: {
             select: {
               slug: true,
@@ -53,12 +60,12 @@ export async function getHomepageContent() {
 
   const spotlightReviews = latestReviews.map((review: (typeof latestReviews)[number]) => ({
     title: review.title,
-    author: review.author,
-    company: review.company,
+    author: `${review.customer.firstName} ${review.customer.lastName}`,
+    company: null,
     ratingOverall: review.ratingOverall,
     highlights: review.highlights,
     body: review.body,
-    publishedAt: review.publishedAt,
+    publishedAt: review.approvedAt?.toISOString() || review.createdAt.toISOString(),
     supplier: {
       slug: review.supplier.slug,
       name: review.supplier.name,

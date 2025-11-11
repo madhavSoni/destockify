@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      ="postgresql://postgres:nend8075@localhost:5432/destockify?schema=public"
+  url      = env("DATABASE_URL")
 }
 
 model Customer {
@@ -23,6 +23,8 @@ model Customer {
 
   resetToken              String?
   resetTokenExpiry        DateTime?
+
+  reviews                 Review[]
 }
 
 model Supplier {
@@ -123,23 +125,29 @@ model SupplierLotSize {
 }
 
 model Review {
-  id                Int      @id @default(autoincrement())
-  supplierId        Int
-  title             String
-  author            String
-  company           String?
-  ratingOverall     Float
-  ratingAccuracy    Float?
-  ratingLogistics   Float?
-  ratingValue       Float?
-  ratingCommunication Float?
-  highlights        String[]         @default([])
-  body              String
-  publishedAt       DateTime @default(now())
+  id                    Int      @id @default(autoincrement())
+  supplierId            Int
+  customerId            Int
+  title                 String?
+  ratingOverall         Float
+  ratingAccuracy        Float?
+  ratingLogistics       Float?
+  ratingValue           Float?
+  ratingCommunication   Float?
+  highlights            String[]         @default([])
+  body                  String
+  images                String[]         @default([])
+  isApproved            Boolean          @default(false)
+  moderationNotes       String?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  approvedAt            DateTime?
 
-  supplier Supplier @relation(fields: [supplierId], references: [id])
+  supplier  Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  customer  Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
-  @@index([supplierId, publishedAt])
+  @@index([supplierId, isApproved, createdAt])
+  @@index([customerId, createdAt])
 }
 
 model Testimonial {
