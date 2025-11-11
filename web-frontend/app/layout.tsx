@@ -2,6 +2,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { DM_Sans } from 'next/font/google';
+import { Providers } from '@/components/providers';
 import './globals.css';
 
 const dmSans = DM_Sans({
@@ -34,11 +35,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${dmSans.variable} bg-slate-50 text-slate-900 antialiased`}>
-        <div className="flex min-h-screen flex-col">
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </div>
+        <Providers>
+          <div className="flex min-h-screen flex-col">
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </div>
+        </Providers>
       </body>
     </html>
   );
