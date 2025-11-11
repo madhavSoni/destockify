@@ -288,6 +288,15 @@ export type AuthResponse = {
   verificationToken?: string;
 };
 
+export type ProfileResponse = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  isVerified: boolean;
+  createdAt: string;
+};
+
 export const api = {
   home: {
     get: () => fetchFromApi<HomepagePayload>('/home', { revalidate: 30 }),
@@ -338,6 +347,13 @@ export const api = {
       fetchFromApi<{ message: string; email: string }>('/auth/reset-password', {
         method: 'POST',
         body: JSON.stringify({ token, newPassword }),
+        cache: 'no-store',
+      }),
+    profile: (token: string) =>
+      fetchFromApi<ProfileResponse>('/auth/profile', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         cache: 'no-store',
       }),
   },

@@ -4,12 +4,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Patrick_Hand } from 'next/font/google';
 import { useState } from 'react';
-import { api } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -39,25 +40,8 @@ export default function LoginPage() {
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
       try {
-        const result = await api.auth.login({
-          email,
-          password,
-        });
-
-        console.log('Login successful!', result);
+        await login(email, password);
         
-        // Store auth token in localStorage
-        if (result.authToken) {
-          localStorage.setItem('authToken', result.authToken);
-          localStorage.setItem('user', JSON.stringify({
-            id: result.id,
-            firstName: result.firstName,
-            lastName: result.lastName,
-            email: result.email,
-            isVerified: result.isVerified,
-          }));
-        }
-
         // Redirect to home page
         router.push('/');
       } catch (error: any) {

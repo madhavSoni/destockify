@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { DM_Sans, Patrick_Hand } from 'next/font/google';
 import './globals.css';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { SiteHeader } from '@/components/site-header';
 
 const dmSans = DM_Sans({
   variable: '--font-dm-sans',
@@ -43,57 +45,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${dmSans.variable} bg-slate-50 text-slate-900 antialiased`}>
-        <div className="flex min-h-screen flex-col">
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </div>
+        <AuthProvider>
+          <div className="flex min-h-screen flex-col">
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </div>
+        </AuthProvider>
       </body>
     </html>
-  );
-}
-
-function SiteHeader() {
-  return (
-    <header className="border-b border-slate-200 bg-white">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        {/* Left: logo (unchanged) */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900"
-        >
-          {/* If you have a real svg logo, drop it here */}
-          <span className="sr-only">Destockify</span>
-          <span aria-hidden className="select-none">
-            <span className="font-black">Destock</span>
-            <span className="font-black text-[#3b82f6]">ify</span>
-          </span>
-        </Link>
-
-        {/* Right: handwritten nav */}
-        <nav
-          className={`${hand.className} flex items-center gap-6 text-lg text-slate-900`}
-          aria-label="Primary"
-        >
-          <Link href="/suppliers" className="hover:opacity-80">
-            Buyers
-          </Link>
-          <Link href="/list-your-business" className="hover:opacity-80">
-            Sellers
-          </Link>
-          <Link href="/login" className="hover:opacity-80">
-            Login
-          </Link>
-
-          <Link
-            href="/list-your-business"
-            className="rounded-full bg-[#2f6feb] px-4 py-2 text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-1px] hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] transition"
-          >
-            List your Business
-          </Link>
-        </nav>
-      </div>
-    </header>
   );
 }
 
