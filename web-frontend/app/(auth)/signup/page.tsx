@@ -14,6 +14,7 @@ export default function SignupPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -76,10 +77,7 @@ export default function SignupPage() {
         });
 
         console.log('Signup successful!', result);
-        
-        // Show success message or redirect to verify email page
-        alert('Signup successful! Please check your email to verify your account.');
-        router.push('/login');
+        setIsSuccess(true);
       } catch (error: any) {
         console.error('Signup failed:', error);
         setErrors({ general: error.message || 'Failed to sign up. Please try again.' });
@@ -88,6 +86,37 @@ export default function SignupPage() {
       }
     }
   };
+
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-start justify-center px-4 pt-12 pb-8">
+        <div className="w-full max-w-md">
+          <div className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-[6px_7px_0_0_rgba(2,6,23,0.85)] p-8 sm:p-10 animate-in fade-in duration-500">
+            <div className="text-center">
+              <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 border-2 border-slate-900/80">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h1 className={`${hand.className} text-3xl sm:text-4xl text-slate-900 mb-3`}>
+                Check Your Email
+              </h1>
+              <p className={`${hand.className} text-base text-slate-600 mb-6`}>
+                We've sent a verification link to your email address. Please check your inbox and click the link to verify your account.
+              </p>
+              <Link
+                href="/login"
+                className={`${hand.className} inline-block px-6 py-3 rounded-2xl bg-[#2f6feb] text-white text-base font-semibold shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200`}
+              >
+                Go to Login
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex items-start justify-center px-4 pt-12 pb-8">
       <div className="w-full max-w-md">

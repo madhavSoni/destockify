@@ -324,5 +324,21 @@ export const api = {
         body: JSON.stringify(payload),
         cache: 'no-store',
       }),
+    verifyEmail: (token: string) =>
+      fetchFromApi<{ message: string; email: string }>(`/auth/verify-email?token=${token}`, {
+        cache: 'no-store',
+      }),
+    forgotPassword: (email: string) =>
+      fetchFromApi<{ message: string; resetToken?: string }>('/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+        cache: 'no-store',
+      }),
+    resetPassword: (token: string, newPassword: string) =>
+      fetchFromApi<{ message: string; email: string }>('/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify({ token, newPassword }),
+        cache: 'no-store',
+      }),
   },
 };

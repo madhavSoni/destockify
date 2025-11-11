@@ -2,6 +2,7 @@ import prisma from '../../lib/prismaClient';
 import * as argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import * as emailService from '../../lib/emailService';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'destockify-secret-key123';
 const TOKEN_EXPIRY_TIME = 24 * 60 * 60 * 1000;
@@ -55,12 +56,18 @@ export async function signUp(payload: {
     },
   });
 
+  try {
+    await emailService.sendVerificationEmail(email, verificationToken);
+  } catch (error) {
+    console.error('Failed to send verification email:', error);
+  }
+
   return {
     id: customer.id,
     firstName: customer.firstName,
     lastName: customer.lastName,
     email: customer.email,
-    verificationToken,
+    verificationToken: process.env.NODE_ENV === 'development' ? verificationToken : undefined,
   };
 }
 
@@ -152,9 +159,16 @@ export async function forgotPassword(payload: { email: string }) {
     },
   });
 
+  try {
+    await emailService.sendPasswordResetEmail(email, resetToken);
+  } catch (error) {
+    console.error('Failed to send password reset email:', error);
+    throw new Error('Failed to send password reset email. Please try again.');
+  }
+
   return {
     message: 'If that email exists, a password reset link has been sent',
-    resetToken, // TODO: Remove in production - only send via email
+    resetToken: process.env.NODE_ENV === 'development' ? resetToken : undefined,
   };
 }
 

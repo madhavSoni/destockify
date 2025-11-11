@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { signUp, login, verifyEmail, forgotPassword, resetPassword } from './auth.service';
 import { authenticateToken, AuthRequest } from '../../middleware/authMiddleware';
 import prisma from '../../lib/prismaClient';
+import * as emailService from '../../lib/emailService';
 
 const router = Router();
 
@@ -83,6 +84,36 @@ router.get('/profile', authenticateToken, async (req: AuthRequest, res) => {
     res.json(customer);
   } catch (error: any) {
     res.status(500).json({ message: error.message ?? 'Unable to fetch profile' });
+  }
+});
+
+router.get('/test-email', async (req, res) => {
+  try {
+    const testEmail = req.query.email as string;
+    
+    if (!testEmail) {
+      return res.status(400).json({ message: 'Please provide an email query parameter: ?email=your@email.com' });
+    }
+
+    const isReady = await emailService.testEmailConnection();
+    
+    if (!isReady) {
+      return res.status(500).json({ 
+        message: 'Email service not configured. Please check SMTP settings in .env file.' 
+      });
+    }
+
+    await emailService.sendVerificationEmail(testEmail, 'test-token-123456');
+    
+    res.json({ 
+      message: `Test verification email sent to ${testEmail}. Check your inbox!`,
+      note: 'In development, the verification token is: test-token-123456'
+    });
+  } catch (error: any) {
+    res.status(500).json({ 
+      message: 'Failed to send test email',
+      error: error.message 
+    });
   }
 });
 
