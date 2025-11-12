@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://postgres:nend8075@localhost:5432/destockify?schema=public"
 }
 
 model Customer {
