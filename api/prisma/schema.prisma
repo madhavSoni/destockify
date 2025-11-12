@@ -18,6 +18,7 @@ model Customer {
   zipCode                 String?
 
   isVerified              Boolean            @default(false)
+  isAdmin                 Boolean            @default(false)
   verificationToken       String?
   verificationTokenExpiry DateTime?
 

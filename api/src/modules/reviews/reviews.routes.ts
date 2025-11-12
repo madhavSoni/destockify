@@ -7,8 +7,10 @@ import {
   approveReview,
   unapproveReview,
   adminDeleteReview,
+  getAllReviewsAdmin,
 } from './reviews.service';
 import { authenticateToken, AuthRequest } from '../../middleware/authMiddleware';
+import { isAdmin } from '../../middleware/adminMiddleware';
 
 const router = Router();
 
@@ -84,12 +86,25 @@ router.delete('/:reviewId', authenticateToken, async (req: AuthRequest, res) => 
 });
 
 // ========================================
-// ADMIN ROUTES (TODO: Add admin middleware)
+// ADMIN ROUTES
 // ========================================
-// Note: In production, add an isAdmin middleware to protect these routes
+
+// Get all reviews (admin only)
+router.get('/admin/all', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
+  try {
+    const status = req.query.status as 'approved' | 'pending' | 'rejected' | undefined;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    const result = await getAllReviewsAdmin({ status, page, limit });
+    res.json(result);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message ?? 'Unable to fetch reviews' });
+  }
+});
 
 // Approve a review (admin only)
-router.post('/:reviewId/approve', async (req, res) => {
+router.post('/:reviewId/approve', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
   try {
     const reviewId = parseInt(req.params.reviewId);
 
@@ -105,7 +120,7 @@ router.post('/:reviewId/approve', async (req, res) => {
 });
 
 // Unapprove a review (admin only)
-router.post('/:reviewId/unapprove', async (req, res) => {
+router.post('/:reviewId/unapprove', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
   try {
     const reviewId = parseInt(req.params.reviewId);
 
@@ -126,7 +141,7 @@ router.post('/:reviewId/unapprove', async (req, res) => {
 });
 
 // Delete any review permanently (admin only)
-router.delete('/:reviewId/admin', async (req, res) => {
+router.delete('/:reviewId/admin', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
   try {
     const reviewId = parseInt(req.params.reviewId);
 

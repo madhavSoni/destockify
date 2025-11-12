@@ -4,7 +4,8 @@ import { api } from '@/lib/api';
 import { SupplierCard } from '@/components/supplier-card';
 import { SectionHeading } from '@/components/section-heading';
 
-export default async function LotSizeDetailPage({ params }: { params: { slug: string } }) {
+export default async function LotSizeDetailPage(props: any) {
+  const { params } = props;
   const [lotSizes, suppliersResult] = await Promise.all([
     api.catalog.lotSizes(),
     api.suppliers.list({ lotSize: params.slug, limit: 12 }),

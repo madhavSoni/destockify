@@ -2,11 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { api } from '@/lib/api';
 
-export default async function SuppliersPage({
-  searchParams,
-}: {
-  searchParams: Record<string, string | string[] | undefined>;
-}) {
+export default async function SuppliersPage(props: any) {
+  const { searchParams } = props;
   // existing filters (kept so your API keeps working)
   const filters = {
     search: typeof searchParams.search === 'string' ? searchParams.search : '',

@@ -72,6 +72,7 @@ router.get('/profile', authenticateToken, async (req: AuthRequest, res) => {
         lastName: true,
         email: true,
         isVerified: true,
+        isAdmin: true,
         createdAt: true,
         updatedAt: true,
       }

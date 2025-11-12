@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api, CreateSubmissionPayload } from '@/lib/api';
@@ -9,9 +9,14 @@ import { api, CreateSubmissionPayload } from '@/lib/api';
 export default function SubmitListingPage() {
   const { isAuthenticated, isLoading: authLoading, authToken } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const editId = searchParams.get('edit');
+  const [editId, setEditId] = useState<string | null>(null);
   const isEditMode = !!editId;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const sp = new URLSearchParams(window.location.search);
+    setEditId(sp.get('edit'));
+  }, []);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(isEditMode);

@@ -4,7 +4,8 @@ import { notFound } from 'next/navigation';
 import { api } from '@/lib/api';
 import { ReviewsWrapper } from './reviews-wrapper';
 
-export default async function SupplierDetailPage({ params }: { params: { slug: string } }) {
+export default async function SupplierDetailPage(props: any) {
+  const { params } = props;
   const detail = await api.suppliers.get(params.slug).catch(() => null);
   if (!detail) notFound();
 

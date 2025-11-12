@@ -9,6 +9,7 @@ type User = {
   lastName: string;
   email: string;
   isVerified: boolean;
+  isAdmin: boolean;
   createdAt: string;
 };
 
@@ -17,6 +18,7 @@ type AuthContextType = {
   authToken: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -69,17 +71,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error('No auth token received from server');
     }
 
-    const userData: User = {
-      id: response.id,
-      firstName: response.firstName,
-      lastName: response.lastName,
-      email: response.email,
-      isVerified: response.isVerified || false,
-      createdAt: response.createdAt || new Date().toISOString(),
-    };
+    // Fetch fresh profile to ensure we have the latest admin status
+    let userData: User;
+    try {
+      const profile = await api.auth.profile(response.authToken);
+      userData = {
+        id: profile.id,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        email: profile.email,
+        isVerified: profile.isVerified,
+        isAdmin: profile.isAdmin,
+        createdAt: profile.createdAt,
+      };
+    } catch (error) {
+      // Fallback to login response if profile fetch fails
+      userData = {
+        id: response.id,
+        firstName: response.firstName,
+        lastName: response.lastName,
+        email: response.email,
+        isVerified: response.isVerified || false,
+        isAdmin: response.isAdmin || false,
+        createdAt: response.createdAt || new Date().toISOString(),
+      };
+    }
 
-    // Only save to localStorage, don't update state
-    // This prevents the navbar from updating before navigation
+    // Update state immediately
+    setAuthToken(response.authToken);
+    setUser(userData);
+    
+    // Also save to localStorage
     localStorage.setItem('authToken', response.authToken);
     localStorage.setItem('user', JSON.stringify(userData));
   };
@@ -114,6 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         authToken,
         isLoading,
         isAuthenticated: !!user && !!authToken,
+        isAdmin: user?.isAdmin || false,
         login,
         logout,
         refreshUser,

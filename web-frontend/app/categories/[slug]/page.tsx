@@ -5,7 +5,8 @@ import { SupplierCard } from '@/components/supplier-card';
 import { GuideCard } from '@/components/guide-card';
 import { SectionHeading } from '@/components/section-heading';
 
-export default async function CategoryDetailPage({ params }: { params: { slug: string } }) {
+export default async function CategoryDetailPage(props: any) {
+  const { params } = props;
   const [categories, suppliersResult, guides] = await Promise.all([
     api.catalog.categories(),
     api.suppliers.list({ category: params.slug, limit: 12 }),
