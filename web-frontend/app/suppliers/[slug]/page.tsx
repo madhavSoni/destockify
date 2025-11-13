@@ -4,8 +4,10 @@ import { notFound } from 'next/navigation';
 import { api } from '@/lib/api';
 import { ReviewsWrapper } from './reviews-wrapper';
 
-export default async function SupplierDetailPage({ params }: { params: { slug: string } }) {
-  const detail = await api.suppliers.get(params.slug).catch(() => null);
+export default async function SupplierDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  // Await params since it's a Promise in Next.js 15+
+  const { slug } = await params;
+  const detail = await api.suppliers.get(slug).catch(() => null);
   if (!detail) notFound();
 
   const { supplier, reviewSummary, recentReviews } = detail;

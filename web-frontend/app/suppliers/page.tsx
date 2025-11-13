@@ -5,15 +5,18 @@ import { api } from '@/lib/api';
 export default async function SuppliersPage({
   searchParams,
 }: {
-  searchParams: Record<string, string | string[] | undefined>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  // Await searchParams since it's a Promise in Next.js 15+
+  const resolvedParams = await searchParams;
+  
   // existing filters (kept so your API keeps working)
   const filters = {
-    search: typeof searchParams.search === 'string' ? searchParams.search : '',
-    category: typeof searchParams.category === 'string' ? searchParams.category : '',
-    region: typeof searchParams.region === 'string' ? searchParams.region : '',
-    lotSize: typeof searchParams['lot-size'] === 'string' ? searchParams['lot-size'] : '',
-    cursor: typeof searchParams.cursor === 'string' ? Number(searchParams.cursor) : undefined,
+    search: typeof resolvedParams.search === 'string' ? resolvedParams.search : '',
+    category: typeof resolvedParams.category === 'string' ? resolvedParams.category : '',
+    region: typeof resolvedParams.region === 'string' ? resolvedParams.region : '',
+    lotSize: typeof resolvedParams['lot-size'] === 'string' ? resolvedParams['lot-size'] : '',
+    cursor: typeof resolvedParams.cursor === 'string' ? Number(resolvedParams.cursor) : undefined,
   };
 
   const [result, categories, regions, lotSizes] = await Promise.all([

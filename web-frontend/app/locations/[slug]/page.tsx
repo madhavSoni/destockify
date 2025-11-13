@@ -25,7 +25,7 @@ export default async function LocationDetailPage({ params }: { params: { slug: s
           {region.headline && <p className="mt-3 text-sm text-slate-600">{region.headline}</p>}
           {region.description && <p className="mt-3 text-sm text-slate-600">{region.description}</p>}
           <div className="mt-6 flex flex-wrap gap-3 text-xs text-slate-500">
-            {region.marketStats && 'averageFreight' in region.marketStats && region.marketStats.averageFreight && (
+            {region.marketStats && 'averageFreight' in region.marketStats && region.marketStats.averageFreight != null && (
               <span className="rounded-full bg-slate-100 px-3 py-1">
                 Avg freight: {String(region.marketStats.averageFreight)}
               </span>
