@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@destockify.com';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://destockify-frontend-78602435411.us-central1.run.app';
 
 export async function sendVerificationEmail(email: string, verificationToken: string) {
   const verificationUrl = `${FRONTEND_URL}/verify-email?token=${verificationToken}`;
