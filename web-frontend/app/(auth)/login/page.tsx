@@ -39,21 +39,9 @@ export default function LoginPage() {
       try {
         await login(email, password);
         
-        // Small delay to ensure state is updated
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Check if user is admin and redirect accordingly
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          const user = JSON.parse(storedUser);
-          if (user.isAdmin) {
-            window.location.href = '/admin';
-          } else {
-            window.location.href = '/';
-          }
-        } else {
-          window.location.href = '/';
-        }
+        // Always redirect to home page after login
+        // Admin users can navigate to /admin manually
+        window.location.href = '/';
       } catch (error: any) {
         console.error('Login failed:', error);
         setErrors({ general: error.message || 'Failed to login. Please try again.' });

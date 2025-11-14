@@ -11,6 +11,7 @@ export default function EditCompanyPage() {
   const { authToken } = useAuth();
   const id = parseInt(params.id as string);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     shortDescription: '',
@@ -23,9 +24,35 @@ export default function EditCompanyPage() {
   });
 
   useEffect(() => {
-    // In a real implementation, fetch the supplier data here
-    // For now, this is a placeholder
-  }, [id]);
+    const fetchSupplier = async () => {
+      if (!authToken || isNaN(id)) {
+        setFetching(false);
+        return;
+      }
+
+      try {
+        const supplier = await api.suppliers.getByIdAdmin(id, authToken);
+        setFormData({
+          name: supplier.name || '',
+          shortDescription: supplier.shortDescription || '',
+          description: supplier.description || '',
+          website: supplier.website || '',
+          phone: supplier.phone || '',
+          email: supplier.email || '',
+          heroImage: supplier.heroImage || '',
+          logoImage: supplier.logoImage || '',
+        });
+      } catch (error) {
+        console.error('Failed to fetch supplier:', error);
+        alert('Failed to load company data');
+        router.push('/admin/companies');
+      } finally {
+        setFetching(false);
+      }
+    };
+
+    fetchSupplier();
+  }, [id, authToken, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +69,17 @@ export default function EditCompanyPage() {
       setLoading(false);
     }
   };
+
+  if (fetching) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">Edit Company</h1>
+          <p className="mt-2 text-slate-600">Loading company data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

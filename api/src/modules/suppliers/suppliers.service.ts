@@ -374,14 +374,41 @@ export async function getSupplierDetail(slug: string) {
 export async function getSupplierByIdAdmin(supplierId: number) {
   const supplier = await prisma.supplier.findUnique({
     where: { id: supplierId },
-    include: supplierSummaryInclude,
+    include: {
+      region: true,
+      categories: { include: { category: true } },
+      lotSizes: { include: { lotSize: true } },
+    },
   });
 
   if (!supplier) {
     throw new Error('Supplier not found');
   }
 
-  return mapSupplierSummary(supplier as SupplierSummaryPayload);
+  // Return all fields needed for admin editing
+  return {
+    id: supplier.id,
+    name: supplier.name,
+    slug: supplier.slug,
+    shortDescription: supplier.shortDescription,
+    description: supplier.description,
+    website: supplier.website,
+    phone: supplier.phone,
+    email: supplier.email,
+    heroImage: supplier.heroImage,
+    logoImage: supplier.logoImage,
+    minimumOrder: supplier.minimumOrder,
+    leadTime: supplier.leadTime,
+    specialties: supplier.specialties,
+    certifications: supplier.certifications,
+    badges: supplier.badges,
+    logisticsNotes: supplier.logisticsNotes,
+    pricingNotes: supplier.pricingNotes,
+    homeRank: supplier.homeRank,
+    regionId: supplier.regionId,
+    categoryIds: supplier.categories.map((c) => c.categoryId),
+    lotSizeIds: supplier.lotSizes.map((l) => l.lotSizeId),
+  };
 }
 
 // Helper function to generate slug from name
@@ -555,7 +582,29 @@ export async function deleteSupplier(supplierId: number) {
     throw new Error('Supplier not found');
   }
 
-  await prisma.supplier.delete({ where: { id: supplierId } });
+  // Manually delete all related records before deleting the supplier
+  // (Database foreign key constraints may not have CASCADE enabled)
+  await prisma.$transaction(async (tx) => {
+    // Delete reviews
+    await tx.review.deleteMany({ where: { supplierId } });
+    
+    // Delete testimonials
+    await tx.testimonial.deleteMany({ where: { supplierId } });
+    
+    // Delete resources
+    await tx.supplierResource.deleteMany({ where: { supplierId } });
+    
+    // Delete category relationships
+    await tx.supplierCategory.deleteMany({ where: { supplierId } });
+    
+    // Delete lot size relationships
+    await tx.supplierLotSize.deleteMany({ where: { supplierId } });
+    
+    // Note: SupplierSubmission is not linked to suppliers - it's for customer submissions to become suppliers
+    
+    // Finally, delete the supplier
+    await tx.supplier.delete({ where: { id: supplierId } });
+  });
 
   return { message: 'Supplier deleted successfully' };
 }

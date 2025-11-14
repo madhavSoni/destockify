@@ -51,10 +51,14 @@ export async function createReview(payload: {
   }
 
   // Create review (not approved by default)
+  // Note: author field is required by database schema (derived from customer name)
+  const authorName = `${customer.firstName} ${customer.lastName}`.trim() || 'Anonymous';
   const review = await prisma.review.create({
     data: {
       customerId,
       supplierId,
+      author: authorName, // Required field in database
+      company: null, // Optional field
       title: title || null,
       ratingOverall,
       ratingAccuracy: ratingAccuracy || null,

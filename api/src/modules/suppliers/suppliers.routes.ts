@@ -7,6 +7,7 @@ import {
   updateSupplier,
   deleteSupplier,
   getAllSuppliersAdmin,
+  getSupplierByIdAdmin,
 } from './suppliers.service';
 import { authenticateToken, AuthRequest } from '../../middleware/authMiddleware';
 import { isAdmin } from '../../middleware/adminMiddleware';
@@ -45,7 +46,7 @@ router.get('/featured', async (_req, res) => {
 // ADMIN ROUTES (must come before /:slug to avoid route conflicts)
 // ========================================
 
-// Get all suppliers (admin only)
+// Get all suppliers (admin only) - MUST come before /admin/:id to avoid route conflicts
 router.get('/admin/all', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
   try {
     const search = req.query.search as string | undefined;
@@ -56,6 +57,21 @@ router.get('/admin/all', authenticateToken, isAdmin, async (req: AuthRequest, re
     res.json(result);
   } catch (error: any) {
     res.status(400).json({ message: error.message ?? 'Unable to fetch suppliers' });
+  }
+});
+
+// Get supplier by ID (admin only)
+router.get('/admin/:id', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
+  try {
+    const supplierId = parseInt(req.params.id);
+    if (isNaN(supplierId)) {
+      return res.status(400).json({ message: 'Invalid supplier ID' });
+    }
+
+    const supplier = await getSupplierByIdAdmin(supplierId);
+    res.json(supplier);
+  } catch (error: any) {
+    res.status(404).json({ message: error.message ?? 'Supplier not found' });
   }
 });
 

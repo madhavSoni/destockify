@@ -461,6 +461,14 @@ export const api = {
       fetchFromApi<SupplierListResponse>(`/suppliers${buildQueryString(params)}`, { revalidate: 30 }),
     get: (slug: string) => fetchFromApi<SupplierDetailResponse>(`/suppliers/${slug}`, { revalidate: 30 }),
     featured: () => fetchFromApi<SupplierSummary[]>('/suppliers/featured', { revalidate: 30 }),
+    // Admin: Get supplier by ID
+    getByIdAdmin: (id: number, token: string) =>
+      fetchFromApi<any>(`/suppliers/admin/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
     // Admin: Get all suppliers
     getAllAdmin: (token: string, params?: { search?: string; page?: number; limit?: number }) =>
       fetchFromApi<{ items: any[]; pagination: any }>(`/suppliers/admin/all${buildQueryString(params)}`, {
