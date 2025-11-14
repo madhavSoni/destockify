@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { wholesalerSuppliers } from '../seed-scripts/wholesaler-seed-data';
 
 const prisma = new PrismaClient();
 
@@ -957,6 +958,8 @@ async function main() {
         data: supplierSeed.reviews.map((review, index) => ({
           supplierId: supplierRecord.id,
           customerId: customerIds[index % customerIds.length], // Rotate through customers
+          author: review.author,
+          company: review.company,
           title: review.title,
           ratingOverall: review.ratingOverall,
           ratingAccuracy: review.ratingAccuracy,
@@ -999,6 +1002,43 @@ async function main() {
       });
     }
   }
+
+  console.log('🏢 Creating wholesaler suppliers from CSV data...');
+  let wholesalerCount = 0;
+  for (const wholesaler of wholesalerSuppliers) {
+    try {
+      await prisma.supplier.create({
+        data: {
+          name: wholesaler.name,
+          slug: wholesaler.slug,
+          shortDescription: wholesaler.shortDescription,
+          description: wholesaler.description,
+          website: wholesaler.website,
+          phone: wholesaler.phone,
+          email: wholesaler.email,
+          heroImage: wholesaler.heroImage ?? heroPlaceholder(wholesaler.name),
+          logoImage: wholesaler.logoImage ?? logoPlaceholder(wholesaler.name),
+          homeRank: wholesaler.homeRank,
+          trustScore: wholesaler.trustScore,
+          minimumOrder: wholesaler.minimumOrder,
+          leadTime: wholesaler.leadTime,
+          specialties: wholesaler.specialties,
+          certifications: wholesaler.certifications,
+          badges: wholesaler.badges,
+          logisticsNotes: wholesaler.logisticsNotes,
+          pricingNotes: wholesaler.pricingNotes,
+          averageRating: wholesaler.averageRating,
+          reviewCount: wholesaler.reviewCount,
+          regionId: wholesaler.regionId,
+        },
+      });
+      wholesalerCount++;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.warn(`⚠️  Skipped wholesaler "${wholesaler.name}": ${errorMessage}`);
+    }
+  }
+  console.log(`✅ Created ${wholesalerCount} wholesaler suppliers`);
 
   console.log('📚 Publishing guides and linking categories...');
   for (const guideSeed of guides) {
