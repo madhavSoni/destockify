@@ -1,16 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  // Get redirect URL from query params
+  const redirectUrl = searchParams.get('redirect') || '/';
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,9 +43,8 @@ export default function LoginPage() {
       try {
         await login(email, password);
         
-        // Always redirect to home page after login
-        // Admin users can navigate to /admin manually
-        window.location.href = '/';
+        // Redirect to the intended page (or home if no redirect param)
+        window.location.href = redirectUrl;
       } catch (error: any) {
         console.error('Login failed:', error);
         setErrors({ general: error.message || 'Failed to login. Please try again.' });

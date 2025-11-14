@@ -1,24 +1,26 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import Link from 'next/link';
 
 export function AdminGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isAdmin, isLoading, user, refreshUser, login } = useAuth();
-  const router = useRouter();
+  const { isAuthenticated, isAdmin, isLoading, user, refreshUser } = useAuth();
+  const pathname = usePathname();
   const [checking, setChecking] = useState(true);
-  const [showLogin, setShowLogin] = useState(false);
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const checkAdmin = async () => {
       if (isLoading) {
         setChecking(true);
+        return;
+      }
+
+      // Check 1: User must be authenticated
+      if (!isAuthenticated) {
+        // Don't auto-redirect - just show the login required message
+        setChecking(false);
         return;
       }
 
@@ -36,7 +38,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
 
       // Only refresh user profile once if we're authenticated but admin status is unclear
       // This prevents unnecessary API calls that cause rate limiting
-      if (isAuthenticated && user && finalIsAdmin === false && !showLogin) {
+      if (isAuthenticated && user && finalIsAdmin === false) {
         // Only refresh if we haven't checked recently (avoid rate limits)
         const lastCheck = sessionStorage.getItem('adminCheckTime');
         const now = Date.now();
@@ -58,56 +60,17 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
 
       setChecking(false);
 
-      if (!isAuthenticated) {
-        setShowLogin(true);
-      } else if (!finalIsAdmin) {
-        // User is logged in but not admin - redirect to home
-        router.push('/');
-      } else {
-        // User is authenticated and is admin - show admin panel
-        setShowLogin(false);
+      // Check 2: Authenticated user must be an admin
+      if (!finalIsAdmin) {
+        // User is logged in but not admin - they stay on this page but see access denied
+        return;
       }
     };
 
     checkAdmin();
-  }, [isAuthenticated, isAdmin, isLoading, user, router, refreshUser, showLogin]);
+  }, [isAuthenticated, isAdmin, isLoading, user, refreshUser, pathname]);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginError('');
-    setLoginLoading(true);
-
-    try {
-      await login(loginEmail, loginPassword);
-      
-      // Wait a bit for the login function to update state
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Force refresh user to get latest admin status
-      await refreshUser();
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Check if user is admin from localStorage (most reliable)
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
-        if (user.isAdmin) {
-          // Admin login successful - reload page to ensure all state is fresh
-          window.location.reload();
-        } else {
-          setLoginError('This account does not have admin access. Please use a different account.');
-          setLoginLoading(false);
-        }
-      } else {
-        setLoginError('Login failed. Please try again.');
-        setLoginLoading(false);
-      }
-    } catch (error: any) {
-      setLoginError(error.message || 'Failed to login. Please try again.');
-      setLoginLoading(false);
-    }
-  };
-
+  // Loading state
   if (isLoading || checking) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50">
@@ -116,93 +79,112 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (showLogin || !isAuthenticated || !isAdmin) {
+  // Check 1: Not authenticated - redirect handled in useEffect
+  // This is just a fallback render while redirect is happening
+  if (!isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-        <div className="w-full max-w-md">
-          <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
-            <div className="text-center mb-6">
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">Admin Login</h1>
-              <p className="text-sm text-slate-600">Sign in to access the admin panel</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center">
+          {/* Login Required Icon */}
+          <div className="mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-100 text-blue-600">
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
             </div>
+          </div>
 
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label htmlFor="admin-email" className="block text-sm font-medium text-slate-700 mb-1">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="admin-email"
-                  required
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                />
-              </div>
+          {/* Message */}
+          <h1 className="font-bold text-3xl text-slate-900 mb-4">
+            Admin Login Required
+          </h1>
+          <p className="font-normal text-lg text-slate-600 mb-8">
+            You need to be logged in as an administrator to access the admin panel.
+          </p>
 
-              <div>
-                <label htmlFor="admin-password" className="block text-sm font-medium text-slate-700 mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    id="admin-password"
-                    required
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full rounded-lg border border-slate-300 px-4 py-2 pr-10 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    {showPassword ? (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.29 3.29m13.42 13.42L21 21M12 12l.01.01" />
-                      </svg>
-                    ) : (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-              </div>
+          {/* Action Button */}
+          <Link
+            href={`/login?redirect=${encodeURIComponent(pathname)}`}
+            className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+            </svg>
+            Sign In
+          </Link>
 
-              {loginError && (
-                <div className="rounded-lg bg-red-50 border border-red-200 p-3">
-                  <p className="text-sm text-red-600">{loginError}</p>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loginLoading}
-                className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loginLoading ? 'Signing in...' : 'Sign In'}
-              </button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <a
-                href="/"
-                className="text-sm text-slate-600 hover:text-slate-900"
-              >
-                ← Back to Home
-              </a>
-            </div>
+          {/* Back to home link */}
+          <div className="mt-6">
+            <Link
+              href="/"
+              className="text-sm text-slate-600 hover:text-slate-900 hover:underline underline-offset-2"
+            >
+              ← Back to Home
+            </Link>
           </div>
         </div>
       </div>
     );
   }
 
+  // Check 2: Authenticated but not admin - show access denied
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center">
+          {/* Lock Icon */}
+          <div className="mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100 text-red-600">
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Message */}
+          <h1 className="font-bold text-3xl text-slate-900 mb-4">
+            Access Denied
+          </h1>
+          <p className="font-normal text-lg text-slate-600 mb-2">
+            You don't have permission to access the admin panel.
+          </p>
+          <p className="font-normal text-sm text-slate-500 mb-8">
+            Logged in as: <span className="font-semibold text-slate-700">{user?.email}</span>
+          </p>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link
+              href="/"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              Go Home
+            </Link>
+            <Link
+              href="/profile"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-700 font-semibold rounded-lg border-2 border-slate-300 hover:bg-slate-50 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              View Profile
+            </Link>
+          </div>
+
+          {/* Additional Info */}
+          <div className="mt-8 pt-6 border-t border-slate-200">
+            <p className="text-sm text-slate-500">
+              If you believe this is an error, please contact an administrator.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // User is authenticated AND is admin - show admin panel
   return <>{children}</>;
 }
