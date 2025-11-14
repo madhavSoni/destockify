@@ -1,17 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Patrick_Hand } from 'next/font/google';
-import { api } from '@/lib/api';
+import { StateSelector } from './state-selector';
 
 const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
 export default async function LocationsPage() {
-  const STATES = [
-    'AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','IA','ID','IL','IN','KS','KY','LA','MA',
-    'MD','ME','MI','MN','MO','MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','OR','PA','RI',
-    'SC','SD','TN','TX','UT','VA','VT','WA','WI','WV','WY',
-  ];
-
   return (
     <div className="bg-white">
       <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -48,21 +42,7 @@ export default async function LocationsPage() {
         </div>
 
         {/* Shop by State dropdown */}
-        <form action="/suppliers" method="get" className="mx-auto mt-8 max-w-sm">
-          <div className="relative">
-            <select
-              name="state"
-              defaultValue=""
-              className={`${hand.className} h-11 w-full appearance-none rounded-[14px] border-2 border-slate-900/80 bg-white px-4 pr-10 text-base text-slate-900 shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] focus:outline-none`}
-            >
-              <option value="" disabled>Shop by State</option>
-              {STATES.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-700">▾</span>
-          </div>
-        </form>
+        <StateSelector />
       </div>
 
       {/* Feature cards section */}
@@ -130,16 +110,85 @@ export default async function LocationsPage() {
       <section className="py-16 bg-white text-center">
         <h2 className={`${hand.className} text-3xl text-slate-900 mb-8`}>FAQ</h2>
         <div className="mx-auto max-w-xl space-y-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div
-              key={i}
-              className="rounded-[12px] border-2 border-slate-900/80 bg-white py-3 px-4 text-left shadow-[3px_4px_0_0_rgba(2,6,23,0.85)]"
-            >
-              <p className={`${hand.className} text-base text-slate-800`}>
-                Question {i} — placeholder text
-              </p>
+          <details className="group rounded-[14px] border-2 border-slate-900/80 bg-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] transition hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5">
+              <div>
+                <div className={`${hand.className} text-base font-semibold text-xl text-slate-900`}>
+                  How do I find suppliers in my state?
+                </div>
+              </div>
+              <span className="ml-4 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition group-open:rotate-45">
+                +
+              </span>
+            </summary>
+            <div className={`${hand.className} mt-4 px-5 pb-5 text-base text-slate-700 leading-relaxed`}>
+              Use the "Shop by State" dropdown above to filter suppliers by location. You can also browse by region or search for specific cities. Each supplier profile shows their warehouse locations and service areas.
             </div>
-          ))}
+          </details>
+
+          <details className="group rounded-[14px] border-2 border-slate-900/80 bg-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] transition hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5">
+              <div>
+                <div className={`${hand.className} text-base font-semibold text-xl text-slate-900`}>
+                  What types of products can I buy by location?
+                </div>
+              </div>
+              <span className="ml-4 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition group-open:rotate-45">
+                +
+              </span>
+            </summary>
+            <div className={`${hand.className} mt-4 px-5 pb-5 text-base text-slate-700 leading-relaxed`}>
+              Suppliers offer a wide variety of liquidation merchandise including clothing, electronics, home goods, toys, and more. Each supplier profile lists their available categories and minimum order requirements. Filter by category to find specific product types in your area.
+            </div>
+          </details>
+
+          <details className="group rounded-[14px] border-2 border-slate-900/80 bg-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] transition hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5">
+              <div>
+                <div className={`${hand.className} text-base font-semibold text-xl text-slate-900`}>
+                  Do suppliers ship nationwide or only locally?
+                </div>
+              </div>
+              <span className="ml-4 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition group-open:rotate-45">
+                +
+              </span>
+            </summary>
+            <div className={`${hand.className} mt-4 px-5 pb-5 text-base text-slate-700 leading-relaxed`}>
+              Shipping policies vary by supplier. Some offer nationwide shipping, while others prefer local pickup or have specific service areas. Check each supplier's profile for their logistics notes, which detail shipping options, freight costs, and pickup availability.
+            </div>
+          </details>
+
+          <details className="group rounded-[14px] border-2 border-slate-900/80 bg-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] transition hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5">
+              <div>
+                <div className={`${hand.className} text-base font-semibold text-xl text-slate-900`}>
+                  What's the minimum order quantity?
+                </div>
+              </div>
+              <span className="ml-4 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition group-open:rotate-45">
+                +
+              </span>
+            </summary>
+            <div className={`${hand.className} mt-4 px-5 pb-5 text-base text-slate-700 leading-relaxed`}>
+              Minimum order requirements vary significantly by supplier. Some accept pallet orders (typically 500-1,500 units), while others require full truckloads. Each supplier profile displays their minimum order and lot size options. Contact suppliers directly for specific requirements.
+            </div>
+          </details>
+
+          <details className="group rounded-[14px] border-2 border-slate-900/80 bg-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] transition hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5">
+              <div>
+                <div className={`${hand.className} text-base font-semibold text-xl text-slate-900`}>
+                  How do I contact suppliers in my area?
+                </div>
+              </div>
+              <span className="ml-4 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition group-open:rotate-45">
+                +
+              </span>
+            </summary>
+            <div className={`${hand.className} mt-4 px-5 pb-5 text-base text-slate-700 leading-relaxed`}>
+              Each supplier profile includes contact information including email, phone, and website. You can reach out directly through their listed contact methods. Many suppliers also have inquiry forms on their websites for bulk order requests.
+            </div>
+          </details>
         </div>
       </section>
     </div>
