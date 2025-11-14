@@ -27,11 +27,7 @@ app.use(cors({
 app.use(express.json({ limit: '25mb' }));
 app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
-app.use(rateLimit({
-  windowMs: config.rateLimit.windowMs,
-  max: config.rateLimit.maxRequests,
-}));
-
+// Skip rate limiting for health check
 app.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
@@ -39,6 +35,15 @@ app.get('/health', (_req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// Rate limiting with skip for health endpoint
+app.use(rateLimit({
+  windowMs: config.rateLimit.windowMs,
+  max: config.rateLimit.maxRequests,
+  skip: (req) => req.path === '/health',
+  standardHeaders: true,
+  legacyHeaders: false,
+}));
 
 app.use('/api', router);
 

@@ -62,10 +62,15 @@ export function SupplierCard({ supplier, variant = 'default' }: { supplier: Supp
           <p className="text-sm text-slate-600">{supplier.shortDescription}</p>
 
           <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-slate-600">
-            {supplier.averageRating ? (
+            {supplier.averageRating != null && supplier.averageRating > 0 ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-amber-700">
                 <span aria-hidden className="text-base leading-none text-amber-500">★</span>
                 {supplier.averageRating.toFixed(1)} avg ({supplier.reviewCount ?? 0} reviews)
+              </span>
+            ) : supplier.reviewCount === 0 ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-slate-600">
+                <span aria-hidden className="text-base leading-none text-slate-400">★</span>
+                0.0 avg (0 reviews)
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-slate-600">

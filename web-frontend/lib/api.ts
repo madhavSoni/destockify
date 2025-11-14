@@ -249,6 +249,7 @@ export type SupplierDetailResponse = {
 export type SupplierListResponse = {
   items: SupplierSummary[];
   nextCursor: number | null;
+  total: number;
 };
 
 export type HomepagePayload = {
@@ -285,6 +286,7 @@ export type AuthResponse = {
   lastName: string;
   email: string;
   isVerified?: boolean;
+  isAdmin?: boolean;
   createdAt?: string;
   authToken?: string;
   verificationToken?: string;
@@ -296,6 +298,7 @@ export type ProfileResponse = {
   lastName: string;
   email: string;
   isVerified: boolean;
+  isAdmin: boolean;
   createdAt: string;
 };
 
@@ -459,6 +462,51 @@ export const api = {
       fetchFromApi<SupplierListResponse>(`/suppliers${buildQueryString(params)}`, { revalidate: 30 }),
     get: (slug: string) => fetchFromApi<SupplierDetailResponse>(`/suppliers/${slug}`, { revalidate: 30 }),
     featured: () => fetchFromApi<SupplierSummary[]>('/suppliers/featured', { revalidate: 30 }),
+    // Admin: Get supplier by ID
+    getByIdAdmin: (id: number, token: string) =>
+      fetchFromApi<any>(`/suppliers/admin/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Get all suppliers
+    getAllAdmin: (token: string, params?: { search?: string; page?: number; limit?: number }) =>
+      fetchFromApi<{ items: any[]; pagination: any }>(`/suppliers/admin/all${buildQueryString(params)}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Create supplier
+    create: (payload: any, token: string) =>
+      fetchFromApi<any>('/suppliers', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Update supplier
+    update: (id: number, payload: any, token: string) =>
+      fetchFromApi<any>(`/suppliers/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Delete supplier
+    delete: (id: number, token: string) =>
+      fetchFromApi<{ message: string }>(`/suppliers/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
   },
   catalog: {
     categories: () => fetchFromApi<CategorySummary[]>('/catalog/categories', { revalidate: 3600 }),
@@ -548,23 +596,40 @@ export const api = {
         },
         cache: 'no-store',
       }),
+    // Admin: Get all reviews
+    getAllAdmin: (token: string, params?: { status?: 'approved' | 'pending' | 'rejected'; page?: number; limit?: number }) =>
+      fetchFromApi<{ items: any[]; pagination: any }>(`/reviews/admin/all${buildQueryString(params)}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
     // Admin: Approve a review
-    approve: (reviewId: number) =>
+    approve: (reviewId: number, token: string) =>
       fetchFromApi<ReviewActionResponse>(`/reviews/${reviewId}/approve`, {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         cache: 'no-store',
       }),
     // Admin: Unapprove a review
-    unapprove: (reviewId: number, moderationNotes?: string) =>
+    unapprove: (reviewId: number, token: string, moderationNotes?: string) =>
       fetchFromApi<ReviewActionResponse>(`/reviews/${reviewId}/unapprove`, {
         method: 'POST',
         body: JSON.stringify({ moderationNotes }),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         cache: 'no-store',
       }),
     // Admin: Delete any review permanently
-    adminDelete: (reviewId: number) =>
+    adminDelete: (reviewId: number, token: string) =>
       fetchFromApi<ReviewActionResponse>(`/reviews/${reviewId}/admin`, {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         cache: 'no-store',
       }),
   },
@@ -615,7 +680,7 @@ export const api = {
         cache: 'no-store',
       }),
     // Admin: Get all submissions with filters
-    getAllAdmin: (status?: string, page?: number, limit?: number) => {
+    getAllAdmin: (token: string, status?: string, page?: number, limit?: number) => {
       const params = new URLSearchParams();
       if (status) params.append('status', status);
       if (page) params.append('page', page.toString());
@@ -624,28 +689,53 @@ export const api = {
       return fetchFromApi<AllSubmissionsResponse>(
         `/submissions/admin/all?${params.toString()}`,
         {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           cache: 'no-store',
         }
       );
     },
     // Admin: Approve submission
-    approve: (id: number, adminNotes?: string) =>
+    approve: (id: number, token: string, adminNotes?: string) =>
       fetchFromApi<ApproveSubmissionResponse>(`/submissions/${id}/approve`, {
         method: 'POST',
         body: JSON.stringify({ adminNotes }),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         cache: 'no-store',
       }),
     // Admin: Reject submission
-    reject: (id: number, adminNotes: string) =>
+    reject: (id: number, token: string, adminNotes: string) =>
       fetchFromApi<SubmissionResponse>(`/submissions/${id}/reject`, {
         method: 'POST',
         body: JSON.stringify({ adminNotes }),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         cache: 'no-store',
       }),
     // Admin: Delete any submission
-    adminDelete: (id: number) =>
+    adminDelete: (id: number, token: string) =>
       fetchFromApi<{ message: string }>(`/submissions/${id}/admin`, {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+  },
+  admin: {
+    // Get dashboard stats
+    dashboard: (token: string) =>
+      fetchFromApi<{
+        stats: { totalSuppliers: number; totalReviews: number; pendingReviews: number };
+        recentActivity: { suppliers: any[]; reviews: any[] };
+      }>('/admin/dashboard', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         cache: 'no-store',
       }),
   },

@@ -56,14 +56,12 @@ export function TrendingSuppliersRail({
           ref={railRef}
           className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {suppliers.slice(0, 8).map((s, i) => (
+          {suppliers.slice(0, 8).map((s) => (
             <Link
               key={s.slug}
               href={`/suppliers/${s.slug}`}
               data-card
-              className={`group relative w-[320px] shrink-0 snap-start overflow-hidden rounded-lg border border-slate-200 bg-white transition-all duration-200 hover:border-slate-300 hover:shadow-sm ${
-                i === suppliers.slice(0, 8).length - 1 ? 'mr-16' : ''
-              }`}
+              className="group relative w-[320px] shrink-0 snap-start overflow-hidden rounded-lg border border-slate-200 bg-white transition-all duration-200 hover:border-slate-300 hover:shadow-sm"
             >
               {/* Header with gradient */}
               <div className="relative h-32 bg-gradient-to-br from-blue-50 to-blue-100 border-b border-slate-200">
@@ -130,8 +128,22 @@ export function TrendingSuppliersRail({
               </div>
             </Link>
           ))}
-          {/* half-peek spacer */}
-          <div className="pointer-events-none w-[160px] shrink-0" aria-hidden />
+          
+          {/* "See more" button card - half peek */}
+          <Link
+            href="/suppliers"
+            className="group relative shrink-0 snap-start overflow-hidden rounded-lg border border-dashed border-slate-300 bg-white/70 backdrop-blur-sm hover:bg-white hover:border-slate-400 transition-all duration-200"
+            style={{ width: '192px' }}
+            aria-label="See more suppliers"
+          >
+            <div className="flex h-full min-h-[200px] w-full flex-col items-center justify-center gap-2 p-4 text-center">
+              <span className="text-2xl text-slate-400 group-hover:text-blue-600 transition-colors">→</span>
+              <span className="text-sm font-medium text-slate-700 group-hover:text-blue-700 transition-colors">See more</span>
+            </div>
+          </Link>
+
+          {/* Right spacer */}
+          <div className="shrink-0 w-4" aria-hidden />
         </div>
 
         {/* Mobile nudge button */}

@@ -69,18 +69,18 @@ export default function ProfilePage() {
         </div>
 
         {/* Profile Header */}
-        <div className="mb-8 rounded-lg border border-slate-200 bg-white p-8">
-          <div className="flex items-start gap-6">
+        <div className="mb-8 rounded-lg border border-slate-200 bg-white p-4 sm:p-8">
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
             {/* Avatar */}
-            <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-4xl font-bold text-white border-4 border-white shadow-lg">
+            <div className="flex h-20 w-20 sm:h-24 sm:w-24 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-3xl sm:text-4xl font-bold text-white border-4 border-white shadow-lg">
               {user.firstName.charAt(0).toUpperCase()}
               {user.lastName.charAt(0).toUpperCase()}
             </div>
 
             {/* User Info */}
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <h1 className="text-3xl font-bold text-slate-900">
+            <div className="flex-1 w-full sm:w-auto">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
                   {user.firstName} {user.lastName}
                 </h1>
                 {/* Verification Badge */}
@@ -93,10 +93,10 @@ export default function ProfilePage() {
                   </span>
                 )}
               </div>
-              <p className="text-base text-slate-600 mb-2">{user.email}</p>
+              <p className="text-sm sm:text-base text-slate-600 mb-2 break-all">{user.email}</p>
               
               {/* Member Since */}
-              <p className="text-sm text-slate-500">
+              <p className="text-xs sm:text-sm text-slate-500">
                 Member since {new Date(user.createdAt).toLocaleDateString('en-US', { 
                   month: 'long', 
                   year: 'numeric' 
@@ -105,8 +105,8 @@ export default function ProfilePage() {
             </div>
 
             {/* Stats */}
-            <div className="text-center">
-              <div className="rounded-lg border border-slate-200 bg-gradient-to-br from-blue-50 to-blue-100 px-6 py-4">
+            <div className="w-full sm:w-auto mt-4 sm:mt-0">
+              <div className="rounded-lg border border-slate-200 bg-gradient-to-br from-blue-50 to-blue-100 px-6 py-4 text-center">
                 <div className="text-3xl font-bold text-slate-900 mb-1">{reviews.length}</div>
                 <div className="text-sm font-medium text-slate-600">
                   {reviews.length === 1 ? 'Review' : 'Reviews'}
@@ -117,8 +117,8 @@ export default function ProfilePage() {
         </div>
 
         {/* Reviews Section */}
-        <div className="rounded-lg border border-slate-200 bg-white p-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">My Reviews</h2>
+        <div className="rounded-lg border border-slate-200 bg-white p-4 sm:p-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6">My Reviews</h2>
 
           {isLoading ? (
             <div className="text-center py-12">
@@ -203,10 +203,10 @@ export default function ProfilePage() {
 
               {/* Navigation Buttons */}
               {reviews.length > 1 && (
-                <div className="flex items-center justify-between mt-6">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
                   <button
                     onClick={prevReview}
-                    className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -230,7 +230,7 @@ export default function ProfilePage() {
 
                   <button
                     onClick={nextReview}
-                    className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                   >
                     Next
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

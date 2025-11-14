@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from 'react';
 export function SiteHeader() {
   const { user, isAuthenticated, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -21,9 +22,30 @@ export function SiteHeader() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Close mobile menu when screen size changes to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isMobileMenuOpen]);
+
   const handleLogout = () => {
     logout();
     setIsDropdownOpen(false);
+    setIsMobileMenuOpen(false);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  const toggleMobileProfile = () => {
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   return (
@@ -32,7 +54,8 @@ export function SiteHeader() {
         {/* Logo */}
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-2xl font-black tracking-tight text-slate-900 hover:opacity-80 transition-opacity"
+          className="inline-flex items-center gap-2 text-xl sm:text-2xl font-black tracking-tight text-slate-900 hover:opacity-80 transition-opacity"
+          onClick={closeMobileMenu}
         >
           <span className="sr-only">Destockify</span>
           <span aria-hidden className="select-none">
@@ -41,9 +64,30 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        {/* Navigation */}
+        {/* Hamburger Button (Mobile) */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg border-2 border-slate-900/80 bg-white hover:bg-slate-50 transition-colors"
+          aria-label="Toggle menu"
+        >
+          <svg
+            className="w-6 h-6 text-slate-900"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2.5}
+          >
+            {isMobileMenuOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
+
+        {/* Desktop Navigation */}
         <nav
-          className="flex items-center gap-8 text-base font-bold"
+          className="hidden md:flex items-center gap-8 text-base font-bold"
           aria-label="Primary"
         >
           <Link 
@@ -159,6 +203,150 @@ export function SiteHeader() {
           )}
         </nav>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="md:hidden fixed inset-0 bg-black/30 z-40 animate-in fade-in duration-200"
+            onClick={closeMobileMenu}
+          />
+          
+          {/* Side Menu */}
+          <div className="md:hidden fixed right-0 top-0 h-full w-72 bg-white border-l-2 border-slate-900/80 shadow-[-4px_0_20px_0_rgba(0,0,0,0.15)] z-50 animate-in slide-in-from-right duration-300">
+            <div className="flex flex-col h-full">
+              {/* Menu Header */}
+              <div className="flex items-center justify-between px-4 py-4 border-b-2 border-slate-900/80">
+                <span className="text-lg font-black text-slate-900">Menu</span>
+                <button
+                  onClick={closeMobileMenu}
+                  className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 transition-colors"
+                  aria-label="Close menu"
+                >
+                  <svg className="w-5 h-5 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Menu Content */}
+              <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+                <Link 
+                  href="/suppliers" 
+                  onClick={closeMobileMenu}
+                  className="block px-4 py-3 text-base font-bold text-slate-900 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                >
+                  Buyers
+                </Link>
+                <Link 
+                  href="/list-your-business" 
+                  onClick={closeMobileMenu}
+                  className="block px-4 py-3 text-base font-bold text-slate-900 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                >
+                  Sellers
+                </Link>
+
+                {!isAuthenticated && (
+                  <Link 
+                    href="/login" 
+                    onClick={closeMobileMenu}
+                    className="block px-4 py-3 text-base font-bold text-slate-900 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                  >
+                    Login
+                  </Link>
+                )}
+
+                {!isAuthenticated && (
+                  <div className="pt-4 mt-2">
+                    <Link
+                      href="/list-your-business"
+                      onClick={closeMobileMenu}
+                      className="block text-center rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] border-2 border-slate-900/80 active:translate-y-[1px] active:shadow-[2px_3px_0_0_rgba(2,6,23,0.85)] transition-all duration-150"
+                    >
+                      List your Business
+                    </Link>
+                  </div>
+                )}
+
+                {/* Profile Section - Collapsible */}
+                {isAuthenticated && user && (
+                  <div className="pt-2 mt-2 border-t-2 border-slate-200">
+                    <button
+                      onClick={toggleMobileProfile}
+                      className="flex items-center justify-between w-full px-4 py-2.5 text-base font-bold text-slate-900 hover:bg-slate-50 rounded-lg transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-sm font-black text-white border-2 border-white shadow-sm">
+                          {user.firstName.charAt(0).toUpperCase()}
+                        </div>
+                        <span>{user.firstName}</span>
+                      </div>
+                      <svg
+                        className={`h-5 w-5 text-slate-600 transition-transform duration-200 flex-shrink-0 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2.5}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {/* Collapsible Profile Menu */}
+                    {isDropdownOpen && (
+                      <div className="mt-1 ml-4 pl-4 border-l-2 border-slate-200 space-y-1 animate-in slide-in-from-top-2 duration-200">
+                        <Link
+                          href="/profile"
+                          onClick={closeMobileMenu}
+                          className="flex items-center gap-3 px-3 py-2 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                        >
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          My Profile
+                        </Link>
+                        
+                        <Link
+                          href="/my-listings"
+                          onClick={closeMobileMenu}
+                          className="flex items-center gap-3 px-3 py-2 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                        >
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          My Listings
+                        </Link>
+                        
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center gap-3 w-full px-3 py-2 text-sm font-bold text-slate-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+                        >
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                          </svg>
+                          Logout
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </nav>
+
+              {/* Menu Footer */}
+              <div className="px-4 py-4 border-t-2 border-slate-200">
+                <Link
+                  href="/list-your-business"
+                  onClick={closeMobileMenu}
+                  className="block text-center rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] border-2 border-slate-900/80 active:translate-y-[1px] active:shadow-[2px_3px_0_0_rgba(2,6,23,0.85)] transition-all duration-150"
+                >
+                  List your Business
+                </Link>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </header>
   );
 }

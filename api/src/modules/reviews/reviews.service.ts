@@ -51,10 +51,14 @@ export async function createReview(payload: {
   }
 
   // Create review (not approved by default)
+  // Note: author field is required by database schema (derived from customer name)
+  const authorName = `${customer.firstName} ${customer.lastName}`.trim() || 'Anonymous';
   const review = await prisma.review.create({
     data: {
       customerId,
       supplierId,
+      author: authorName, // Required field in database
+      company: null, // Optional field
       title: title || null,
       ratingOverall,
       ratingAccuracy: ratingAccuracy || null,
@@ -301,6 +305,79 @@ export async function unapproveReview(payload: {
   return {
     message: 'Review unapproved successfully',
     review: updatedReview,
+  };
+}
+
+// Admin: Get all reviews with filters
+export async function getAllReviewsAdmin(params: {
+  status?: 'approved' | 'pending' | 'rejected';
+  page?: number;
+  limit?: number;
+}) {
+  const page = params.page || 1;
+  const limit = Math.min(params.limit || 20, 100);
+  const skip = (page - 1) * limit;
+
+  const where: any = {};
+
+  if (params.status === 'approved') {
+    where.isApproved = true;
+  } else if (params.status === 'pending') {
+    where.isApproved = false;
+  }
+
+  const [reviews, total] = await Promise.all([
+    prisma.review.findMany({
+      where,
+      include: {
+        customer: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        supplier: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    }),
+    prisma.review.count({ where }),
+  ]);
+
+  return {
+    items: reviews.map((r) => ({
+      id: r.id,
+      title: r.title,
+      ratingOverall: r.ratingOverall,
+      isApproved: r.isApproved,
+      createdAt: r.createdAt.toISOString(),
+      approvedAt: r.approvedAt?.toISOString() || null,
+      customer: {
+        id: r.customer.id,
+        name: `${r.customer.firstName} ${r.customer.lastName}`,
+        email: r.customer.email,
+      },
+      supplier: {
+        id: r.supplier.id,
+        name: r.supplier.name,
+        slug: r.supplier.slug,
+      },
+    })),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
   };
 }
 

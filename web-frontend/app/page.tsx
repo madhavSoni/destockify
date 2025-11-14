@@ -41,17 +41,23 @@ export default async function HomePage() {
 /* --------------------------- HERO --------------------------- */
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden border-b border-slate-200 bg-blue-600">
-      {/* Blue bubbles behind headline */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-10 h-80 w-80 -translate-x-1/2 rounded-full bg-blue-400/25 blur-3xl" />
-        <div className="absolute left-[15%] top-32 h-56 w-56 rounded-full bg-blue-300/20 blur-3xl" />
-        <div className="absolute right-[12%] top-20 h-64 w-64 rounded-full bg-sky-400/20 blur-3xl" />
+    <section className="relative overflow-hidden border-b border-slate-200 min-h-[500px]">
+      {/* Background image */}
+      <div className="absolute inset-0">
+        <Image
+          src="/mainbg2.avif"
+          alt=""
+          fill
+          className="object-cover"
+          priority
+          quality={90}
+        />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-slate-900/40" />
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+      <div className="relative mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 z-10">
         <div className="relative inline-block w-full">
-          <div className="absolute left-1/2 top-1/2 -z-10 h-48 w-[90%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-blue-400 via-blue-500 to-blue-400 opacity-40 blur-2xl sm:w-[85%] md:h-56 md:w-[80%]" />
           <h1 className="relative text-center text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
             Find Trusted Wholesale Liquidation Suppliers Near You
           </h1>

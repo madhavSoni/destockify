@@ -4,7 +4,8 @@ import { api } from '@/lib/api';
 import { SupplierCard } from '@/components/supplier-card';
 import { SectionHeading } from '@/components/section-heading';
 
-export default async function LocationDetailPage({ params }: { params: { slug: string } }) {
+export default async function LocationDetailPage(props: any) {
+  const { params } = props;
   const [regions, suppliersResult, categories] = await Promise.all([
     api.catalog.regions(),
     api.suppliers.list({ region: params.slug, limit: 12 }),
@@ -25,16 +26,25 @@ export default async function LocationDetailPage({ params }: { params: { slug: s
           {region.headline && <p className="mt-3 text-sm text-slate-600">{region.headline}</p>}
           {region.description && <p className="mt-3 text-sm text-slate-600">{region.description}</p>}
           <div className="mt-6 flex flex-wrap gap-3 text-xs text-slate-500">
-            {region.marketStats && 'averageFreight' in region.marketStats && region.marketStats.averageFreight != null && (
-              <span className="rounded-full bg-slate-100 px-3 py-1">
-                Avg freight: {String(region.marketStats.averageFreight)}
-              </span>
-            )}
-            {region.marketStats && 'buyerSegments' in region.marketStats && Array.isArray(region.marketStats.buyerSegments) && (
-              <span className="rounded-full bg-slate-100 px-3 py-1">
-                Buyer segments: {(region.marketStats.buyerSegments as string[]).join(', ')}
-              </span>
-            )}
+            {(() => {
+              const stats: any = region.marketStats ?? {};
+              const avg = stats.averageFreight;
+              const buyers = Array.isArray(stats.buyerSegments) ? (stats.buyerSegments as string[]) : null;
+              return (
+                <>
+                  {avg !== undefined && avg !== null && (
+                    <span className="rounded-full bg-slate-100 px-3 py-1">
+                      Avg freight: {String(avg)}
+                    </span>
+                  )}
+                  {buyers && buyers.length > 0 && (
+                    <span className="rounded-full bg-slate-100 px-3 py-1">
+                      Buyer segments: {buyers.join(', ')}
+                    </span>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </section>
 

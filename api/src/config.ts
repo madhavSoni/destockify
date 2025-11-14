@@ -129,7 +129,7 @@ export const config: AppConfig = {
   },
   rateLimit: {
     windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000),
-    maxRequests: Number(process.env.RATE_LIMIT_MAX_REQUESTS || 200),
+    maxRequests: Number(process.env.RATE_LIMIT_MAX_REQUESTS || 500),
   },
 };
 

@@ -18,6 +18,7 @@ model Customer {
   zipCode                 String?
 
   isVerified              Boolean            @default(false)
+  isAdmin                 Boolean            @default(false)
   verificationToken       String?
   verificationTokenExpiry DateTime?
 
@@ -130,6 +131,8 @@ model Review {
   supplierId            Int
   customerId            Int
   title                 String?
+  author                String   // Required by database schema
+  company               String?
   ratingOverall         Float
   ratingAccuracy        Float?
   ratingLogistics       Float?

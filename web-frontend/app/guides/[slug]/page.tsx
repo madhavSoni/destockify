@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import { api } from '@/lib/api';
 import { SectionHeading } from '@/components/section-heading';
 
-export default async function GuideDetailPage({ params }: { params: { slug: string } }) {
+export default async function GuideDetailPage(props: any) {
+  const { params } = props;
   const guide = await api.guides.get(params.slug).catch(() => null);
 
   if (!guide) {

@@ -2,22 +2,19 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { api } from '@/lib/api';
 
-export default async function SuppliersPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  // Await searchParams since it's a Promise in Next.js 15+
-  const resolvedParams = await searchParams;
-  
+export default async function SuppliersPage(props: any) {
+  const searchParams = await props.searchParams;
   // existing filters (kept so your API keeps working)
   const filters = {
-    search: typeof resolvedParams.search === 'string' ? resolvedParams.search : '',
-    category: typeof resolvedParams.category === 'string' ? resolvedParams.category : '',
-    region: typeof resolvedParams.region === 'string' ? resolvedParams.region : '',
-    lotSize: typeof resolvedParams['lot-size'] === 'string' ? resolvedParams['lot-size'] : '',
-    cursor: typeof resolvedParams.cursor === 'string' ? Number(resolvedParams.cursor) : undefined,
+    search: typeof searchParams.search === 'string' ? searchParams.search : '',
+    category: typeof searchParams.category === 'string' ? searchParams.category : '',
+    region: typeof searchParams.region === 'string' ? searchParams.region : '',
+    lotSize: typeof searchParams['lot-size'] === 'string' ? searchParams['lot-size'] : '',
+    page: typeof searchParams.page === 'string' ? Math.max(1, Number(searchParams.page)) : 1,
   };
+
+  const itemsPerPage = 18;
+  const cursor = filters.page > 1 ? (filters.page - 1) * itemsPerPage : undefined;
 
   const [result, categories, regions, lotSizes] = await Promise.all([
     api.suppliers.list({
@@ -25,21 +22,30 @@ export default async function SuppliersPage({
       category: filters.category || undefined,
       region: filters.region || undefined,
       lotSize: filters.lotSize || undefined,
-      cursor: filters.cursor,
-      limit: 18,
+      cursor: cursor,
+      limit: itemsPerPage,
     }),
     api.catalog.categories(),
     api.catalog.regions(),
     api.catalog.lotSizes(),
   ]);
 
-  const nextCursor = result.nextCursor;
-  const nextParams = new URLSearchParams();
-  if (filters.search) nextParams.set('search', filters.search);
-  if (filters.category) nextParams.set('category', filters.category);
-  if (filters.region) nextParams.set('region', filters.region);
-  if (filters.lotSize) nextParams.set('lot-size', filters.lotSize);
-  if (nextCursor) nextParams.set('cursor', String(nextCursor));
+  // Calculate pagination info
+  const total = result.total ?? result.items.length;
+  const totalPages = Math.ceil(total / itemsPerPage);
+  const hasNextPage = filters.page < totalPages;
+  const hasPrevPage = filters.page > 1;
+  
+  // Helper function to build URL with page number
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams();
+    if (filters.search) params.set('search', filters.search);
+    if (filters.category) params.set('category', filters.category);
+    if (filters.region) params.set('region', filters.region);
+    if (filters.lotSize) params.set('lot-size', filters.lotSize);
+    if (page > 1) params.set('page', String(page));
+    return `/suppliers${params.toString() ? '?' + params.toString() : ''}`;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
@@ -108,7 +114,7 @@ export default async function SuppliersPage({
             {/* Results Count */}
             <div className="mb-6">
               <p className="font-bold text-lg text-slate-900">
-                {result.items.length} Suppliers Found
+                {total} Suppliers Found
                 {filters.region && regions.find(r => r.slug === filters.region) && (
                   <span className="font-medium text-slate-600"> in {regions.find(r => r.slug === filters.region)?.name}</span>
                 )}
@@ -158,28 +164,26 @@ export default async function SuppliersPage({
                     </div>
 
                     {/* Rating */}
-                    {s.averageRating && s.averageRating > 0 && (
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <svg
-                              key={i}
-                              className={`w-4 h-4 ${i < Math.round(s.averageRating!) ? 'text-yellow-400' : 'text-slate-300'}`}
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                          ))}
-                        </div>
-                        <span className="font-bold text-sm text-slate-900">
-                          {s.averageRating.toFixed(1)}
-                        </span>
-                        <span className="font-medium text-xs text-slate-500">
-                          ({s.reviewCount} {s.reviewCount === 1 ? 'review' : 'reviews'})
-                        </span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <svg
+                            key={i}
+                            className={`w-4 h-4 ${s.averageRating && i < Math.round(s.averageRating) ? 'text-yellow-400' : 'text-slate-300'}`}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ))}
                       </div>
-                    )}
+                      <span className="font-bold text-sm text-slate-900">
+                        {s.averageRating ? s.averageRating.toFixed(1) : '0.0'}
+                      </span>
+                      <span className="font-medium text-xs text-slate-500">
+                        ({s.reviewCount ?? 0} {(s.reviewCount ?? 0) === 1 ? 'review' : 'reviews'})
+                      </span>
+                    </div>
 
                     {/* View Details Button */}
                     <div className="pt-2">
@@ -195,15 +199,131 @@ export default async function SuppliersPage({
               ))}
             </div>
 
-            {/* Pagination */}
-            {nextCursor && (
+            {/* Page-based Pagination */}
+            {(hasNextPage || hasPrevPage) && (
               <div className="mt-10 flex justify-center">
-                <Link
-                  href={`/suppliers?${nextParams.toString()}`}
-                  className="font-bold rounded-xl bg-blue-600 px-8 py-3 text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] hover:bg-blue-700 active:translate-y-0 transition-all duration-200"
-                >
-                  Load More Suppliers
-                </Link>
+                <nav className="flex items-center gap-2" aria-label="Pagination">
+                  {/* Previous Button */}
+                  {hasPrevPage ? (
+                    <Link
+                      href={buildPageUrl(filters.page - 1)}
+                      className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-colors"
+                      aria-label="Previous page"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </Link>
+                  ) : (
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </div>
+                  )}
+
+                  {/* Page Numbers */}
+                  {(() => {
+                    const pageNumbers = [];
+                    const maxVisiblePages = 7;
+                    const currentPage = filters.page;
+                    
+                    // Calculate range of pages to show
+                    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+                    
+                    // Adjust startPage if we're near the end
+                    if (endPage - startPage < maxVisiblePages - 1) {
+                      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                    }
+                    
+                    // Show first page and ellipsis if needed
+                    if (startPage > 1) {
+                      pageNumbers.push(
+                        <Link
+                          key={1}
+                          href={buildPageUrl(1)}
+                          className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-colors font-medium"
+                        >
+                          1
+                        </Link>
+                      );
+                      if (startPage > 2) {
+                        pageNumbers.push(
+                          <span key="ellipsis-start" className="flex items-center justify-center w-10 h-10 text-slate-400">
+                            ...
+                          </span>
+                        );
+                      }
+                    }
+                    
+                    // Show page numbers in range
+                    for (let i = startPage; i <= endPage; i++) {
+                      if (i === currentPage) {
+                        pageNumbers.push(
+                          <div
+                            key={i}
+                            className="flex items-center justify-center w-10 h-10 rounded-lg border-2 border-blue-600 bg-blue-600 text-white font-bold"
+                            aria-current="page"
+                          >
+                            {i}
+                          </div>
+                        );
+                      } else {
+                        pageNumbers.push(
+                          <Link
+                            key={i}
+                            href={buildPageUrl(i)}
+                            className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-colors font-medium"
+                          >
+                            {i}
+                          </Link>
+                        );
+                      }
+                    }
+                    
+                    // Show ellipsis and last page if needed
+                    if (endPage < totalPages) {
+                      if (endPage < totalPages - 1) {
+                        pageNumbers.push(
+                          <span key="ellipsis-end" className="flex items-center justify-center w-10 h-10 text-slate-400">
+                            ...
+                          </span>
+                        );
+                      }
+                      pageNumbers.push(
+                        <Link
+                          key={totalPages}
+                          href={buildPageUrl(totalPages)}
+                          className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-colors font-medium"
+                        >
+                          {totalPages}
+                        </Link>
+                      );
+                    }
+                    
+                    return pageNumbers;
+                  })()}
+
+                  {/* Next Button */}
+                  {hasNextPage ? (
+                    <Link
+                      href={buildPageUrl(filters.page + 1)}
+                      className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-colors"
+                      aria-label="Next page"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  ) : (
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  )}
+                </nav>
               </div>
             )}
           </section>

@@ -11,6 +11,7 @@ import {
   deleteSubmissionAdmin,
 } from './submissions.service';
 import { authenticateToken, AuthRequest } from '../../middleware/authMiddleware';
+import { isAdmin } from '../../middleware/adminMiddleware';
 
 const router = Router();
 
@@ -75,10 +76,9 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res) => {
 });
 
 // ========== ADMIN ROUTES ==========
-// Note: isAdmin middleware will be implemented later for actual admin panel
 
 // Get all submissions (admin)
-router.get('/admin/all', authenticateToken, async (req: AuthRequest, res) => {
+router.get('/admin/all', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
   try {
     const status = req.query.status as string | undefined;
     const page = parseInt(req.query.page as string) || 1;
@@ -92,7 +92,7 @@ router.get('/admin/all', authenticateToken, async (req: AuthRequest, res) => {
 });
 
 // Approve submission (admin)
-router.post('/:id/approve', authenticateToken, async (req: AuthRequest, res) => {
+router.post('/:id/approve', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
   try {
     const submissionId = parseInt(req.params.id);
     const { adminNotes } = req.body;
@@ -104,7 +104,7 @@ router.post('/:id/approve', authenticateToken, async (req: AuthRequest, res) => 
 });
 
 // Reject submission (admin)
-router.post('/:id/reject', authenticateToken, async (req: AuthRequest, res) => {
+router.post('/:id/reject', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
   try {
     const submissionId = parseInt(req.params.id);
     const { adminNotes } = req.body;
@@ -121,7 +121,7 @@ router.post('/:id/reject', authenticateToken, async (req: AuthRequest, res) => {
 });
 
 // Delete submission (admin)
-router.delete('/:id/admin', authenticateToken, async (req: AuthRequest, res) => {
+router.delete('/:id/admin', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
   try {
     const submissionId = parseInt(req.params.id);
     const result = await deleteSubmissionAdmin(submissionId);

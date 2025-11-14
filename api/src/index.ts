@@ -25,7 +25,7 @@ async function bootstrap() {
     const port = config.port;
 
     server.listen(port, () => {
-      console.log(`Muse API listening on port ${port}`);
+      console.log(`Destockify API listening on port ${port}`);
     });
   } catch (error) {
     console.error('Failed to start server', error);

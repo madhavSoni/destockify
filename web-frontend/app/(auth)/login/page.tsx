@@ -38,9 +38,6 @@ export default function LoginPage() {
       setIsLoading(true);
       try {
         await login(email, password);
-        
-        // Use replace with refresh to load the entire page with updated auth state
-        window.location.href = '/';
       } catch (error: any) {
         console.error('Login failed:', error);
         setErrors({ general: error.message || 'Failed to login. Please try again.' });
