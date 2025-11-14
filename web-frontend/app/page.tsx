@@ -45,7 +45,7 @@ function HeroSection() {
       {/* Background image */}
       <div className="absolute inset-0">
         <Image
-          src="/mainbg.png"
+          src="/mainbg2.avif"
           alt=""
           fill
           className="object-cover"
