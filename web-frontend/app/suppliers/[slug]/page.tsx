@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { ReviewsWrapper } from './reviews-wrapper';
 
 export default async function SupplierDetailPage(props: any) {
-  const { params } = props;
+  const params = await props.params;
   const detail = await api.suppliers.get(params.slug).catch(() => null);
   if (!detail) notFound();
 

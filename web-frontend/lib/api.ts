@@ -249,6 +249,7 @@ export type SupplierDetailResponse = {
 export type SupplierListResponse = {
   items: SupplierSummary[];
   nextCursor: number | null;
+  total: number;
 };
 
 export type HomepagePayload = {

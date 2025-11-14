@@ -50,6 +50,7 @@ export interface SupplierListParams {
 export interface SupplierListResponse {
   items: Array<ReturnType<typeof mapSupplierSummary>>;
   nextCursor: number | null;
+  total: number;
 }
 
 export function mapSupplierSummary(supplier: SupplierSummaryPayload) {
@@ -236,7 +237,10 @@ export async function listSuppliers(params: SupplierListParams): Promise<Supplie
     query.skip = 1;
   }
 
-  const suppliers = (await prisma.supplier.findMany(query)) as SupplierSummaryPayload[];
+  const [suppliers, total] = await Promise.all([
+    prisma.supplier.findMany(query) as Promise<SupplierSummaryPayload[]>,
+    prisma.supplier.count({ where }),
+  ]);
 
   let nextCursor: number | null = null;
   if (suppliers.length > take) {
@@ -247,6 +251,7 @@ export async function listSuppliers(params: SupplierListParams): Promise<Supplie
   return {
     items: suppliers.map((supplier) => mapSupplierSummary(supplier)),
     nextCursor,
+    total,
   };
 }
 
