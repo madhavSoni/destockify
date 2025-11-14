@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://destockify-api-78602435411.us-central1.run.app/api';
 
 type FetchOptions = {
   revalidate?: number;
