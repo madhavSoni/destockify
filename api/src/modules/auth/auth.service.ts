@@ -92,30 +92,6 @@ export async function login(payload: { email: string; password: string }) {
     throw new Error("Email is not verified.")
   }
 
-  // Auto-promote to admin if email matches ADMIN_EMAIL or hardcoded admin email
-  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-  const hardcodedAdminEmail = 'syedh2971@gmail.com'.toLowerCase();
-  const customerEmailLower = customer.email.toLowerCase();
-  const isAdminEmail = (adminEmail && customerEmailLower === adminEmail) || 
-                       customerEmailLower === hardcodedAdminEmail;
-  
-  console.log('Admin check:', {
-    customerEmail: customer.email,
-    adminEmail,
-    hardcodedAdminEmail,
-    isAdminEmail,
-    currentIsAdmin: customer.isAdmin
-  });
-  
-  if (isAdminEmail && !customer.isAdmin) {
-    console.log('Promoting user to admin:', customer.email);
-    await prisma.customer.update({
-      where: { id: customer.id },
-      data: { isAdmin: true },
-    });
-    customer.isAdmin = true;
-  }
-
   const authToken = generateAuthToken(customer.id, customer.email);
 
   return {
