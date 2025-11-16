@@ -596,6 +596,34 @@ export const api = {
         },
         cache: 'no-store',
       }),
+    // Admin: Get reviews by supplier ID
+    getBySupplierAdmin: (supplierId: number, token: string) =>
+      fetchFromApi<any[]>(`/reviews/admin/supplier/${supplierId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Update any review
+    adminUpdate: (reviewId: number, payload: any, token: string) =>
+      fetchFromApi<ReviewActionResponse>(`/reviews/admin/${reviewId}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Create review
+    adminCreate: (payload: any, token: string) =>
+      fetchFromApi<ReviewActionResponse>('/reviews/admin', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
     // Admin: Get all reviews
     getAllAdmin: (token: string, params?: { status?: 'approved' | 'pending' | 'rejected'; page?: number; limit?: number }) =>
       fetchFromApi<{ items: any[]; pagination: any }>(`/reviews/admin/all${buildQueryString(params)}`, {

@@ -8,6 +8,9 @@ import {
   unapproveReview,
   adminDeleteReview,
   getAllReviewsAdmin,
+  getReviewsBySupplierAdmin,
+  adminUpdateReview,
+  adminCreateReview,
 } from './reviews.service';
 import { authenticateToken, AuthRequest } from '../../middleware/authMiddleware';
 import { isAdmin } from '../../middleware/adminMiddleware';
@@ -153,6 +156,51 @@ router.delete('/:reviewId/admin', authenticateToken, isAdmin, async (req: AuthRe
     res.json(result);
   } catch (error: any) {
     res.status(400).json({ message: error.message ?? 'Unable to delete review' });
+  }
+});
+
+// Get reviews by supplier ID (admin only)
+router.get('/admin/supplier/:supplierId', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
+  try {
+    const supplierId = parseInt(req.params.supplierId);
+
+    if (isNaN(supplierId)) {
+      return res.status(400).json({ message: 'Invalid supplier ID' });
+    }
+
+    const reviews = await getReviewsBySupplierAdmin(supplierId);
+    res.json(reviews);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message ?? 'Unable to fetch reviews' });
+  }
+});
+
+// Admin: Update any review
+router.put('/admin/:reviewId', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
+  try {
+    const reviewId = parseInt(req.params.reviewId);
+
+    if (isNaN(reviewId)) {
+      return res.status(400).json({ message: 'Invalid review ID' });
+    }
+
+    const result = await adminUpdateReview({
+      reviewId,
+      ...req.body,
+    });
+    res.json(result);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message ?? 'Unable to update review' });
+  }
+});
+
+// Admin: Create review
+router.post('/admin', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
+  try {
+    const result = await adminCreateReview(req.body);
+    res.status(201).json(result);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message ?? 'Unable to create review' });
   }
 });
 

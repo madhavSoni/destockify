@@ -357,6 +357,7 @@ export async function getAllReviewsAdmin(params: {
     items: reviews.map((r) => ({
       id: r.id,
       title: r.title,
+      body: r.body,
       ratingOverall: r.ratingOverall,
       isApproved: r.isApproved,
       createdAt: r.createdAt.toISOString(),
@@ -402,6 +403,239 @@ export async function adminDeleteReview(reviewId: number) {
 
   return {
     message: 'Review deleted permanently',
+  };
+}
+
+// Admin: Get reviews by supplier ID
+export async function getReviewsBySupplierAdmin(supplierId: number) {
+  const reviews = await prisma.review.findMany({
+    where: { supplierId },
+    include: {
+      customer: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return reviews.map((r) => ({
+    id: r.id,
+    title: r.title,
+    author: r.author,
+    company: r.company,
+    ratingOverall: r.ratingOverall,
+    ratingAccuracy: r.ratingAccuracy,
+    ratingLogistics: r.ratingLogistics,
+    ratingValue: r.ratingValue,
+    ratingCommunication: r.ratingCommunication,
+    highlights: r.highlights,
+    body: r.body,
+    images: r.images,
+    isApproved: r.isApproved,
+    moderationNotes: r.moderationNotes,
+    createdAt: r.createdAt.toISOString(),
+    updatedAt: r.updatedAt.toISOString(),
+    approvedAt: r.approvedAt?.toISOString() || null,
+    customer: {
+      id: r.customer.id,
+      name: `${r.customer.firstName} ${r.customer.lastName}`,
+      email: r.customer.email,
+    },
+  }));
+}
+
+// Admin: Update any review
+export async function adminUpdateReview(payload: {
+  reviewId: number;
+  title?: string;
+  body?: string;
+  ratingOverall?: number;
+  ratingAccuracy?: number;
+  ratingLogistics?: number;
+  ratingValue?: number;
+  ratingCommunication?: number;
+  highlights?: string[];
+  images?: string[];
+  createdAt?: string; // ISO date string
+  isApproved?: boolean;
+}) {
+  const { reviewId, createdAt, ...updateData } = payload;
+
+  const review = await prisma.review.findUnique({
+    where: { id: reviewId },
+  });
+
+  if (!review) {
+    throw new Error('Review not found');
+  }
+
+  const data: any = { ...updateData };
+  
+  // Handle date update - accept both ISO strings and date strings (YYYY-MM-DD)
+  if (createdAt) {
+    // If it's already a full ISO string, use it directly
+    // Otherwise, treat it as YYYY-MM-DD and convert to Date
+    const dateValue = createdAt.includes('T') 
+      ? new Date(createdAt) 
+      : new Date(createdAt + 'T00:00:00');
+    
+    // Validate the date
+    if (isNaN(dateValue.getTime())) {
+      throw new Error('Invalid date format');
+    }
+    
+    data.createdAt = dateValue;
+  }
+
+  // If approving, set approvedAt
+  if (updateData.isApproved === true && !review.isApproved) {
+    data.approvedAt = new Date();
+  } else if (updateData.isApproved === false && review.isApproved) {
+    data.approvedAt = null;
+  }
+
+  const updatedReview = await prisma.review.update({
+    where: { id: reviewId },
+    data,
+    include: {
+      customer: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
+      supplier: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    },
+  });
+
+  // Update supplier ratings if rating changed or approval status changed
+  if (updateData.ratingOverall !== undefined || updateData.isApproved !== undefined) {
+    await updateSupplierRatings(review.supplierId);
+  }
+
+  return {
+    message: 'Review updated successfully',
+    review: updatedReview,
+  };
+}
+
+// Admin: Create review (bypasses customer verification)
+export async function adminCreateReview(payload: {
+  supplierId: number;
+  customerId?: number; // Optional - can create without customer
+  title?: string;
+  author: string;
+  company?: string;
+  ratingOverall: number;
+  ratingAccuracy?: number;
+  ratingLogistics?: number;
+  ratingValue?: number;
+  ratingCommunication?: number;
+  highlights?: string[];
+  body: string;
+  images?: string[];
+  isApproved?: boolean;
+  createdAt?: string; // ISO date string
+}) {
+  const {
+    supplierId,
+    customerId,
+    title,
+    author,
+    company,
+    ratingOverall,
+    ratingAccuracy,
+    ratingLogistics,
+    ratingValue,
+    ratingCommunication,
+    highlights,
+    body,
+    images,
+    isApproved = true, // Admin-created reviews are approved by default
+    createdAt,
+  } = payload;
+
+  // Validate supplier exists
+  const supplier = await prisma.supplier.findUnique({
+    where: { id: supplierId },
+  });
+
+  if (!supplier) {
+    throw new Error('Supplier not found');
+  }
+
+  // If customerId provided, validate it exists
+  if (customerId) {
+    const customer = await prisma.customer.findUnique({
+      where: { id: customerId },
+    });
+    if (!customer) {
+      throw new Error('Customer not found');
+    }
+  }
+
+  const data: any = {
+    supplierId,
+    customerId: customerId || 1, // Use a default customer if none provided (you may want to create a system customer)
+    author,
+    company: company || null,
+    title: title || null,
+    ratingOverall,
+    ratingAccuracy: ratingAccuracy || null,
+    ratingLogistics: ratingLogistics || null,
+    ratingValue: ratingValue || null,
+    ratingCommunication: ratingCommunication || null,
+    highlights: highlights || [],
+    body,
+    images: images || [],
+    isApproved,
+    approvedAt: isApproved ? new Date() : null,
+  };
+
+  if (createdAt) {
+    data.createdAt = new Date(createdAt);
+  }
+
+  const review = await prisma.review.create({
+    data,
+    include: {
+      customer: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
+      supplier: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    },
+  });
+
+  // Update supplier ratings
+  await updateSupplierRatings(supplierId);
+
+  return {
+    message: 'Review created successfully',
+    review,
   };
 }
 
