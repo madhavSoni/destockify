@@ -1,11 +1,15 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { DM_Sans } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import { api } from '@/lib/api';
 import { FaqAccordion } from '@/components/faq-accordion';
 import { TrendingSuppliersRail } from '@/components/trending-suppliers-rail';
 
-const ui = DM_Sans({ subsets: ['latin'], weight: ['400','500','600','700'] });
+const inter = Inter({ 
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  display: 'swap',
+});
 
 export type HomepageData = Awaited<ReturnType<typeof api.home.get>>;
 type SupplierSummaryList = Awaited<ReturnType<typeof api.suppliers.featured>>;
@@ -18,7 +22,11 @@ export default async function HomePage() {
   const [leadGuide] = data.featuredGuides;
 
   return (
-    <div className={`${ui.className} bg-slate-50 scroll-smooth`}>
+    <div className={`${inter.className} bg-slate-50 scroll-smooth`} style={{
+      WebkitFontSmoothing: 'antialiased',
+      textTransform: 'none',
+      fontFamily: '"Inter", "Adjusted Arial", Tahoma, Geneva, sans-serif',
+    }}>
       <HeroSection />
 
       {/* Trending rail with half-peek card */}
