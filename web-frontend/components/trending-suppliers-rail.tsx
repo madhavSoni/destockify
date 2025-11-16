@@ -73,6 +73,20 @@ export function TrendingSuppliersRail({
                     </div>
                   </div>
                 </div>
+                
+                {/* Verified Badge - Sticker Style */}
+                {((s.averageRating && s.averageRating >= 4) || (s.trustScore && s.trustScore > 0)) && (
+                  <div className="absolute top-0 right-0 overflow-hidden w-24 h-24 pointer-events-none">
+                    <div className="absolute top-3 -right-8 bg-gradient-to-br from-green-500 to-green-600 text-white px-8 py-1.5 text-[10px] font-black tracking-wide shadow-lg transform rotate-45 border-2 border-green-700/50">
+                      <div className="flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span>VERIFIED</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Card Content */}
@@ -109,20 +123,6 @@ export function TrendingSuppliersRail({
                     {s.reviewCount && s.reviewCount > 0 && (
                       <span className="text-xs text-slate-600">({s.reviewCount})</span>
                     )}
-                  </div>
-                )}
-
-                {/* Lot Sizes */}
-                {s.lotSizes && s.lotSizes.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {s.lotSizes.slice(0, 2).map((ls) => (
-                      <span
-                        key={ls.slug}
-                        className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 border border-blue-200"
-                      >
-                        {ls.name}
-                      </span>
-                    ))}
                   </div>
                 )}
               </div>

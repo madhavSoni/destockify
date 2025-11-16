@@ -151,54 +151,64 @@ function ConnectByState() {
 /* --------------------------- TWO IMAGE FEATURES ------------------------------ */
 function TwoUpFeatures() {
   return (
-    <section className="mx-auto max-w-[95vw] px-4 sm:px-6 lg:px-8">
-      <div className="grid gap-6 py-20 md:grid-cols-2">
-        <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
-          <div className="relative h-72 w-full overflow-hidden">
+    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <div className="space-y-8">
+        {/* Feature 1: Split Layout - Image Left, Content Right */}
+        <article className="grid gap-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg md:grid-cols-2 md:h-[500px]">
+          <div className="relative h-80 w-full md:h-full">
             <Image
               src="/feature-desk.png"
               alt="Liquidation warehouse desk"
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-cover"
               priority
             />
           </div>
-          <div className="p-6">
-            <h3 className="text-2xl font-semibold text-slate-900 leading-snug sm:text-3xl">
+          <div className="flex flex-col justify-center bg-white p-8 sm:p-12">
+            <h3 className="text-3xl font-bold text-slate-900 leading-tight sm:text-4xl">
               Buy Truckload Liquidation Direct from Vetted Liquidators Near You
             </h3>
-            <p className="mt-4 text-base leading-7 text-slate-700">
+            <p className="mt-6 text-base leading-7 text-slate-600 sm:text-lg">
               Source by the pallet or truckload for your bin stores, discount store, auction house and more! Buy
               truckloads of returns, overstock and liquidations directly from Amazon, Target, Walmart, Home Depot and more.
             </p>
             <Link
               href="/suppliers"
-              className="mt-6 inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/30"
+              className="mt-8 inline-flex w-fit items-center justify-center rounded-lg bg-slate-900 px-8 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:bg-slate-800 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-slate-900/20"
             >
-              Browse
+              Browse Suppliers
+              <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
             </Link>
           </div>
         </article>
 
-        <article className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
-          <div className="p-6">
-            <h3 className="text-2xl font-semibold text-slate-900 leading-snug sm:text-3xl">Read real reviews from buyers</h3>
-            <p className="mt-4 text-base leading-7 text-slate-700">
+        {/* Feature 2: Split Layout - Content Left, Image Right */}
+        <article className="grid gap-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg md:grid-cols-2 md:h-[500px]">
+          <div className="order-2 flex flex-col justify-center bg-white p-8 sm:p-12 md:order-1">
+            <h3 className="text-3xl font-bold text-slate-900 leading-tight sm:text-4xl">
+              Read Real Reviews from Buyers
+            </h3>
+            <p className="mt-6 text-base leading-7 text-slate-600 sm:text-lg">
               Find liquidation pallets, wholesale inventory, and merchandise for live auctions from trusted suppliers.
             </p>
             <Link
               href="/suppliers?search=review"
-              className="mt-6 inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/30"
+              className="mt-8 inline-flex w-fit items-center justify-center rounded-lg bg-slate-900 px-8 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:bg-slate-800 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-slate-900/20"
             >
-              Browse
+              Browse Reviews
+              <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
             </Link>
           </div>
-          <div className="relative min-h-[18rem] w-full flex-1 overflow-hidden">
+          <div className="relative order-1 h-80 w-full md:order-2 md:h-full">
             <Image
               src="/feature-family.png"
               alt="Family business liquidation"
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-cover"
             />
           </div>
         </article>
