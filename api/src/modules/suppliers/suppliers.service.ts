@@ -45,6 +45,8 @@ export interface SupplierListParams {
   cursor?: number;
   limit?: number;
   homeOnly?: boolean;
+  verified?: boolean;
+  regionGroup?: 'south' | 'west' | 'northeast' | 'midwest' | 'other';
 }
 
 export interface SupplierListResponse {
@@ -178,10 +180,35 @@ export function computeReviewSummary(reviews: SupplierDetailPayload['reviews']) 
   };
 }
 
+// Helper function to categorize states into regions
+function getRegionGroup(stateCode: string | null | undefined): string {
+  if (!stateCode) return 'other';
+  
+  const state = stateCode.toUpperCase();
+  
+  // South
+  const southStates = ['FL', 'GA', 'TX', 'AL', 'MS', 'LA', 'AR', 'TN', 'NC', 'SC', 'KY', 'VA', 'WV'];
+  // West
+  const westStates = ['CA', 'OR', 'WA', 'NV', 'AZ', 'UT', 'CO', 'NM', 'ID', 'MT', 'WY', 'AK', 'HI'];
+  // Northeast
+  const northeastStates = ['NY', 'NJ', 'PA', 'MA', 'CT', 'RI', 'VT', 'NH', 'ME', 'DE', 'MD', 'DC'];
+  // Midwest
+  const midwestStates = ['IL', 'IN', 'OH', 'MI', 'WI', 'MN', 'IA', 'MO', 'ND', 'SD', 'NE', 'KS', 'OK'];
+  
+  if (southStates.includes(state)) return 'south';
+  if (westStates.includes(state)) return 'west';
+  if (northeastStates.includes(state)) return 'northeast';
+  if (midwestStates.includes(state)) return 'midwest';
+  return 'other';
+}
+
 export async function listSuppliers(params: SupplierListParams): Promise<SupplierListResponse> {
   const take = Math.min(params.limit ?? 20, 50);
 
   const where: Prisma.SupplierWhereInput = {};
+
+  // Only show suppliers with regions (exclude those without states)
+  where.regionId = { not: null };
 
   if (params.category) {
     where.categories = {
@@ -203,6 +230,71 @@ export async function listSuppliers(params: SupplierListParams): Promise<Supplie
     };
   }
 
+  if (params.verified !== undefined) {
+    if (params.verified) {
+      // Verified: averageRating >= 4 or trustScore > 0
+      const verifiedCondition = {
+        OR: [
+          { averageRating: { gte: 4 } },
+          { trustScore: { gt: 0 } },
+        ],
+      };
+      if (Array.isArray(where.AND)) {
+        where.AND.push(verifiedCondition);
+      } else if (where.AND) {
+        where.AND = [where.AND, verifiedCondition];
+      } else {
+        where.AND = [verifiedCondition];
+      }
+    } else {
+      // Not verified: averageRating < 4 and trustScore is 0 or null
+      const notVerified = {
+        AND: [
+          {
+            OR: [
+              { averageRating: { lt: 4 } },
+              { averageRating: null },
+            ],
+          },
+          {
+            OR: [
+              { trustScore: { lte: 0 } },
+              { trustScore: null },
+            ],
+          },
+        ],
+      };
+      if (Array.isArray(where.AND)) {
+        where.AND.push(notVerified);
+      } else if (where.AND) {
+        where.AND = [where.AND, notVerified];
+      } else {
+        where.AND = [notVerified];
+      }
+    }
+  }
+
+  if (params.regionGroup) {
+    // Get all regions in the specified group
+    const allRegions = await prisma.region.findMany({
+      select: { stateCode: true },
+    });
+    
+    const matchingStateCodes = allRegions
+      .filter(r => getRegionGroup(r.stateCode) === params.regionGroup)
+      .map(r => r.stateCode)
+      .filter((code): code is string => code !== null);
+    
+    if (matchingStateCodes.length > 0) {
+      where.region = {
+        stateCode: { in: matchingStateCodes },
+      };
+    } else {
+      // No matching regions, return empty result
+      where.id = { equals: -1 }; // Impossible condition
+    }
+  }
+
   if (params.homeOnly) {
     where.homeRank = { gt: 0 };
   }
@@ -220,15 +312,26 @@ export async function listSuppliers(params: SupplierListParams): Promise<Supplie
     }
   }
 
+  // Build orderBy based on region group sorting
+  const orderBy: Prisma.SupplierOrderByWithRelationInput[] = [];
+  
+  if (params.regionGroup) {
+    // When filtering by region group, we want to sort by state code within that group
+    orderBy.push({ region: { stateCode: 'asc' } } as Prisma.SupplierOrderByWithRelationInput);
+  } else if (params.homeOnly) {
+    orderBy.push({ homeRank: 'asc' } as Prisma.SupplierOrderByWithRelationInput);
+  } else {
+    // Default: sort by region group (South, West, Northeast, Midwest, Other), then by name
+    // We'll do this in post-processing since Prisma doesn't support custom sorting easily
+    orderBy.push({ region: { stateCode: 'asc' } } as Prisma.SupplierOrderByWithRelationInput);
+  }
+  
+  orderBy.push({ name: 'asc' });
+
   const query: Prisma.SupplierFindManyArgs = {
     where,
     include: supplierSummaryInclude,
-    orderBy: [
-      params.homeOnly
-        ? ({ homeRank: 'asc' } as Prisma.SupplierOrderByWithRelationInput)
-        : ({ homeRank: 'asc' } as Prisma.SupplierOrderByWithRelationInput),
-      { name: 'asc' },
-    ],
+    orderBy,
     take: take + 1,
   };
 
@@ -241,6 +344,32 @@ export async function listSuppliers(params: SupplierListParams): Promise<Supplie
     prisma.supplier.findMany(query) as Promise<SupplierSummaryPayload[]>,
     prisma.supplier.count({ where }),
   ]);
+
+  // Post-process sorting by region group if not filtering by specific group
+  if (!params.regionGroup && !params.homeOnly) {
+    suppliers.sort((a, b) => {
+      const groupA = getRegionGroup(a.region?.stateCode);
+      const groupB = getRegionGroup(b.region?.stateCode);
+      
+      const groupOrder: Record<string, number> = {
+        'south': 1,
+        'west': 2,
+        'northeast': 3,
+        'midwest': 4,
+        'other': 5,
+      };
+      
+      const orderA = groupOrder[groupA] || 5;
+      const orderB = groupOrder[groupB] || 5;
+      
+      if (orderA !== orderB) {
+        return orderA - orderB;
+      }
+      
+      // Same group, sort by name
+      return a.name.localeCompare(b.name);
+    });
+  }
 
   let nextCursor: number | null = null;
   if (suppliers.length > take) {

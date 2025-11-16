@@ -458,7 +458,7 @@ export const api = {
     get: () => fetchFromApi<HomepagePayload>('/home', { revalidate: 30 }),
   },
   suppliers: {
-    list: (params?: { category?: string; region?: string; lotSize?: string; search?: string; cursor?: number; limit?: number }) =>
+    list: (params?: { category?: string; region?: string; lotSize?: string; search?: string; cursor?: number; limit?: number; verified?: boolean; regionGroup?: 'south' | 'west' | 'northeast' | 'midwest' | 'other' }) =>
       fetchFromApi<SupplierListResponse>(`/suppliers${buildQueryString(params)}`, { revalidate: 30 }),
     get: (slug: string) => fetchFromApi<SupplierDetailResponse>(`/suppliers/${slug}`, { revalidate: 30 }),
     featured: () => fetchFromApi<SupplierSummary[]>('/suppliers/featured', { revalidate: 30 }),

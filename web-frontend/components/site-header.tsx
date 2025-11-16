@@ -114,9 +114,15 @@ export function SiteHeader() {
 
           <Link
             href="/list-your-business"
-            className="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] border-2 border-slate-900/80 hover:translate-y-[-2px] hover:shadow-[4px_6px_0_0_rgba(2,6,23,0.85)] transition-all duration-200"
+            className="group relative inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 text-sm font-bold text-white shadow-lg border-2 border-blue-800/50 hover:from-blue-700 hover:to-blue-800 hover:shadow-xl hover:scale-105 active:scale-100 transition-all duration-200 ring-2 ring-blue-500/20 hover:ring-blue-500/40"
           >
-            List your Business
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>List your Business</span>
+            <svg className="w-4 h-4 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
           </Link>
           
           {isAuthenticated && user && (
@@ -262,9 +268,15 @@ export function SiteHeader() {
                     <Link
                       href="/list-your-business"
                       onClick={closeMobileMenu}
-                      className="block text-center rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] border-2 border-slate-900/80 active:translate-y-[1px] active:shadow-[2px_3px_0_0_rgba(2,6,23,0.85)] transition-all duration-150"
+                      className="group flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-3.5 text-sm font-bold text-white shadow-lg border-2 border-blue-800/50 active:scale-95 transition-all duration-150 ring-2 ring-blue-500/20"
                     >
-                      List your Business
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                      </svg>
+                      <span>List your Business</span>
+                      <svg className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
                     </Link>
                   </div>
                 )}
@@ -338,9 +350,15 @@ export function SiteHeader() {
                 <Link
                   href="/list-your-business"
                   onClick={closeMobileMenu}
-                  className="block text-center rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] border-2 border-slate-900/80 active:translate-y-[1px] active:shadow-[2px_3px_0_0_rgba(2,6,23,0.85)] transition-all duration-150"
+                  className="group flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-3.5 text-sm font-bold text-white shadow-lg border-2 border-blue-800/50 active:scale-95 transition-all duration-150 ring-2 ring-blue-500/20"
                 >
-                  List your Business
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>List your Business</span>
+                  <svg className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
                 </Link>
               </div>
             </div>

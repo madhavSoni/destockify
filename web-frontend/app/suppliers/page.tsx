@@ -2,6 +2,24 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { api } from '@/lib/api';
 
+// Helper function to categorize states into regions
+function getRegionGroup(stateCode: string | null | undefined): string {
+  if (!stateCode) return 'other';
+  
+  const state = stateCode.toUpperCase();
+  
+  const southStates = ['FL', 'GA', 'TX', 'AL', 'MS', 'LA', 'AR', 'TN', 'NC', 'SC', 'KY', 'VA', 'WV'];
+  const westStates = ['CA', 'OR', 'WA', 'NV', 'AZ', 'UT', 'CO', 'NM', 'ID', 'MT', 'WY', 'AK', 'HI'];
+  const northeastStates = ['NY', 'NJ', 'PA', 'MA', 'CT', 'RI', 'VT', 'NH', 'ME', 'DE', 'MD', 'DC'];
+  const midwestStates = ['IL', 'IN', 'OH', 'MI', 'WI', 'MN', 'IA', 'MO', 'ND', 'SD', 'NE', 'KS', 'OK'];
+  
+  if (southStates.includes(state)) return 'south';
+  if (westStates.includes(state)) return 'west';
+  if (northeastStates.includes(state)) return 'northeast';
+  if (midwestStates.includes(state)) return 'midwest';
+  return 'other';
+}
+
 export default async function SuppliersPage(props: any) {
   const searchParams = await props.searchParams;
   // existing filters (kept so your API keeps working)
@@ -10,6 +28,8 @@ export default async function SuppliersPage(props: any) {
     category: typeof searchParams.category === 'string' ? searchParams.category : '',
     region: typeof searchParams.region === 'string' ? searchParams.region : '',
     lotSize: typeof searchParams['lot-size'] === 'string' ? searchParams['lot-size'] : '',
+    verified: typeof searchParams.verified === 'string' ? searchParams.verified : '',
+    regionGroup: typeof searchParams['region-group'] === 'string' ? searchParams['region-group'] : '',
     page: typeof searchParams.page === 'string' ? Math.max(1, Number(searchParams.page)) : 1,
   };
 
@@ -22,6 +42,10 @@ export default async function SuppliersPage(props: any) {
       category: filters.category || undefined,
       region: filters.region || undefined,
       lotSize: filters.lotSize || undefined,
+      verified: filters.verified === 'true' ? true : filters.verified === 'false' ? false : undefined,
+      regionGroup: filters.regionGroup && ['south', 'west', 'northeast', 'midwest', 'other'].includes(filters.regionGroup) 
+        ? filters.regionGroup as 'south' | 'west' | 'northeast' | 'midwest' | 'other'
+        : undefined,
       cursor: cursor,
       limit: itemsPerPage,
     }),
@@ -29,6 +53,22 @@ export default async function SuppliersPage(props: any) {
     api.catalog.regions(),
     api.catalog.lotSizes(),
   ]);
+
+  // Group regions by region group
+  const regionsByGroup: Record<string, typeof regions> = {
+    south: [],
+    west: [],
+    northeast: [],
+    midwest: [],
+    other: [],
+  };
+
+  regions.forEach(region => {
+    const group = getRegionGroup(region.stateCode);
+    if (regionsByGroup[group]) {
+      regionsByGroup[group].push(region);
+    }
+  });
 
   // Calculate pagination info
   const total = result.total ?? result.items.length;
@@ -43,6 +83,8 @@ export default async function SuppliersPage(props: any) {
     if (filters.category) params.set('category', filters.category);
     if (filters.region) params.set('region', filters.region);
     if (filters.lotSize) params.set('lot-size', filters.lotSize);
+    if (filters.verified) params.set('verified', filters.verified);
+    if (filters.regionGroup) params.set('region-group', filters.regionGroup);
     if (page > 1) params.set('page', String(page));
     return `/suppliers${params.toString() ? '?' + params.toString() : ''}`;
   };
@@ -64,49 +106,128 @@ export default async function SuppliersPage(props: any) {
         <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
           {/* Sidebar Filters */}
           <aside className="space-y-6">
-            <div className="rounded-lg border border-slate-200 bg-white p-6">
-              <h3 className="font-semibold text-lg text-slate-900 mb-4">Filter by State</h3>
+            <form method="get" className="space-y-6">
+              <input type="hidden" name="search" defaultValue={filters.search} />
               
-              <form method="get" className="space-y-4">
-                <input type="hidden" name="search" defaultValue={filters.search} />
-                
-                {/* States List */}
+              {/* State Filter with Expandable Region Groups */}
+              <div className="rounded-lg border border-slate-200 bg-white p-6">
+                <h3 className="font-semibold text-lg text-slate-900 mb-4">Filter by State</h3>
                 <div className="space-y-2 max-h-[500px] overflow-y-auto">
-                  {regions.map((r) => (
+                  {Object.entries(regionsByGroup).map(([groupName, groupRegions]) => {
+                    if (groupRegions.length === 0) return null;
+                    const groupLabels: Record<string, string> = {
+                      south: 'South',
+                      west: 'West',
+                      northeast: 'Northeast',
+                      midwest: 'Midwest',
+                      other: 'Other',
+                    };
+                    return (
+                      <details key={groupName} className="group">
+                        <summary className="flex items-center justify-between p-2 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors list-none">
+                          <span className="font-semibold text-sm text-slate-900 group-hover:text-blue-600">
+                            {groupLabels[groupName]}
+                          </span>
+                          <svg
+                            className="w-4 h-4 text-slate-500 group-open:rotate-180 transition-transform"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </summary>
+                        <div className="mt-1 ml-2 space-y-1 border-l-2 border-slate-200 pl-3">
+                          {groupRegions.map((r) => (
+                            <label
+                              key={r.slug}
+                              className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors group"
+                            >
+                              <input
+                                type="radio"
+                                name="region"
+                                value={r.slug}
+                                defaultChecked={filters.region === r.slug}
+                                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                              />
+                              <span className="font-normal text-sm text-slate-700 group-hover:text-blue-600">
+                                {r.name}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      </details>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Lot Size Filter */}
+              <div className="rounded-lg border border-slate-200 bg-white p-6">
+                <h3 className="font-semibold text-lg text-slate-900 mb-4">Filter by Lot Size</h3>
+                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                  {lotSizes.map((ls) => (
                     <label
-                      key={r.slug}
+                      key={ls.slug}
                       className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors group"
                     >
                       <input
                         type="radio"
-                        name="region"
-                        value={r.slug}
-                        defaultChecked={filters.region === r.slug}
+                        name="lot-size"
+                        value={ls.slug}
+                        defaultChecked={filters.lotSize === ls.slug}
                         className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                       />
                       <span className="font-normal text-sm text-slate-700 group-hover:text-blue-600">
-                        {r.name}
+                        {ls.name}
                       </span>
                     </label>
                   ))}
                 </div>
+              </div>
 
-                <div className="pt-4 border-t border-slate-200 flex flex-col gap-2">
-                  <button
-                    type="submit"
-                    className="w-full font-semibold rounded-lg bg-blue-600 px-4 py-2.5 text-white hover:bg-blue-700 transition-colors duration-200"
-                  >
-                    Apply Filter
-                  </button>
-                  <Link
-                    href="/suppliers"
-                    className="w-full text-center font-normal text-sm text-slate-600 hover:text-slate-900 py-2 hover:underline underline-offset-2"
-                  >
-                    Clear Filter
-                  </Link>
+              {/* Verified Filter */}
+              <div className="rounded-lg border border-slate-200 bg-white p-6">
+                <h3 className="font-semibold text-lg text-slate-900 mb-4">Verification Status</h3>
+                <div className="space-y-2">
+                  {[
+                    { value: 'true', label: 'Verified' },
+                    { value: 'false', label: 'Not Verified' },
+                  ].map((option) => (
+                    <label
+                      key={option.value}
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors group"
+                    >
+                      <input
+                        type="radio"
+                        name="verified"
+                        value={option.value}
+                        defaultChecked={filters.verified === option.value}
+                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                      />
+                      <span className="font-normal text-sm text-slate-700 group-hover:text-blue-600">
+                        {option.label}
+                      </span>
+                    </label>
+                  ))}
                 </div>
-              </form>
-            </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-200 flex flex-col gap-2">
+                <button
+                  type="submit"
+                  className="w-full font-semibold rounded-lg bg-blue-600 px-4 py-2.5 text-white hover:bg-blue-700 transition-colors duration-200"
+                >
+                  Apply Filters
+                </button>
+                <Link
+                  href="/suppliers"
+                  className="w-full text-center font-normal text-sm text-slate-600 hover:text-slate-900 py-2 hover:underline underline-offset-2"
+                >
+                  Clear All Filters
+                </Link>
+              </div>
+            </form>
           </aside>
 
           {/* Cards Section */}
