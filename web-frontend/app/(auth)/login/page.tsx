@@ -38,6 +38,8 @@ export default function LoginPage() {
       setIsLoading(true);
       try {
         await login(email, password);
+        // Redirect to home page after successful login
+        router.push('/');
       } catch (error: any) {
         console.error('Login failed:', error);
         setErrors({ general: error.message || 'Failed to login. Please try again.' });
