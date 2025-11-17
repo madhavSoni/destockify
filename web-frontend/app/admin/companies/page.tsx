@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 
@@ -10,17 +9,56 @@ type SupplierItem = {
   name: string;
   slug: string;
   email: string | null;
+  phone: string | null;
+  website: string | null;
+  shortDescription: string | null;
+  description: string | null;
+  heroImage: string | null;
+  logoImage: string | null;
   averageRating: number | null;
   reviewCount: number;
   createdAt: string;
   region: { name: string; slug: string } | null;
 };
 
+type Review = {
+  id: number;
+  title: string | null;
+  author: string;
+  company: string | null;
+  ratingOverall: number;
+  body: string;
+  isApproved: boolean;
+  createdAt: string;
+  customer: {
+    id: number;
+    name: string;
+    email: string;
+  };
+};
+
 export default function CompaniesPage() {
   const { authToken } = useAuth();
   const [suppliers, setSuppliers] = useState<SupplierItem[]>([]);
+  const [selectedSupplier, setSelectedSupplier] = useState<SupplierItem | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [loadingReviews, setLoadingReviews] = useState(false);
   const [search, setSearch] = useState('');
+  const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
+  const [showAddReview, setShowAddReview] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    shortDescription: '',
+    description: '',
+    website: '',
+    phone: '',
+    email: '',
+    heroImage: '',
+    logoImage: '',
+  });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (authToken) {
@@ -32,13 +70,70 @@ export default function CompaniesPage() {
     }
   }, [authToken, search]);
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this company?')) return;
-    if (!authToken) return;
+  const handleSelectSupplier = async (supplier: SupplierItem) => {
+    setSelectedSupplier(supplier);
+    setLoadingDetail(true);
+    setShowAddReview(false);
+    setEditingReviewId(null);
 
     try {
-      await api.suppliers.delete(id, authToken);
-      setSuppliers(suppliers.filter((s) => s.id !== id));
+      // Fetch full supplier details
+      const fullSupplier = await api.suppliers.getByIdAdmin(supplier.id, authToken!);
+      setFormData({
+        name: fullSupplier.name || '',
+        shortDescription: fullSupplier.shortDescription || '',
+        description: fullSupplier.description || '',
+        website: fullSupplier.website || '',
+        phone: fullSupplier.phone || '',
+        email: fullSupplier.email || '',
+        heroImage: fullSupplier.heroImage || '',
+        logoImage: fullSupplier.logoImage || '',
+      });
+
+      // Fetch reviews
+      setLoadingReviews(true);
+      const reviewsData = await api.reviews.getBySupplierAdmin(supplier.id, authToken!);
+      setReviews(reviewsData);
+    } catch (error) {
+      console.error('Failed to fetch supplier details:', error);
+    } finally {
+      setLoadingDetail(false);
+      setLoadingReviews(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!selectedSupplier || !authToken) return;
+
+    setSaving(true);
+    try {
+      await api.suppliers.update(selectedSupplier.id, formData, authToken);
+      
+      // Update the supplier in the list
+      setSuppliers(suppliers.map(s => 
+        s.id === selectedSupplier.id 
+          ? { ...s, name: formData.name, email: formData.email, phone: formData.phone }
+          : s
+      ));
+      
+      alert('Company updated successfully!');
+    } catch (error: any) {
+      alert(error.message || 'Failed to update company');
+      console.error(error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedSupplier || !authToken) return;
+    if (!confirm(`Are you sure you want to delete "${selectedSupplier.name}"? This cannot be undone.`)) return;
+
+    try {
+      await api.suppliers.delete(selectedSupplier.id, authToken);
+      setSuppliers(suppliers.filter((s) => s.id !== selectedSupplier.id));
+      setSelectedSupplier(null);
+      alert('Company deleted successfully!');
     } catch (error) {
       alert('Failed to delete company');
       console.error(error);
@@ -51,99 +146,519 @@ export default function CompaniesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Companies</h1>
-          <p className="mt-2 text-slate-600">Manage all company listings</p>
-        </div>
-        <Link
-          href="/admin/companies/new"
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
-          ➕ Add Company
-        </Link>
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900">Companies</h1>
+        <p className="mt-2 text-slate-600">Manage all company listings</p>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-200 p-4">
-          <input
-            type="text"
-            placeholder="Search by name or email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none"
-          />
+      <div className="flex gap-6 h-[calc(100vh-250px)]">
+        {/* Sidebar - Company List */}
+        <div className="w-80 flex-shrink-0 flex flex-col rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
+          {/* Search */}
+          <div className="border-b border-slate-200 p-4">
+            <input
+              type="text"
+              placeholder="Search companies..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+
+          {/* Company List */}
+          <div className="flex-1 overflow-y-auto">
+            {suppliers.length === 0 ? (
+              <div className="p-8 text-center text-sm text-slate-500">
+                No companies found
+              </div>
+            ) : (
+              suppliers.map((supplier) => (
+                <button
+                  key={supplier.id}
+                  onClick={() => handleSelectSupplier(supplier)}
+                  className={`w-full text-left px-4 py-3 border-b border-slate-100 hover:bg-blue-50 transition-colors ${
+                    selectedSupplier?.id === supplier.id ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''
+                  }`}
+                >
+                  <div className="font-medium text-slate-900 text-sm">{supplier.name}</div>
+                  <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                    {supplier.averageRating ? (
+                      <span>{supplier.averageRating.toFixed(1)}⭐</span>
+                    ) : (
+                      <span>No rating</span>
+                    )}
+                    <span>•</span>
+                    <span>{supplier.reviewCount} reviews</span>
+                  </div>
+                  {supplier.region && (
+                    <div className="text-xs text-slate-500 mt-1">{supplier.region.name}</div>
+                  )}
+                </button>
+              ))
+            )}
+          </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-700">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-700">
-                  Email
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-700">
-                  Rating
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-700">
-                  Date Added
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-700">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 bg-white">
-              {suppliers.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-slate-500">
-                    No companies found
-                  </td>
-                </tr>
-              ) : (
-                suppliers.map((supplier) => (
-                  <tr key={supplier.id} className="hover:bg-slate-50">
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <div className="font-medium text-slate-900">{supplier.name}</div>
-                      {supplier.region && (
-                        <div className="text-xs text-slate-500">{supplier.region.name}</div>
-                      )}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
-                      {supplier.email || '-'}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
-                      {supplier.averageRating ? `${supplier.averageRating.toFixed(1)}⭐` : '-'} (
-                      {supplier.reviewCount})
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
-                      {new Date(supplier.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                      <Link
-                        href={`/admin/companies/${supplier.id}`}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(supplier.id)}
-                        className="ml-4 text-red-600 hover:text-red-900"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+        {/* Detail Panel */}
+        <div className="flex-1 overflow-y-auto">
+          {!selectedSupplier ? (
+            <div className="h-full flex items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50">
+              <div className="text-center">
+                <svg className="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <p className="mt-4 text-sm font-medium text-slate-900">No company selected</p>
+                <p className="mt-1 text-sm text-slate-500">Select a company from the list to view and edit details</p>
+              </div>
+            </div>
+          ) : loadingDetail ? (
+            <div className="text-slate-600">Loading details...</div>
+          ) : (
+            <div className="space-y-6">
+              {/* Company Information */}
+              <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-semibold text-slate-900">Company Information</h2>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleSave}
+                      disabled={saving}
+                      className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      {saving ? 'Saving...' : 'Save Changes'}
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      className="rounded-lg border-2 border-red-600 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                    >
+                      Delete Company
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Company Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Short Description</label>
+                    <input
+                      type="text"
+                      value={formData.shortDescription}
+                      onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                    <textarea
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={4}
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                      <input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                      <input
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Website</label>
+                    <input
+                      type="url"
+                      value={formData.website}
+                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Reviews Section */}
+              <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-xl font-semibold text-slate-900">Reviews</h2>
+                    <p className="mt-1 text-sm text-slate-600">
+                      {reviews.length} total • Average: {selectedSupplier?.averageRating?.toFixed(1) || 'N/A'}⭐
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowAddReview(!showAddReview)}
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  >
+                    {showAddReview ? 'Cancel' : '+ Add Review'}
+                  </button>
+                </div>
+
+                {showAddReview && (
+                  <AddReviewForm
+                    supplierId={selectedSupplier!.id}
+                    authToken={authToken!}
+                    onSuccess={async () => {
+                      setShowAddReview(false);
+                      const reviewsData = await api.reviews.getBySupplierAdmin(selectedSupplier!.id, authToken!);
+                      setReviews(reviewsData);
+                    }}
+                    onCancel={() => setShowAddReview(false)}
+                  />
+                )}
+
+                {loadingReviews ? (
+                  <div className="py-8 text-center text-sm text-slate-600">Loading reviews...</div>
+                ) : reviews.length === 0 ? (
+                  <div className="py-8 text-center text-sm text-slate-500">No reviews yet</div>
+                ) : (
+                  <div className="space-y-4">
+                    {reviews.map((review) => (
+                      <ReviewItem
+                        key={review.id}
+                        review={review}
+                        authToken={authToken!}
+                        isEditing={editingReviewId === review.id}
+                        onEdit={() => setEditingReviewId(review.id)}
+                        onCancel={() => setEditingReviewId(null)}
+                        onSave={async () => {
+                          setEditingReviewId(null);
+                          const reviewsData = await api.reviews.getBySupplierAdmin(selectedSupplier!.id, authToken!);
+                          setReviews(reviewsData);
+                        }}
+                        onDelete={async () => {
+                          const reviewsData = await api.reviews.getBySupplierAdmin(selectedSupplier!.id, authToken!);
+                          setReviews(reviewsData);
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
+// Add Review Form Component
+function AddReviewForm({ supplierId, authToken, onSuccess, onCancel }: { supplierId: number; authToken: string; onSuccess: () => void; onCancel: () => void }) {
+  const [loading, setLoading] = useState(false);
+  
+  // Get today's date in local timezone
+  const getLocalDateString = () => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const [formData, setFormData] = useState({
+    author: '',
+    title: '',
+    body: '',
+    ratingOverall: 5,
+    createdAt: getLocalDateString(),
+    isApproved: true,
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await api.reviews.adminCreate({
+        supplierId,
+        author: formData.author,
+        title: formData.title || undefined,
+        body: formData.body,
+        ratingOverall: formData.ratingOverall,
+        isApproved: formData.isApproved,
+        createdAt: formData.createdAt,
+      }, authToken);
+      onSuccess();
+    } catch (error: any) {
+      alert(error.message || 'Failed to create review');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="mb-6 rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Author *</label>
+        <input
+          type="text"
+          required
+          value={formData.author}
+          onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
+        <input
+          type="text"
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Review Text *</label>
+        <textarea
+          required
+          value={formData.body}
+          onChange={(e) => setFormData({ ...formData, body: e.target.value })}
+          rows={4}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+        />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Rating *</label>
+          <select
+            value={formData.ratingOverall}
+            onChange={(e) => setFormData({ ...formData, ratingOverall: Number(e.target.value) })}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+          >
+            {[5, 4, 3, 2, 1].map((r) => (
+              <option key={r} value={r}>{r} ⭐</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Date</label>
+          <input
+            type="date"
+            value={formData.createdAt}
+            onChange={(e) => setFormData({ ...formData, createdAt: e.target.value })}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
+        <select
+          value={formData.isApproved ? 'approved' : 'pending'}
+          onChange={(e) => setFormData({ ...formData, isApproved: e.target.value === 'approved' })}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+        >
+          <option value="approved">Approved</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+      <div className="flex gap-3">
+        <button
+          type="submit"
+          disabled={loading}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+        >
+          {loading ? 'Creating...' : 'Create Review'}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
+// Review Item Component
+function ReviewItem({ review, authToken, isEditing, onEdit, onCancel, onSave, onDelete }: {
+  review: Review;
+  authToken: string;
+  isEditing: boolean;
+  onEdit: () => void;
+  onCancel: () => void;
+  onSave: () => void;
+  onDelete: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    title: review.title || '',
+    body: review.body,
+    ratingOverall: review.ratingOverall,
+    createdAt: review.createdAt.split('T')[0],
+    isApproved: review.isApproved,
+  });
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      await api.reviews.adminUpdate(review.id, {
+        title: formData.title || undefined,
+        body: formData.body,
+        ratingOverall: formData.ratingOverall,
+        createdAt: formData.createdAt,
+        isApproved: formData.isApproved,
+      }, authToken);
+      onSave();
+    } catch (error: any) {
+      alert(error.message || 'Failed to update review');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm('Are you sure you want to delete this review?')) return;
+    setLoading(true);
+    try {
+      await api.reviews.adminDelete(review.id, authToken);
+      onDelete();
+    } catch (error: any) {
+      alert(error.message || 'Failed to delete review');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-4 space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Title</label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Rating</label>
+            <select
+              value={formData.ratingOverall}
+              onChange={(e) => setFormData({ ...formData, ratingOverall: Number(e.target.value) })}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            >
+              {[5, 4, 3, 2, 1].map((r) => (
+                <option key={r} value={r}>{r} ⭐</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-slate-700 mb-1">Review Text</label>
+          <textarea
+            value={formData.body}
+            onChange={(e) => setFormData({ ...formData, body: e.target.value })}
+            rows={4}
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+          />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Date</label>
+            <input
+              type="date"
+              value={formData.createdAt}
+              onChange={(e) => setFormData({ ...formData, createdAt: e.target.value })}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Status</label>
+            <select
+              value={formData.isApproved ? 'approved' : 'pending'}
+              onChange={(e) => setFormData({ ...formData, isApproved: e.target.value === 'approved' })}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            >
+              <option value="approved">Approved</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={handleSave}
+            disabled={loading}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loading ? 'Saving...' : 'Save'}
+          </button>
+          <button
+            onClick={onCancel}
+            className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white p-4">
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-lg font-semibold text-slate-900">{review.ratingOverall}⭐</span>
+            {review.isApproved ? (
+              <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-800">Approved</span>
+            ) : (
+              <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">Pending</span>
+            )}
+          </div>
+          {review.title && (
+            <h3 className="font-medium text-slate-900 mb-1">{review.title}</h3>
+          )}
+          <p className="text-sm text-slate-700 mb-2">{review.body}</p>
+          <div className="flex items-center gap-4 text-xs text-slate-500">
+            <span>By: {review.author}</span>
+            {review.company && <span>• {review.company}</span>}
+            <span>• {new Date(review.createdAt).toLocaleDateString()}</span>
+          </div>
+        </div>
+        <div className="flex gap-2 ml-4">
+          <button
+            onClick={onEdit}
+            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+          >
+            Edit
+          </button>
+          <button
+            onClick={handleDelete}
+            disabled={loading}
+            className="rounded-lg border border-red-300 bg-white px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
