@@ -591,6 +591,8 @@ export async function updateSupplier(
     email?: string;
     heroImage?: string;
     logoImage?: string;
+    isVerified?: boolean;
+    isScam?: boolean;
     minimumOrder?: string;
     leadTime?: string;
     specialties?: string[];
@@ -650,6 +652,8 @@ export async function updateSupplier(
       ...(payload.email !== undefined && { email: payload.email }),
       ...(payload.heroImage !== undefined && { heroImage: payload.heroImage }),
       ...(payload.logoImage !== undefined && { logoImage: payload.logoImage }),
+      ...(payload.isVerified !== undefined && { isVerified: payload.isVerified }),
+      ...(payload.isScam !== undefined && { isScam: payload.isScam }),
       ...(payload.minimumOrder !== undefined && { minimumOrder: payload.minimumOrder }),
       ...(payload.leadTime !== undefined && { leadTime: payload.leadTime }),
       ...(payload.specialties !== undefined && { specialties: payload.specialties }),
