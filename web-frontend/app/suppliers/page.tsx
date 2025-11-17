@@ -89,13 +89,21 @@ export default async function SuppliersPage(props: any) {
     return `/suppliers${params.toString() ? '?' + params.toString() : ''}`;
   };
 
+  // Get the selected region name for the header
+  const selectedRegion = filters.region 
+    ? regions.find(r => r.slug === filters.region) 
+    : null;
+  const headerTitle = selectedRegion 
+    ? `Find Trusted Suppliers in ${selectedRegion.name}`
+    : 'Find Trusted Suppliers Near You';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="mb-8 rounded-lg border border-slate-200 bg-gradient-to-br from-blue-500 to-blue-600 p-8 sm:p-12">
           <h1 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-white mb-4">
-            Find Trusted Suppliers Near You
+            {headerTitle}
           </h1>
           <p className="font-normal text-lg text-blue-50 max-w-3xl">
             Browse hundreds of verified liquidators and wholesalers across the United States. Connect with suppliers offering returned, overstock, and brand new merchandise.
