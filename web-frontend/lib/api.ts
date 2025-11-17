@@ -107,6 +107,12 @@ export type SupplierSummary = {
   averageRating?: number | null;
   reviewCount?: number | null;
   trustScore?: number | null;
+  isVerified?: boolean;
+  isScam?: boolean;
+  flags?: Array<{
+    text: string;
+    variant: 'verified' | 'scam';
+  }>;
   badges?: string[];
   region?: {
     name: string;
@@ -178,6 +184,12 @@ export type SupplierDetailResponse = {
     averageRating?: number | null;
     reviewCount?: number | null;
     trustScore?: number | null;
+    isVerified?: boolean;
+    isScam?: boolean;
+    flags?: Array<{
+      text: string;
+      variant: 'verified' | 'scam';
+    }>;
     minimumOrder?: string | null;
     leadTime?: string | null;
     badges?: string[];

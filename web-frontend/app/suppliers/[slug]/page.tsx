@@ -95,9 +95,47 @@ function SupplierHeader({
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h1 className="font-bold text-3xl sm:text-4xl text-slate-900 mb-2">
-              {supplier.name}
-            </h1>
+            <div className="flex items-center gap-3 flex-wrap mb-2">
+              <h1 className="font-bold text-3xl sm:text-4xl text-slate-900">
+                {supplier.name}
+              </h1>
+              {/* Prominent Flags next to name */}
+              {supplier.flags?.map((flag, i) => (
+                <div key={`flag-${i}`} className="group relative">
+                  <span 
+                    className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold shadow-sm cursor-help transition-all hover:scale-105 ${
+                      flag.variant === 'verified' 
+                        ? 'bg-green-500 border-green-600 text-white' 
+                        : 'bg-red-500 border-red-600 text-white'
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      {flag.variant === 'verified' ? (
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      ) : (
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      )}
+                    </svg>
+                    {flag.text}
+                  </span>
+                  {/* Hover tooltip */}
+                  <div className={`absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-2 rounded-lg text-sm font-medium text-white whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10 shadow-lg ${
+                    flag.variant === 'verified' 
+                      ? 'bg-green-700' 
+                      : 'bg-red-700'
+                  }`}>
+                    {flag.variant === 'verified' 
+                      ? 'This supplier has been verified by our team' 
+                      : 'Warning: This supplier has been reported as fraudulent'}
+                    <div className={`absolute left-1/2 -translate-x-1/2 -top-1 w-2 h-2 rotate-45 ${
+                      flag.variant === 'verified' 
+                        ? 'bg-green-700' 
+                        : 'bg-red-700'
+                    }`}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
             {supplier.shortDescription && (
               <p className="font-normal text-base text-slate-600">{supplier.shortDescription}</p>
             )}
@@ -114,7 +152,7 @@ function SupplierHeader({
                 </span>
               )}
               {supplier.badges?.map((badge, i) => (
-                <span key={i} className="inline-flex items-center gap-1.5 rounded-lg bg-green-50 border border-green-200 px-3 py-1.5 text-sm font-medium text-green-700">
+                <span key={`badge-${i}`} className="inline-flex items-center gap-1.5 rounded-lg bg-slate-50 border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>

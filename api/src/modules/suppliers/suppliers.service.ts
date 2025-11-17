@@ -56,6 +56,14 @@ export interface SupplierListResponse {
 }
 
 export function mapSupplierSummary(supplier: SupplierSummaryPayload) {
+  const flags = [];
+  if (supplier.isVerified) {
+    flags.push({ text: 'Verified', variant: 'verified' as const });
+  }
+  if (supplier.isScam) {
+    flags.push({ text: 'Scam', variant: 'scam' as const });
+  }
+
   return {
     slug: supplier.slug,
     name: supplier.name,
@@ -65,6 +73,9 @@ export function mapSupplierSummary(supplier: SupplierSummaryPayload) {
     averageRating: supplier.averageRating,
     reviewCount: supplier.reviewCount,
     trustScore: supplier.trustScore,
+    isVerified: supplier.isVerified,
+    isScam: supplier.isScam,
+    flags,
     badges: supplier.badges,
     homeRank: supplier.homeRank ?? 0,
     region: supplier.region
@@ -228,47 +239,7 @@ export async function listSuppliers(params: SupplierListParams): Promise<Supplie
   }
 
   if (params.verified !== undefined) {
-    if (params.verified) {
-      // Verified: averageRating >= 4 or trustScore > 0
-      const verifiedCondition = {
-        OR: [
-          { averageRating: { gte: 4 } },
-          { trustScore: { gt: 0 } },
-        ],
-      };
-      if (Array.isArray(where.AND)) {
-        where.AND.push(verifiedCondition);
-      } else if (where.AND) {
-        where.AND = [where.AND, verifiedCondition];
-      } else {
-        where.AND = [verifiedCondition];
-      }
-    } else {
-      // Not verified: averageRating < 4 and trustScore is 0 or null
-      const notVerified = {
-        AND: [
-          {
-            OR: [
-              { averageRating: { lt: 4 } },
-              { averageRating: null },
-            ],
-          },
-          {
-            OR: [
-              { trustScore: { lte: 0 } },
-              { trustScore: null },
-            ],
-          },
-        ],
-      };
-      if (Array.isArray(where.AND)) {
-        where.AND.push(notVerified);
-      } else if (where.AND) {
-        where.AND = [where.AND, notVerified];
-      } else {
-        where.AND = [notVerified];
-      }
-    }
+    where.isVerified = params.verified;
   }
 
   if (params.regionGroup) {
@@ -314,13 +285,15 @@ export async function listSuppliers(params: SupplierListParams): Promise<Supplie
   
   if (params.regionGroup) {
     // When filtering by region group, we want to sort by state code within that group
+    orderBy.push({ isVerified: 'desc' } as Prisma.SupplierOrderByWithRelationInput);
     orderBy.push({ region: { stateCode: 'asc' } } as Prisma.SupplierOrderByWithRelationInput);
   } else if (params.homeOnly) {
     orderBy.push({ homeRank: 'asc' } as Prisma.SupplierOrderByWithRelationInput);
   } else {
-    // Default: sort by region group (South, West, Northeast, Midwest, Other), then by name
-    // We'll do this in post-processing since Prisma doesn't support custom sorting easily
-    orderBy.push({ region: { stateCode: 'asc' } } as Prisma.SupplierOrderByWithRelationInput);
+    // Default: sort by verified first, then average rating, then review count, then name
+    orderBy.push({ isVerified: 'desc' } as Prisma.SupplierOrderByWithRelationInput);
+    orderBy.push({ averageRating: 'desc' } as Prisma.SupplierOrderByWithRelationInput);
+    orderBy.push({ reviewCount: 'desc' } as Prisma.SupplierOrderByWithRelationInput);
   }
   
   orderBy.push({ name: 'asc' });
@@ -341,32 +314,6 @@ export async function listSuppliers(params: SupplierListParams): Promise<Supplie
     prisma.supplier.findMany(query) as Promise<SupplierSummaryPayload[]>,
     prisma.supplier.count({ where }),
   ]);
-
-  // Post-process sorting by region group if not filtering by specific group
-  if (!params.regionGroup && !params.homeOnly) {
-    suppliers.sort((a, b) => {
-      const groupA = getRegionGroup(a.region?.stateCode);
-      const groupB = getRegionGroup(b.region?.stateCode);
-      
-      const groupOrder: Record<string, number> = {
-        'south': 1,
-        'west': 2,
-        'northeast': 3,
-        'midwest': 4,
-        'other': 5,
-      };
-      
-      const orderA = groupOrder[groupA] || 5;
-      const orderB = groupOrder[groupB] || 5;
-      
-      if (orderA !== orderB) {
-        return orderA - orderB;
-      }
-      
-      // Same group, sort by name
-      return a.name.localeCompare(b.name);
-    });
-  }
 
   let nextCursor: number | null = null;
   if (suppliers.length > take) {
@@ -452,6 +399,14 @@ export async function getSupplierDetail(slug: string) {
     take: 4,
   });
 
+  const flags = [];
+  if (supplier.isVerified) {
+    flags.push({ text: 'Verified', variant: 'verified' as const });
+  }
+  if (supplier.isScam) {
+    flags.push({ text: 'Scam', variant: 'scam' as const });
+  }
+
   return {
     supplier: {
       id: supplier.id,
@@ -467,6 +422,9 @@ export async function getSupplierDetail(slug: string) {
       averageRating: supplier.averageRating ?? reviewSummary.average,
       reviewCount: supplier.reviewCount ?? reviewSummary.count,
       trustScore: supplier.trustScore,
+      isVerified: supplier.isVerified,
+      isScam: supplier.isScam,
+      flags,
       minimumOrder: supplier.minimumOrder,
       leadTime: supplier.leadTime,
       badges: supplier.badges,
@@ -528,6 +486,8 @@ export async function getSupplierByIdAdmin(supplierId: number) {
     email: supplier.email,
     heroImage: supplier.heroImage,
     logoImage: supplier.logoImage,
+    isVerified: supplier.isVerified,
+    isScam: supplier.isScam,
     minimumOrder: supplier.minimumOrder,
     leadTime: supplier.leadTime,
     specialties: supplier.specialties,

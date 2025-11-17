@@ -67,29 +67,35 @@ export function TrendingSuppliersRail({
               <div className="relative h-32 bg-gradient-to-br from-blue-50 to-blue-100 border-b border-slate-200">
                 {/* Company Name Badge */}
                 <div className="absolute inset-0 flex items-center justify-center p-4">
-                  <div className="bg-white rounded-lg px-5 py-2.5 border border-slate-200 max-w-full">
-                    <div className="font-semibold text-base text-slate-900 text-center truncate">
-                      {s.name}
-                    </div>
+              <div className="bg-white rounded-lg px-5 py-2.5 border border-slate-200 max-w-full">
+                <div className="font-semibold text-base text-slate-900 text-center truncate">
+                  {s.name}
+                </div>
+              </div>
+            </div>
+            
+            {/* Flags from API - Sticker Style */}
+            {s.flags && s.flags.length > 0 && s.flags.some(f => f.variant === 'verified') && (
+              <div className="absolute top-0 right-0 overflow-hidden w-24 h-24 pointer-events-none">
+                <div className="absolute top-3 -right-8 bg-gradient-to-br from-green-500 to-green-600 text-white px-8 py-1.5 text-[10px] font-black tracking-wide shadow-lg transform rotate-45 border-2 border-green-700/50">
+                  <div className="flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>VERIFIED</span>
                   </div>
                 </div>
-                
-                {/* Verified Badge - Sticker Style */}
-                {((s.averageRating && s.averageRating >= 4) || (s.trustScore && s.trustScore > 0)) && (
-                  <div className="absolute top-0 right-0 overflow-hidden w-24 h-24 pointer-events-none">
-                    <div className="absolute top-3 -right-8 bg-gradient-to-br from-green-500 to-green-600 text-white px-8 py-1.5 text-[10px] font-black tracking-wide shadow-lg transform rotate-45 border-2 border-green-700/50">
-                      <div className="flex items-center gap-1">
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>VERIFIED</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
-
-              {/* Card Content */}
+            )}
+            {/* Scam warning flag */}
+            {s.flags && s.flags.length > 0 && s.flags.some(f => f.variant === 'scam') && (
+              <div className="absolute top-3 right-3">
+                <div className="bg-red-500 text-white px-2.5 py-1 rounded-full text-xs font-medium border border-red-600">
+                  ⚠ Scam
+                </div>
+              </div>
+            )}
+          </div>              {/* Card Content */}
               <div className="p-4 space-y-3">
                 {/* Location */}
                 <div className="flex items-start gap-2">

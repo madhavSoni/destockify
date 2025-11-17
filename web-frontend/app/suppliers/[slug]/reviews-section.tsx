@@ -221,27 +221,27 @@ export function ReviewsSection({
           {(reviewSummary.aspects.accuracy || reviewSummary.aspects.logistics || reviewSummary.aspects.value || reviewSummary.aspects.communication) && (
             <div className="mt-8 grid grid-cols-2 gap-4 pt-8 border-t-2 border-slate-900/80 sm:grid-cols-4">
               {reviewSummary.aspects.accuracy && (
-                <div className="text-center rounded-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 p-4 shadow-sm">
-                  <div className="text-3xl font-black text-blue-600">{reviewSummary.aspects.accuracy.toFixed(1)}</div>
-                  <div className="text-xs font-bold text-blue-900 mt-1">Accuracy</div>
+                <div className="text-center rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 shadow-sm">
+                  <div className="text-3xl font-black text-slate-900">{reviewSummary.aspects.accuracy.toFixed(1)}</div>
+                  <div className="text-xs font-bold text-slate-600 mt-1">Accuracy</div>
                 </div>
               )}
               {reviewSummary.aspects.logistics && (
-                <div className="text-center rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100 p-4 shadow-sm">
-                  <div className="text-3xl font-black text-purple-600">{reviewSummary.aspects.logistics.toFixed(1)}</div>
-                  <div className="text-xs font-bold text-purple-900 mt-1">Logistics</div>
+                <div className="text-center rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 shadow-sm">
+                  <div className="text-3xl font-black text-slate-900">{reviewSummary.aspects.logistics.toFixed(1)}</div>
+                  <div className="text-xs font-bold text-slate-600 mt-1">Logistics</div>
                 </div>
               )}
               {reviewSummary.aspects.value && (
-                <div className="text-center rounded-2xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 shadow-sm">
-                  <div className="text-3xl font-black text-emerald-600">{reviewSummary.aspects.value.toFixed(1)}</div>
-                  <div className="text-xs font-bold text-emerald-900 mt-1">Value</div>
+                <div className="text-center rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 shadow-sm">
+                  <div className="text-3xl font-black text-slate-900">{reviewSummary.aspects.value.toFixed(1)}</div>
+                  <div className="text-xs font-bold text-slate-600 mt-1">Value</div>
                 </div>
               )}
               {reviewSummary.aspects.communication && (
-                <div className="text-center rounded-2xl border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-orange-100 p-4 shadow-sm">
-                  <div className="text-3xl font-black text-orange-600">{reviewSummary.aspects.communication.toFixed(1)}</div>
-                  <div className="text-xs font-bold text-orange-900 mt-1">Communication</div>
+                <div className="text-center rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 shadow-sm">
+                  <div className="text-3xl font-black text-slate-900">{reviewSummary.aspects.communication.toFixed(1)}</div>
+                  <div className="text-xs font-bold text-slate-600 mt-1">Communication</div>
                 </div>
               )}
             </div>

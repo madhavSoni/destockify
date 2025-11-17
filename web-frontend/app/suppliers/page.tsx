@@ -269,12 +269,21 @@ export default async function SuppliersPage(props: any) {
                       </div>
                     </div>
                     
-                    {/* Verified Badge */}
-                    {s.averageRating && s.averageRating >= 4 && (
-                      <div className="absolute top-3 right-3">
-                        <div className="bg-green-500 text-white px-2.5 py-1 rounded-full text-xs font-medium border border-green-600">
-                          ✓ Verified
-                        </div>
+                    {/* Flags from API */}
+                    {s.flags && s.flags.length > 0 && (
+                      <div className="absolute top-3 right-3 flex flex-col gap-1">
+                        {s.flags.map((flag, idx) => (
+                          <div 
+                            key={idx}
+                            className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
+                              flag.variant === 'verified' 
+                                ? 'bg-green-500 text-white border-green-600' 
+                                : 'bg-red-500 text-white border-red-600'
+                            }`}
+                          >
+                            {flag.variant === 'verified' ? '✓' : '⚠'} {flag.text}
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>

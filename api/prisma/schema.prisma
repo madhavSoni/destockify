@@ -43,6 +43,8 @@ model Supplier {
   averageRating    Float?             @default(0)
   reviewCount      Int                @default(0)
   trustScore       Int?               @default(0)
+  isVerified       Boolean            @default(false)
+  isScam           Boolean            @default(false)
   minimumOrder     String?
   leadTime         String?
   specialties      String[]          @default([])
