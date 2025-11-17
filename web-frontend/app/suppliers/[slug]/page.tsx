@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { api } from '@/lib/api';
 import { ReviewsWrapper } from './reviews-wrapper';
+import { generateSupplierSchema, schemaToJsonLd } from '@/lib/schema';
 
 export default async function SupplierDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   // Await params since it's a Promise in Next.js 15+
@@ -12,17 +13,28 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
 
   const { supplier, reviewSummary, recentReviews } = detail;
 
+  // Generate Schema.org structured data - DYNAMICALLY from database
+  // This updates automatically when reviews are added/changed
+  const supplierSchema = generateSupplierSchema(supplier, reviewSummary, recentReviews);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
-      <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <div className="mb-6 text-sm font-medium text-slate-600">
-          <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
-          <span className="mx-2">›</span>
-          <Link href="/suppliers" className="hover:text-blue-600 transition-colors">Suppliers</Link>
-          <span className="mx-2">›</span>
-          <span className="font-bold text-slate-900">{supplier.name}</span>
-        </div>
+    <>
+      {/* Schema.org JSON-LD for SEO - Star ratings will appear in Google search! */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(supplierSchema) }}
+      />
+
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+        <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          {/* Breadcrumb */}
+          <div className="mb-6 text-sm font-medium text-slate-600">
+            <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
+            <span className="mx-2">›</span>
+            <Link href="/suppliers" className="hover:text-blue-600 transition-colors">Suppliers</Link>
+            <span className="mx-2">›</span>
+            <span className="font-bold text-slate-900">{supplier.name}</span>
+          </div>
 
         {/* Main Content Grid */}
         <div className="grid gap-6 lg:grid-cols-3">
@@ -47,6 +59,7 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
         </div>
       </div>
     </div>
+    </>
   );
 }
 

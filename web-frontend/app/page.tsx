@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import { api } from '@/lib/api';
 import { FaqAccordion } from '@/components/faq-accordion';
 import { TrendingSuppliersRail } from '@/components/trending-suppliers-rail';
+import { generateWebsiteSchema, generateOrganizationSchema, schemaToJsonLd } from '@/lib/schema';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -21,28 +22,44 @@ export default async function HomePage() {
   const data = await api.home.get();
   const [leadGuide] = data.featuredGuides;
 
+  // Generate Schema.org structured data for homepage
+  const websiteSchema = generateWebsiteSchema();
+  const organizationSchema = generateOrganizationSchema();
+
   return (
-    <div className={`${inter.className} bg-slate-50 scroll-smooth`} style={{
-      WebkitFontSmoothing: 'antialiased',
-      textTransform: 'none',
-      fontFamily: '"Inter", "Adjusted Arial", Tahoma, Geneva, sans-serif',
-    }}>
-      <HeroSection />
+    <>
+      {/* Schema.org JSON-LD for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(organizationSchema) }}
+      />
 
-      {/* Trending rail with half-peek card */}
-      <TrendingSuppliersRail suppliers={data.featuredSuppliers} />
+      <div className={`${inter.className} bg-slate-50 scroll-smooth`} style={{
+        WebkitFontSmoothing: 'antialiased',
+        textTransform: 'none',
+        fontFamily: '"Inter", "Adjusted Arial", Tahoma, Geneva, sans-serif',
+      }}>
+        <HeroSection />
 
-      <ConnectByState />
-      <QuickActionsBar />
-      <TwoUpFeatures />
-      <GuideStrip leadGuide={leadGuide} />
+        {/* Trending rail with half-peek card */}
+        <TrendingSuppliersRail suppliers={data.featuredSuppliers} />
 
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <MiniCards categories={data.categories} />
-        <ListBusinessCta />
-        <FaqSection faqs={data.faqs} />
+        <ConnectByState />
+        <QuickActionsBar />
+        <TwoUpFeatures />
+        <GuideStrip leadGuide={leadGuide} />
+
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+          <MiniCards categories={data.categories} />
+          <ListBusinessCta />
+          <FaqSection faqs={data.faqs} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
