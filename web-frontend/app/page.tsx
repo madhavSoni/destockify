@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { FaqAccordion } from '@/components/faq-accordion';
 import { TrendingSuppliersRail } from '@/components/trending-suppliers-rail';
 import { generateWebsiteSchema, generateOrganizationSchema, schemaToJsonLd } from '@/lib/schema';
+import { StateSelector } from '@/components/state-selector';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -20,7 +21,7 @@ type FaqList = Awaited<ReturnType<typeof api.faq.list>>;
 
 export default async function HomePage() {
   const data = await api.home.get();
-  const [leadGuide] = data.featuredGuides;
+  const regions = await api.catalog.regions();
 
   // Generate Schema.org structured data for homepage
   const websiteSchema = generateWebsiteSchema();
@@ -48,13 +49,11 @@ export default async function HomePage() {
         {/* Trending rail with half-peek card */}
         <TrendingSuppliersRail suppliers={data.featuredSuppliers} />
 
-        <ConnectByState />
+        <ConnectByState regions={regions} />
         <QuickActionsBar />
         <TwoUpFeatures />
-        <GuideStrip leadGuide={leadGuide} />
 
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-          <MiniCards categories={data.categories} />
           <ListBusinessCta />
           <FaqSection faqs={data.faqs} />
         </div>
@@ -118,49 +117,86 @@ function HeroSection() {
 /* --------------------------- QUICK ACTIONS ------------------------ */
 function QuickActionsBar() {
   const items = [
-    { href: '/suppliers', label: 'Find vetted suppliers' },
-    { href: '/suppliers?search=review', label: 'Read reviews' },
-    { href: '/guides/how-to-vet-liquidation-suppliers-2025', label: 'Buyer guides' },
+    { 
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+      href: '/suppliers', 
+      label: 'Find Vetted Suppliers',
+      description: 'Browse verified wholesale liquidators'
+    },
+    { 
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+        </svg>
+      ),
+      href: '/suppliers#reviews', 
+      label: 'Read Reviews',
+      description: 'See real buyer experiences'
+    },
+    { 
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      ),
+      href: '/list-your-business', 
+      label: 'List Your Business',
+      description: 'Get discovered by buyers'
+    },
   ];
+
   return (
-    <section className="border-b border-slate-200 bg-white">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-3 px-4 py-5 sm:grid-cols-3 sm:px-6 lg:px-8">
-        {items.map((it) => (
-          <Link
-            key={it.href}
-            href={it.href}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-center text-sm font-semibold text-slate-900 hover:bg-slate-100"
-          >
-            {it.label}
-          </Link>
-        ))}
+    <section className="border-y border-slate-200 bg-gradient-to-br from-slate-50 via-white to-blue-50/30 py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((item, index) => (
+            <Link
+              key={`${item.href}-${index}`}
+              href={item.href}
+              className="group relative flex flex-col items-center rounded-2xl border-2 border-slate-200 bg-gradient-to-br from-white to-slate-50/50 p-8 text-center transition-all hover:shadow-2xl hover:-translate-y-2 hover:border-blue-400 hover:from-blue-50/50"
+            >
+              {/* Subtle background decoration */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/80 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+              
+              <div className="relative mb-5 flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 shadow-sm transition-all group-hover:bg-blue-100 group-hover:shadow-md group-hover:scale-110 group-hover:rotate-3">
+                {item.icon}
+              </div>
+              
+              <h3 className="relative text-xl font-bold text-slate-900 transition-colors group-hover:text-blue-600">
+                {item.label}
+              </h3>
+              
+              <p className="relative mt-3 text-sm leading-relaxed text-slate-600">
+                {item.description}
+              </p>
+              
+              <div className="relative mt-5 flex items-center text-sm font-semibold text-blue-600 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-y-0 translate-y-2">
+                Learn more
+                <svg className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
 /* -------------------- CONNECT BY STATE -------------------- */
-function ConnectByState() {
-  const states = ['AL','AK','AZ','AR','CA','CO','CT','DC','DE','FL','GA','HI','IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MI','MN','MO','MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VA','VT','WA','WI','WV','WY'];
+function ConnectByState({ regions }: { regions: any[] }) {
   return (
     <section className="mx-auto w-full max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8">
       <h3 className="text-3xl font-semibold text-slate-900 sm:text-4xl">Connect with Verified Suppliers</h3>
       <p className="mx-auto mt-4 max-w-xl text-base text-slate-700">
         Search for overstock, returns and liquidations by the pallet or truckload.
       </p>
-      <form action="/suppliers" method="get" className="mx-auto mt-8 max-w-sm">
-        <div className="relative">
-          <select
-            name="state"
-            defaultValue=""
-            className="h-14 w-full appearance-none rounded-xl border border-slate-300 bg-white px-5 pr-12 text-base text-slate-900 shadow focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20"
-          >
-            <option value="" disabled>Shop by State</option>
-            {states.map((st) => <option key={st} value={st}>{st}</option>)}
-          </select>
-          <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">▾</span>
-        </div>
-      </form>
+      <StateSelector regions={regions} />
     </section>
   );
 }
@@ -211,7 +247,7 @@ function TwoUpFeatures() {
               Find liquidation pallets, wholesale inventory, and merchandise for live auctions from trusted suppliers.
             </p>
             <Link
-              href="/suppliers?search=review"
+              href="/suppliers"
               className="mt-8 inline-flex w-fit items-center justify-center rounded-lg bg-slate-900 px-8 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:bg-slate-800 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-slate-900/20"
             >
               Browse Reviews
@@ -229,65 +265,6 @@ function TwoUpFeatures() {
             />
           </div>
         </article>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------- GUIDE STRIP ------------------------- */
-function GuideStrip({ leadGuide }: { leadGuide?: GuideList[number] }) {
-  const href = leadGuide ? `/guides/${leadGuide.slug}` : '/guides/how-to-vet-liquidation-suppliers-2025';
-  const title = leadGuide?.title ?? 'How to find a legitimate liquidation supplier in 2025';
-  return (
-    <section className="relative my-12 overflow-hidden bg-slate-900 text-center text-white">
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute left-1/4 top-0 h-96 w-96 rounded-full bg-blue-500 blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-purple-500 blur-3xl" />
-      </div>
-      <div className="relative px-4 py-16">
-        <h3 className="mx-auto max-w-3xl text-3xl font-semibold leading-snug sm:text-4xl">{title}</h3>
-        <Link
-          href={href}
-          className="mt-8 inline-flex items-center justify-center rounded-lg border-2 border-white px-6 py-3 text-base font-semibold text-white hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/30"
-        >
-          Read Article
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-/* ----------------------------- MINI CARDS ROW -------------------------------- */
-function MiniCards({ categories }: { categories: CategoryList }) {
-  const items = (categories ?? []).slice(0, 5);
-  if (!items.length) return null;
-
-  return (
-    <section className="py-12">
-      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-        {items.map((c) => (
-          <Link
-            key={c.slug}
-            href={`/categories/${c.slug}`}
-            className="group relative flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            <div className="relative mb-4 flex h-24 w-full items-center justify-center rounded-xl border border-slate-200 bg-slate-50">
-              <div className="flex items-center gap-2">
-                <span className="text-blue-600 text-xl">→</span>
-                <div className="text-left">
-                  <span className="block text-base font-bold text-slate-900">Select</span>
-                  <span className="block text-sm text-slate-600">liquidation</span>
-                </div>
-              </div>
-            </div>
-            <div className="text-base font-semibold leading-tight text-slate-900 group-hover:text-blue-600">
-              {c.name}
-            </div>
-            <div className="mt-2 text-sm text-slate-600">
-              {c.headline ?? c.description ?? 'Popular liquidations'}
-            </div>
-          </Link>
-        ))}
       </div>
     </section>
   );
