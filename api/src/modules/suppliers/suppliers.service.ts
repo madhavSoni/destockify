@@ -207,9 +207,6 @@ export async function listSuppliers(params: SupplierListParams): Promise<Supplie
 
   const where: Prisma.SupplierWhereInput = {};
 
-  // Only show suppliers with regions (exclude those without states)
-  where.regionId = { not: null };
-
   if (params.category) {
     where.categories = {
       some: {
