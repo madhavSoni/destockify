@@ -91,16 +91,16 @@ export function SiteHeader() {
           aria-label="Primary"
         >
           <Link 
+            href="/about" 
+            className="text-slate-900 hover:text-blue-600 transition-colors duration-200"
+          >
+            About Us
+          </Link>
+          <Link 
             href="/suppliers" 
             className="text-slate-900 hover:text-blue-600 transition-colors duration-200"
           >
-            Buyers
-          </Link>
-          <Link 
-            href="/list-your-business" 
-            className="text-slate-900 hover:text-blue-600 transition-colors duration-200"
-          >
-            Sellers
+            Directory
           </Link>
 
           {!isAuthenticated && (
@@ -239,18 +239,18 @@ export function SiteHeader() {
               {/* Menu Content */}
               <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
                 <Link 
+                  href="/about" 
+                  onClick={closeMobileMenu}
+                  className="block px-4 py-3 text-base font-bold text-slate-900 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                >
+                  About Us
+                </Link>
+                <Link 
                   href="/suppliers" 
                   onClick={closeMobileMenu}
                   className="block px-4 py-3 text-base font-bold text-slate-900 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
                 >
-                  Buyers
-                </Link>
-                <Link 
-                  href="/list-your-business" 
-                  onClick={closeMobileMenu}
-                  className="block px-4 py-3 text-base font-bold text-slate-900 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
-                >
-                  Sellers
+                  Directory
                 </Link>
 
                 {!isAuthenticated && (
