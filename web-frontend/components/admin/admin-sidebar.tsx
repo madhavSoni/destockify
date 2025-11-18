@@ -21,7 +21,7 @@ export function AdminSidebar({ onClose }: { onClose?: () => void }) {
   };
 
   return (
-    <div className="flex h-screen w-64 flex-col border-r border-slate-200 bg-white">
+    <div className="flex h-screen w-64 flex-col border-r border-slate-200 bg-white lg:sticky lg:top-0">
       <div className="flex h-16 items-center justify-between border-b border-slate-200 px-6">
         <Link href="/admin" onClick={handleLinkClick} className="text-xl font-bold text-slate-900">
           Admin Panel
