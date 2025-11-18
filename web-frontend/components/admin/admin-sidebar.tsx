@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
-export function AdminSidebar() {
+export function AdminSidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
@@ -14,12 +14,27 @@ export function AdminSidebar() {
     { href: '/admin/reviews', label: 'Reviews', icon: '⭐' },
   ];
 
+  const handleLinkClick = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
     <div className="flex h-screen w-64 flex-col border-r border-slate-200 bg-white">
-      <div className="flex h-16 items-center border-b border-slate-200 px-6">
-        <Link href="/admin" className="text-xl font-bold text-slate-900">
+      <div className="flex h-16 items-center justify-between border-b border-slate-200 px-6">
+        <Link href="/admin" onClick={handleLinkClick} className="text-xl font-bold text-slate-900">
           Admin Panel
         </Link>
+        <button
+          onClick={onClose}
+          className="lg:hidden flex items-center justify-center rounded-lg p-1.5 text-slate-500 hover:bg-slate-100"
+          aria-label="Close menu"
+        >
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
       <nav className="flex-1 space-y-1 px-4 py-6">
@@ -29,6 +44,7 @@ export function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={handleLinkClick}
               className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
                 isActive
                   ? 'bg-blue-50 text-blue-700'
