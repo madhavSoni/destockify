@@ -21,20 +21,20 @@ export function TrendingSuppliersRail({
   };
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mb-2 flex items-end justify-between gap-4">
+    <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
+      <div className="mb-4 sm:mb-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-3xl font-semibold text-slate-900 sm:text-4xl">Trending Wholesale Suppliers Near You</h2>
-          <p className="mt-1 text-slate-600">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-900">Trending Wholesale Suppliers Near You</h2>
+          <p className="mt-1 text-sm sm:text-base text-slate-600">
             Find wholesale lots of returns, overstock and mixed merchandise by the pallet or truckload.
           </p>
         </div>
-        <div className="hidden items-center gap-2 sm:flex">
+        <div className="hidden lg:flex items-center gap-2">
           <button
             type="button"
             aria-label="Previous"
             onClick={() => scrollByCards(-1)}
-            className="rounded-full border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-50"
+            className="rounded-full border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-50 transition-colors"
           >
             <Chevron dir="left" />
           </button>
@@ -42,7 +42,7 @@ export function TrendingSuppliersRail({
             type="button"
             aria-label="Next"
             onClick={() => scrollByCards(1)}
-            className="rounded-full border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-50"
+            className="rounded-full border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-50 transition-colors"
           >
             <Chevron dir="right" />
           </button>
@@ -50,18 +50,43 @@ export function TrendingSuppliersRail({
       </div>
 
       <div className="relative">
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-slate-50 to-transparent" />
+        {/* Gradient fades on both sides - visible on all screens */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-8 sm:w-12 bg-gradient-to-r from-slate-50 to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-8 sm:w-12 bg-gradient-to-l from-slate-50 to-transparent z-10" />
+
+        {/* Mobile navigation arrows */}
+        <button
+          type="button"
+          onClick={() => scrollByCards(-1)}
+          className="lg:hidden absolute left-1 top-1/2 -translate-y-1/2 z-20 rounded-full bg-white/95 p-2 shadow-lg ring-1 ring-slate-900/10 text-slate-700 hover:bg-white transition-all"
+          aria-label="Previous"
+        >
+          <Chevron dir="left" />
+        </button>
+        <button
+          type="button"
+          onClick={() => scrollByCards(1)}
+          className="lg:hidden absolute right-1 top-1/2 -translate-y-1/2 z-20 rounded-full bg-white/95 p-2 shadow-lg ring-1 ring-slate-900/10 text-slate-700 hover:bg-white transition-all"
+          aria-label="Next"
+        >
+          <Chevron dir="right" />
+        </button>
 
         <div
           ref={railRef}
-          className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-mandatory gap-3 sm:gap-4 overflow-x-auto pb-3 scrollbar-hide"
+          style={{ 
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
+          }}
         >
           {suppliers.slice(0, 8).map((s) => (
             <Link
               key={s.slug}
               href={`/suppliers/${s.slug}`}
               data-card
-              className="group relative w-[320px] shrink-0 snap-start overflow-hidden rounded-lg border border-slate-200 bg-white transition-all duration-200 hover:border-slate-300 hover:shadow-sm"
+              className="group relative w-[280px] sm:w-[320px] shrink-0 snap-start overflow-hidden rounded-lg border border-slate-200 bg-white transition-all duration-200 hover:border-slate-300 hover:shadow-lg"
             >
               {/* Header with gradient */}
               <div className="relative h-32 bg-gradient-to-br from-blue-50 to-blue-100 border-b border-slate-200">
@@ -139,7 +164,7 @@ export function TrendingSuppliersRail({
           <Link
             href="/suppliers"
             className="group relative shrink-0 snap-start overflow-hidden rounded-lg border border-dashed border-slate-300 bg-white/70 backdrop-blur-sm hover:bg-white hover:border-slate-400 transition-all duration-200"
-            style={{ width: '192px' }}
+            style={{ width: '160px' }}
             aria-label="See more suppliers"
           >
             <div className="flex h-full min-h-[200px] w-full flex-col items-center justify-center gap-2 p-4 text-center">
@@ -148,25 +173,15 @@ export function TrendingSuppliersRail({
             </div>
           </Link>
 
-          {/* Right spacer */}
-          <div className="shrink-0 w-4" aria-hidden />
+          {/* Right spacer for last card breathing room */}
+          <div className="shrink-0 w-4 sm:w-8" aria-hidden />
         </div>
-
-        {/* Mobile nudge button */}
-        <button
-          type="button"
-          onClick={() => scrollByCards(1)}
-          className="sm:hidden absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow ring-1 ring-slate-200"
-          aria-label="Next"
-        >
-          <Chevron dir="right" />
-        </button>
       </div>
 
       <div className="mt-6 flex justify-center">
         <Link
           href="/suppliers"
-          className="inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700"
+          className="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white shadow hover:bg-blue-700 transition-colors"
         >
           See all suppliers
         </Link>
