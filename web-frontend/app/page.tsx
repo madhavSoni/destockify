@@ -76,39 +76,43 @@ function HeroSection() {
           priority
           quality={90}
         />
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-slate-900/40" />
+        {/* Dark overlay for text readability - lighter for more vibrant image */}
+        <div className="absolute inset-0 bg-slate-900/30" />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-14 sm:px-6 lg:py-20 lg:px-8 z-10">
-        <div className="relative inline-block w-full">
-          <h1 className="relative text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
-            Find Trusted Wholesale Liquidation Suppliers Near You
+      {/* Content */}
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
+        {/* Left-anchored content block like Zillow */}
+        <div className="max-w-xl space-y-4 sm:space-y-5">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
+          Find Liquidation Suppliers Near You
           </h1>
+
+          <p className="text-sm sm:text-base lg:text-lg leading-6 sm:leading-7 text-blue-50/90">
+            Discover vetted suppliers offering truckloads and pallets of returns, overstock and liquidations in your area.
+          </p>
+
+          {/* Search bar – Zillow-style, clean & simple */}
+          <form action="/suppliers" method="get" className="mt-6 sm:mt-8">
+            <div className="relative flex items-center rounded-lg bg-white shadow-xl">
+              <input
+                type="search"
+                name="search"
+                placeholder="Enter city, state, or keyword"
+                className="h-14 sm:h-16 w-full bg-transparent border-0 text-sm sm:text-base text-slate-900 placeholder:text-slate-500 focus:outline-none px-4 sm:px-6 pr-12 sm:pr-14"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 sm:right-3 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900/30 transition-colors"
+                aria-label="Search"
+              >
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+            </div>
+          </form>
         </div>
-
-        <p className="mx-auto mt-3 sm:mt-4 max-w-3xl text-center text-sm sm:text-base lg:text-lg leading-6 sm:leading-7 text-blue-50 px-4">
-          Discover trusted wholesale suppliers offering truckloads and pallets in your area.
-        </p>
-
-        {/* Search */}
-        <form action="/suppliers" method="get" className="mx-auto mt-8 max-w-2xl">
-          <div className="relative">
-            <input
-              type="search"
-              name="search"
-              placeholder="Search suppliers or keywords"
-              className="h-16 sm:h-16 w-full rounded-2xl border-2 border-white/30 bg-white pl-12 sm:pl-14 pr-20 sm:pr-28 text-sm sm:text-base text-slate-900 shadow-lg placeholder:text-slate-500 focus:border-white focus:outline-none focus:ring-4 focus:ring-white/30"
-            />
-            <span className="pointer-events-none absolute inset-y-0 left-4 sm:left-5 flex items-center text-slate-500 text-lg sm:text-xl">🔍</span>
-            <button
-              type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-slate-900 px-3 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white shadow-md hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/30 whitespace-nowrap"
-            >
-              Search
-            </button>
-          </div>
-        </form>
       </div>
     </section>
   );
