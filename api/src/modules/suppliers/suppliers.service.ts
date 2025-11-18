@@ -587,6 +587,7 @@ export async function updateSupplier(
   supplierId: number,
   payload: {
     name?: string;
+    slug?: string;
     shortDescription?: string;
     description?: string;
     website?: string;
@@ -603,6 +604,7 @@ export async function updateSupplier(
     badges?: string[];
     logisticsNotes?: string;
     pricingNotes?: string;
+    trustScore?: number;
     homeRank?: number;
     regionId?: number;
     categoryIds?: number[];
@@ -614,14 +616,19 @@ export async function updateSupplier(
     throw new Error('Supplier not found');
   }
 
-  // Generate new slug if name changed
-  const slug = payload.name ? generateSlug(payload.name) : existing.slug;
+  // Determine slug: use provided slug, or generate from name, or keep existing
+  let slug = existing.slug;
+  if (payload.slug) {
+    slug = payload.slug;
+  } else if (payload.name) {
+    slug = generateSlug(payload.name);
+  }
   
   // Check if new slug conflicts with another supplier
   if (slug !== existing.slug) {
     const slugConflict = await prisma.supplier.findUnique({ where: { slug } });
     if (slugConflict) {
-      throw new Error('A supplier with this name already exists');
+      throw new Error('A supplier with this slug already exists');
     }
   }
 
@@ -647,7 +654,8 @@ export async function updateSupplier(
   const supplier = await prisma.supplier.update({
     where: { id: supplierId },
     data: {
-      ...(payload.name && { name: payload.name, slug }),
+      ...(payload.name !== undefined && { name: payload.name }),
+      ...(slug !== existing.slug && { slug }),
       ...(payload.shortDescription !== undefined && { shortDescription: payload.shortDescription }),
       ...(payload.description !== undefined && { description: payload.description }),
       ...(payload.website !== undefined && { website: payload.website }),
@@ -664,6 +672,7 @@ export async function updateSupplier(
       ...(payload.badges !== undefined && { badges: payload.badges }),
       ...(payload.logisticsNotes !== undefined && { logisticsNotes: payload.logisticsNotes }),
       ...(payload.pricingNotes !== undefined && { pricingNotes: payload.pricingNotes }),
+      ...(payload.trustScore !== undefined && { trustScore: payload.trustScore }),
       ...(payload.homeRank !== undefined && { homeRank: payload.homeRank }),
       ...(payload.regionId !== undefined && { regionId: payload.regionId }),
     },

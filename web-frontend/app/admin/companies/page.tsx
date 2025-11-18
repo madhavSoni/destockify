@@ -52,6 +52,7 @@ export default function CompaniesPage() {
   const [showAddReview, setShowAddReview] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    slug: '',
     shortDescription: '',
     description: '',
     website: '',
@@ -59,8 +60,17 @@ export default function CompaniesPage() {
     email: '',
     heroImage: '',
     logoImage: '',
+    minimumOrder: '',
+    leadTime: '',
+    specialties: [] as string[],
+    certifications: [] as string[],
+    badges: [] as string[],
+    logisticsNotes: '',
+    pricingNotes: '',
+    trustScore: 0,
     isVerified: false,
     isScam: false,
+    homeRank: 0,
   });
   const [saving, setSaving] = useState(false);
 
@@ -85,6 +95,7 @@ export default function CompaniesPage() {
       const fullSupplier = await api.suppliers.getByIdAdmin(supplier.id, authToken!);
       setFormData({
         name: fullSupplier.name || '',
+        slug: fullSupplier.slug || '',
         shortDescription: fullSupplier.shortDescription || '',
         description: fullSupplier.description || '',
         website: fullSupplier.website || '',
@@ -92,8 +103,17 @@ export default function CompaniesPage() {
         email: fullSupplier.email || '',
         heroImage: fullSupplier.heroImage || '',
         logoImage: fullSupplier.logoImage || '',
+        minimumOrder: fullSupplier.minimumOrder || '',
+        leadTime: fullSupplier.leadTime || '',
+        specialties: fullSupplier.specialties || [],
+        certifications: fullSupplier.certifications || [],
+        badges: fullSupplier.badges || [],
+        logisticsNotes: fullSupplier.logisticsNotes || '',
+        pricingNotes: fullSupplier.pricingNotes || '',
+        trustScore: fullSupplier.trustScore || 0,
         isVerified: fullSupplier.isVerified || false,
         isScam: fullSupplier.isScam || false,
+        homeRank: fullSupplier.homeRank || 0,
       });
 
       // Fetch reviews
@@ -243,66 +263,203 @@ export default function CompaniesPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Company Name *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Short Description</label>
-                    <input
-                      type="text"
-                      value={formData.shortDescription}
-                      onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                    <textarea
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      rows={4}
-                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                      <input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
-                      <input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-                      />
+                  {/* Basic Information */}
+                  <div className="pb-3 border-b border-slate-200">
+                    <h3 className="text-sm font-semibold text-slate-900 mb-3">Basic Information</h3>
+                    <div className="space-y-3">
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Company Name *</label>
+                          <input
+                            type="text"
+                            required
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Slug *</label>
+                          <input
+                            type="text"
+                            required
+                            value={formData.slug}
+                            onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Short Description</label>
+                        <input
+                          type="text"
+                          value={formData.shortDescription}
+                          onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                        <textarea
+                          value={formData.description}
+                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                          rows={3}
+                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
                     </div>
                   </div>
 
+                  {/* Contact Information */}
+                  <div className="pb-3 border-b border-slate-200">
+                    <h3 className="text-sm font-semibold text-slate-900 mb-3">Contact Information</h3>
+                    <div className="space-y-3">
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                          <input
+                            type="email"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                          <input
+                            type="tel"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Website</label>
+                        <input
+                          type="url"
+                          value={formData.website}
+                          onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Business Details */}
+                  <div className="pb-3 border-b border-slate-200">
+                    <h3 className="text-sm font-semibold text-slate-900 mb-3">Business Details</h3>
+                    <div className="space-y-3">
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Minimum Order</label>
+                          <input
+                            type="text"
+                            value={formData.minimumOrder}
+                            onChange={(e) => setFormData({ ...formData, minimumOrder: e.target.value })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                            placeholder="e.g., 1 pallet"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Lead Time</label>
+                          <input
+                            type="text"
+                            value={formData.leadTime}
+                            onChange={(e) => setFormData({ ...formData, leadTime: e.target.value })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                            placeholder="e.g., 2-3 days"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Logistics Notes</label>
+                        <textarea
+                          value={formData.logisticsNotes}
+                          onChange={(e) => setFormData({ ...formData, logisticsNotes: e.target.value })}
+                          rows={2}
+                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          placeholder="Shipping info..."
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Pricing Notes</label>
+                        <textarea
+                          value={formData.pricingNotes}
+                          onChange={(e) => setFormData({ ...formData, pricingNotes: e.target.value })}
+                          rows={2}
+                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          placeholder="Pricing structure..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tags & Classifications */}
+                  <div className="pb-3 border-b border-slate-200">
+                    <h3 className="text-sm font-semibold text-slate-900 mb-3">Tags & Classifications</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Specialties</label>
+                        <input
+                          type="text"
+                          value={formData.specialties.join(', ')}
+                          onChange={(e) => setFormData({ ...formData, specialties: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
+                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          placeholder="Electronics, Apparel (comma-separated)"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Certifications</label>
+                        <input
+                          type="text"
+                          value={formData.certifications.join(', ')}
+                          onChange={(e) => setFormData({ ...formData, certifications: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
+                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          placeholder="ISO 9001, BBB (comma-separated)"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Badges</label>
+                        <input
+                          type="text"
+                          value={formData.badges.join(', ')}
+                          onChange={(e) => setFormData({ ...formData, badges: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
+                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          placeholder="Top Rated, Fast Shipping (comma-separated)"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status & Ranking */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Website</label>
-                    <input
-                      type="url"
-                      value={formData.website}
-                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-                    />
+                    <h3 className="text-sm font-semibold text-slate-900 mb-3">Status & Ranking</h3>
+                    <div className="space-y-3">
+                      <div className="grid gap-3 grid-cols-2">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Trust Score</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={formData.trustScore}
+                            onChange={(e) => setFormData({ ...formData, trustScore: parseInt(e.target.value) || 0 })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Home Rank</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={formData.homeRank}
+                            onChange={(e) => setFormData({ ...formData, homeRank: parseInt(e.target.value) || 0 })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
