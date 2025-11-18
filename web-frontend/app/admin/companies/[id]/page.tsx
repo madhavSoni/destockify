@@ -13,6 +13,7 @@ type Review = {
   ratingOverall: number;
   body: string;
   isApproved: boolean;
+  isTrending: boolean;
   createdAt: string;
   approvedAt: string | null;
   customer: {
@@ -416,6 +417,7 @@ function ReviewItem({ review, authToken, isEditing, onEdit, onCancel, onSave, on
     ratingOverall: review.ratingOverall,
     createdAt: review.createdAt.split('T')[0],
     isApproved: review.isApproved,
+    isTrending: review.isTrending,
   });
 
   const handleSave = async () => {
@@ -427,6 +429,7 @@ function ReviewItem({ review, authToken, isEditing, onEdit, onCancel, onSave, on
         ratingOverall: formData.ratingOverall,
         createdAt: formData.createdAt,
         isApproved: formData.isApproved,
+        isTrending: formData.isTrending,
       }, authToken);
       onSave();
     } catch (error: any) {
@@ -506,6 +509,23 @@ function ReviewItem({ review, authToken, isEditing, onEdit, onCancel, onSave, on
             </select>
           </div>
         </div>
+        <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <input
+            type="checkbox"
+            id={`trending-company-${review.id}`}
+            checked={formData.isTrending}
+            onChange={(e) => setFormData({ ...formData, isTrending: e.target.checked })}
+            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+          />
+          <label htmlFor={`trending-company-${review.id}`} className="flex-1 cursor-pointer">
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm font-medium text-slate-900">Mark as Trending</span>
+            </div>
+          </label>
+        </div>
         <div className="flex gap-3">
           <button
             onClick={handleSave}
@@ -526,10 +546,15 @@ function ReviewItem({ review, authToken, isEditing, onEdit, onCancel, onSave, on
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
+    <div className={`rounded-lg border bg-white p-4 ${review.isTrending ? 'border-red-300 bg-red-50/30' : 'border-slate-200'}`}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
+            {review.isTrending && (
+              <svg className="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
+              </svg>
+            )}
             <span className="text-lg font-semibold text-slate-900">{review.ratingOverall}⭐</span>
             {review.isApproved ? (
               <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-800">Approved</span>

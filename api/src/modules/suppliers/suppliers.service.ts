@@ -19,7 +19,10 @@ const supplierDetailInclude = {
   ...supplierSummaryInclude,
   reviews: {
     where: { isApproved: true },
-    orderBy: { approvedAt: 'desc' },
+    orderBy: [
+      { isTrending: 'desc' }, // Trending reviews first
+      { createdAt: 'desc' },   // Then by date (respects admin edits)
+    ],
     take: 10,
     include: {
       customer: true,
@@ -352,7 +355,7 @@ export async function getSupplierDetail(slug: string) {
     ratingOverall: review.ratingOverall,
     highlights: review.highlights,
     body: review.body,
-    publishedAt: review.approvedAt?.toISOString() || review.createdAt.toISOString(),
+    publishedAt: review.createdAt.toISOString(), // Use createdAt to respect admin date edits
   }));
 
   const testimonials = supplier.testimonials.map((testimonial: (typeof supplier.testimonials)[number]) => ({
