@@ -42,7 +42,7 @@ export default async function HomePage() {
       <div className={`${inter.className} bg-slate-50 scroll-smooth`} style={{
         WebkitFontSmoothing: 'antialiased',
         textTransform: 'none',
-        fontFamily: '"Inter", "Adjusted Arial", Tahoma, Geneva, sans-serif',
+        fontFamily: '"Object Sans", "Adjusted Arial", Tahoma, Geneva, sans-serif',
       }}>
         <HeroSection />
 
@@ -84,8 +84,8 @@ function HeroSection() {
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
         {/* Left-anchored content block like Zillow */}
         <div className="max-w-xl space-y-4 sm:space-y-5">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
-          Find Liquidation Suppliers Near You
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight text-center sm:text-left antialiased m-0" style={{ fontFamily: '"Object Sans", "Adjusted Arial", Tahoma, Geneva, sans-serif', WebkitFontSmoothing: 'antialiased' }}>
+        Suppliers. Pallets. Truckloads. Deals.
           </h1>
 
           <p className="text-sm sm:text-base lg:text-lg leading-6 sm:leading-7 text-blue-50/90">
@@ -98,7 +98,7 @@ function HeroSection() {
               <input
                 type="search"
                 name="search"
-                placeholder="Enter city, state, or keyword"
+                placeholder="Search supplier or keywords"
                 className="h-14 sm:h-16 w-full bg-transparent border-0 text-sm sm:text-base text-slate-900 placeholder:text-slate-500 focus:outline-none px-4 sm:px-6 pr-12 sm:pr-14"
               />
               <button
