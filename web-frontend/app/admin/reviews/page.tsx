@@ -10,6 +10,7 @@ type ReviewItem = {
   body?: string;
   ratingOverall: number;
   isApproved: boolean;
+  isTrending: boolean;
   createdAt: string;
   approvedAt: string | null;
   customer: {
@@ -254,6 +255,7 @@ function ReviewRow({
     ratingOverall: review.ratingOverall,
     createdAt: review.createdAt ? review.createdAt.split('T')[0] : new Date().toISOString().split('T')[0],
     isApproved: review.isApproved,
+    isTrending: review.isTrending,
   });
 
   // Update form data and local review when review prop changes
@@ -266,6 +268,7 @@ function ReviewRow({
       ratingOverall: review.ratingOverall,
       createdAt: dateValue,
       isApproved: review.isApproved,
+      isTrending: review.isTrending,
     });
   }, [review]);
 
@@ -275,9 +278,9 @@ function ReviewRow({
     // Ensure date is in correct format (YYYY-MM-DD)
     const dateForAPI = formData.createdAt || localReview.createdAt.split('T')[0];
     
-    // Convert date string to ISO format for optimistic update
+    // Convert date string to ISO format for optimistic update (UTC to prevent timezone shifts)
     const dateISO = formData.createdAt 
-      ? new Date(formData.createdAt + 'T00:00:00').toISOString() 
+      ? new Date(formData.createdAt + 'T00:00:00.000Z').toISOString() 
       : localReview.createdAt;
     
     // Optimistic update - update local state immediately
@@ -288,6 +291,7 @@ function ReviewRow({
       ratingOverall: formData.ratingOverall,
       createdAt: dateISO,
       isApproved: formData.isApproved,
+      isTrending: formData.isTrending,
       approvedAt: formData.isApproved ? (localReview.approvedAt || new Date().toISOString()) : null,
     };
     
@@ -304,6 +308,7 @@ function ReviewRow({
         ratingOverall: formData.ratingOverall,
         createdAt: dateForAPI,
         isApproved: formData.isApproved,
+        isTrending: formData.isTrending,
       }, authToken);
     } catch (error: any) {
       // Revert on error
@@ -397,6 +402,24 @@ function ReviewRow({
                   </select>
                 </div>
               </div>
+              <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <input
+                  type="checkbox"
+                  id={`trending-${localReview.id}`}
+                  checked={formData.isTrending}
+                  onChange={(e) => setFormData({ ...formData, isTrending: e.target.checked })}
+                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label htmlFor={`trending-${localReview.id}`} className="flex-1 cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
+                    </svg>
+                    <span className="font-medium text-slate-900">Mark as Trending</span>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-600">Trending reviews appear at the top of the list</p>
+                </label>
+              </div>
               <div className="flex gap-3">
                 <button
                   onClick={handleSave}
@@ -424,10 +447,19 @@ function ReviewRow({
 
   return (
     <>
-      <tr className="hover:bg-slate-50">
+      <tr className={`hover:bg-slate-50 ${localReview.isTrending ? 'bg-red-50/30' : ''}`}>
         <td className="whitespace-nowrap px-6 py-4">
-          <div className="font-medium text-slate-900">{localReview.customer.name}</div>
-          <div className="text-xs text-slate-500">{localReview.customer.email}</div>
+          <div className="flex items-center gap-2">
+            {localReview.isTrending && (
+              <svg className="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
+              </svg>
+            )}
+            <div>
+              <div className="font-medium text-slate-900">{localReview.customer.name}</div>
+              <div className="text-xs text-slate-500">{localReview.customer.email}</div>
+            </div>
+          </div>
         </td>
         <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-900">
           {localReview.supplier.name}

@@ -346,7 +346,10 @@ export async function getAllReviewsAdmin(params: {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [
+        { isTrending: 'desc' }, // Trending reviews first
+        { createdAt: 'desc' },
+      ],
       skip,
       take: limit,
     }),
@@ -360,6 +363,7 @@ export async function getAllReviewsAdmin(params: {
       body: r.body,
       ratingOverall: r.ratingOverall,
       isApproved: r.isApproved,
+      isTrending: r.isTrending,
       createdAt: r.createdAt.toISOString(),
       approvedAt: r.approvedAt?.toISOString() || null,
       customer: {
@@ -463,6 +467,7 @@ export async function adminUpdateReview(payload: {
   images?: string[];
   createdAt?: string; // ISO date string
   isApproved?: boolean;
+  isTrending?: boolean;
 }) {
   const { reviewId, createdAt, ...updateData } = payload;
 
@@ -479,10 +484,10 @@ export async function adminUpdateReview(payload: {
   // Handle date update - accept both ISO strings and date strings (YYYY-MM-DD)
   if (createdAt) {
     // If it's already a full ISO string, use it directly
-    // Otherwise, treat it as YYYY-MM-DD and convert to Date
+    // Otherwise, treat it as YYYY-MM-DD and convert to Date in UTC (prevents timezone shifts)
     const dateValue = createdAt.includes('T') 
       ? new Date(createdAt) 
-      : new Date(createdAt + 'T00:00:00');
+      : new Date(createdAt + 'T00:00:00.000Z');
     
     // Validate the date
     if (isNaN(dateValue.getTime())) {
@@ -490,6 +495,7 @@ export async function adminUpdateReview(payload: {
     }
     
     data.createdAt = dateValue;
+    console.log('Updating review date:', { input: createdAt, parsed: dateValue.toISOString(), date: dateValue.toDateString() });
   }
 
   // If approving, set approvedAt
