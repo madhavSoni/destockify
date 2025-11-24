@@ -12,12 +12,14 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "gcp-build": "npm run prisma:generate && npm run build",
-    "prisma:generate": "prisma generate",
+    "prisma:generate": "dotenv -e .env.local -- prisma generate",
     "prisma:migrate": "prisma migrate deploy",
-    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:dev": "dotenv -e .env.local -- prisma migrate dev",
     "prisma:studio": "prisma studio",
     "db:reset": "prisma migrate reset",
-    "db:seed": "ts-node -r tsconfig-paths/register prisma/seed.ts"
+    "db:seed": "ts-node -r tsconfig-paths/register prisma/seed.ts",
+    "seed:sheet1": "ts-node -r tsconfig-paths/register seed-scripts/seed-from-sheet1.ts",
+    "seed:sheet1:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/seed-from-sheet1.ts"
   },
   "prisma": {
     "seed": "ts-node -r tsconfig-paths/register prisma/seed.ts"
@@ -28,6 +30,7 @@
     "@prisma/client": "^6.11.1",
     "@types/jsonwebtoken": "^9.0.10",
     "argon2": "^0.44.0",
+    "cheerio": "^1.1.2",
     "cors": "^2.8.5",
     "csv-parser": "^3.2.0",
     "express": "^4.21.2",
@@ -36,12 +39,14 @@
     "nodemailer": "^7.0.10"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.35",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.23",
     "@types/node": "^20.19.24",
     "@types/nodemailer": "^7.0.3",
     "cross-env": "^7.0.3",
     "dotenv": "^16.6.1",
+    "dotenv-cli": "^11.0.0",
     "nodemon": "^3.1.10",
     "prisma": "^6.11.1",
     "ts-node": "^10.9.2",
