@@ -88,85 +88,45 @@ export type RegionSummary = {
   supplierCount: number;
 };
 
-export type LotSizeSummary = {
-  slug: string;
-  name: string;
-  headline?: string | null;
-  description?: string | null;
-  minUnits?: number | null;
-  maxUnits?: number | null;
-  supplierCount: number;
-};
-
 export type SupplierSummary = {
   slug: string;
   name: string;
   shortDescription?: string | null;
   heroImage?: string | null;
   logoImage?: string | null;
-  averageRating?: number | null;
-  reviewCount?: number | null;
-  trustScore?: number | null;
   isVerified?: boolean;
   isScam?: boolean;
   flags?: Array<{
     text: string;
     variant: 'verified' | 'scam';
   }>;
-  badges?: string[];
+  homeRank?: number;
+  streetAddress?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
   region?: {
-    name: string;
     slug: string;
-    stateCode?: string | null;
+    name: string;
   } | null;
   categories: Array<{
-    slug: string;
-    name: string;
-  }>;
-  lotSizes?: Array<{
     slug: string;
     name: string;
   }>;
 };
 
 export type ReviewHighlight = {
-  title: string;
   author: string;
-  company?: string | null;
   ratingOverall: number;
-  highlights?: string[];
   body: string;
+  images?: string[];
   publishedAt?: string;
   supplier: {
     slug: string;
     name: string;
     heroImage?: string | null;
     logoImage?: string | null;
-    badges?: string[];
   };
-};
-
-export type GuideSummary = {
-  slug: string;
-  title: string;
-  intro?: string | null;
-  heroImage?: string | null;
-  excerpt?: string | null;
-  sections?: unknown;
-  isFeatured?: boolean;
-  publishedAt?: string | null;
-  categories?: Array<{
-    slug: string;
-    name: string;
-  }>;
-};
-
-export type FaqItem = {
-  question: string;
-  answer: string;
-  category?: string | null;
-  audience?: string | null;
-  order?: number;
 };
 
 export type SupplierDetailResponse = {
@@ -181,35 +141,23 @@ export type SupplierDetailResponse = {
     website?: string | null;
     phone?: string | null;
     email?: string | null;
-    averageRating?: number | null;
-    reviewCount?: number | null;
-    trustScore?: number | null;
     isVerified?: boolean;
     isScam?: boolean;
     flags?: Array<{
       text: string;
       variant: 'verified' | 'scam';
     }>;
-    minimumOrder?: string | null;
-    leadTime?: string | null;
-    badges?: string[];
-    specialties?: string[];
-    certifications?: string[];
-    logisticsNotes?: string | null;
-    pricingNotes?: string | null;
+    socialLink?: string | null;
+    streetAddress?: string | null;
+    city?: string | null;
+    state?: string | null;
+    country?: string | null;
     region?: {
-      name: string;
       slug: string;
+      name: string;
       headline?: string | null;
-      description?: string | null;
-      stateCode?: string | null;
     } | null;
     categories: Array<{
-      slug: string;
-      name: string;
-      headline?: string | null;
-    }>;
-    lotSizes: Array<{
       slug: string;
       name: string;
       headline?: string | null;
@@ -225,35 +173,13 @@ export type SupplierDetailResponse = {
       fourStar: number;
       fiveStar: number;
     };
-    aspects: {
-      accuracy: number | null;
-      logistics: number | null;
-      value: number | null;
-      communication: number | null;
-    };
   };
   recentReviews: Array<{
-    title: string;
     author: string;
-    company?: string | null;
     ratingOverall: number;
-    highlights?: string[];
     body: string;
+    images?: string[];
     publishedAt?: string;
-  }>;
-  testimonials: Array<{
-    quote: string;
-    author: string;
-    role?: string | null;
-    company?: string | null;
-    publishedAt?: string;
-  }>;
-  resources: Array<{
-    title: string;
-    type: string;
-    url?: string | null;
-    description?: string | null;
-    order: number;
   }>;
   relatedSuppliers: SupplierSummary[];
 };
@@ -268,16 +194,12 @@ export type HomepagePayload = {
   stats: {
     suppliers: number;
     reviews: number;
-    guides: number;
     categories: number;
   };
   featuredSuppliers: SupplierSummary[];
   spotlightReviews: ReviewHighlight[];
-  featuredGuides: GuideSummary[];
   categories: CategorySummary[];
   regions: RegionSummary[];
-  lotSizes: LotSizeSummary[];
-  faqs: FaqItem[];
 };
 
 export type SignupPayload = {
@@ -316,25 +238,13 @@ export type ProfileResponse = {
 
 export type CreateReviewPayload = {
   supplierId: number;
-  title?: string;
-  ratingOverall: number;
-  ratingAccuracy?: number;
-  ratingLogistics?: number;
-  ratingValue?: number;
-  ratingCommunication?: number;
-  highlights?: string[];
+  ratingOverall: number; // Single 1-5 integer rating
   body: string;
   images?: string[];
 };
 
 export type UpdateReviewPayload = {
-  title?: string;
-  ratingOverall?: number;
-  ratingAccuracy?: number;
-  ratingLogistics?: number;
-  ratingValue?: number;
-  ratingCommunication?: number;
-  highlights?: string[];
+  ratingOverall?: number; // Single 1-5 integer rating
   body?: string;
   images?: string[];
 };
@@ -343,20 +253,13 @@ export type ReviewResponse = {
   id: number;
   supplierId: number;
   customerId: number;
-  title?: string | null;
-  ratingOverall: number;
-  ratingAccuracy?: number | null;
-  ratingLogistics?: number | null;
-  ratingValue?: number | null;
-  ratingCommunication?: number | null;
-  highlights: string[];
+  author: string; // reviewer_name
+  ratingOverall: number; // Single 1-5 integer rating
   body: string;
   images: string[];
   isApproved: boolean;
-  moderationNotes?: string | null;
   createdAt: string;
   updatedAt: string;
-  approvedAt?: string | null;
   customer: {
     id: number;
     firstName: string;
@@ -369,6 +272,38 @@ export type ReviewResponse = {
     slug: string;
     logoImage?: string | null;
   };
+};
+
+export type SupplierImage = {
+  id: number;
+  url: string;
+  caption?: string | null;
+  isPrimary: boolean;
+  order: number;
+};
+
+export type SupplierAdminResponse = {
+  id: number;
+  name: string;
+  slug: string;
+  shortDescription?: string | null;
+  description?: string | null;
+  website?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  heroImage?: string | null;
+  logoImage?: string | null;
+  isVerified: boolean;
+  isScam: boolean;
+  homeRank: number;
+  socialLink?: string | null;
+  streetAddress?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  regionId?: number | null;
+  categoryIds: number[];
+  images: SupplierImage[];
 };
 
 export type MyReviewsResponse = ReviewResponse[];
@@ -388,15 +323,6 @@ export type CreateSubmissionPayload = {
   description: string;
   logoUrl?: string;
   bannerUrl?: string;
-  hoursOfOperation?: {
-    monday?: { open: string; close: string };
-    tuesday?: { open: string; close: string };
-    wednesday?: { open: string; close: string };
-    thursday?: { open: string; close: string };
-    friday?: { open: string; close: string };
-    saturday?: { open: string; close: string };
-    sunday?: { open: string; close: string };
-  };
   socialMedia?: {
     instagram?: string;
     facebook?: string;
@@ -422,7 +348,6 @@ export type SubmissionResponse = {
   description: string;
   logoUrl?: string | null;
   bannerUrl?: string | null;
-  hoursOfOperation?: any;
   socialMedia?: any;
   ownershipDocuments: string[];
   notes?: string | null;
@@ -470,7 +395,7 @@ export const api = {
     get: () => fetchFromApi<HomepagePayload>('/home', { revalidate: 30 }),
   },
   suppliers: {
-    list: (params?: { category?: string; region?: string; lotSize?: string; search?: string; cursor?: number; limit?: number; verified?: boolean; regionGroup?: 'south' | 'west' | 'northeast' | 'midwest' | 'other' }) =>
+    list: (params?: { category?: string; region?: string; search?: string; cursor?: number; limit?: number; verified?: boolean }) =>
       fetchFromApi<SupplierListResponse>(`/suppliers${buildQueryString(params)}`, { revalidate: 30 }),
     get: (slug: string) => fetchFromApi<SupplierDetailResponse>(`/suppliers/${slug}`, { revalidate: 30 }),
     featured: () => fetchFromApi<SupplierSummary[]>('/suppliers/featured', { revalidate: 30 }),
@@ -523,15 +448,80 @@ export const api = {
   catalog: {
     categories: () => fetchFromApi<CategorySummary[]>('/catalog/categories', { revalidate: 3600 }),
     regions: () => fetchFromApi<RegionSummary[]>('/catalog/regions', { revalidate: 3600 }),
-    lotSizes: () => fetchFromApi<LotSizeSummary[]>('/catalog/lot-sizes', { revalidate: 3600 }),
-  },
-  guides: {
-    list: (params?: { featuredOnly?: boolean; limit?: number }) =>
-      fetchFromApi<GuideSummary[]>(`/guides${buildQueryString(params)}`, { revalidate: 600 }),
-    get: (slug: string) => fetchFromApi<GuideSummary>(`/guides/${slug}`, { revalidate: 600 }),
-  },
-  faq: {
-    list: (audience?: string) => fetchFromApi<FaqItem[]>(`/faq${audience ? `?audience=${audience}` : ''}`, { revalidate: 600 }),
+    // Admin: Get category by ID
+    getCategoryById: (id: number, token: string) =>
+      fetchFromApi<any>(`/catalog/categories/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Create category
+    createCategory: (payload: any, token: string) =>
+      fetchFromApi<any>('/catalog/categories', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Update category
+    updateCategory: (id: number, payload: any, token: string) =>
+      fetchFromApi<any>(`/catalog/categories/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Delete category
+    deleteCategory: (id: number, token: string) =>
+      fetchFromApi<{ message: string }>(`/catalog/categories/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Get region by ID
+    getRegionById: (id: number, token: string) =>
+      fetchFromApi<any>(`/catalog/regions/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Create region
+    createRegion: (payload: any, token: string) =>
+      fetchFromApi<any>('/catalog/regions', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Update region
+    updateRegion: (id: number, payload: any, token: string) =>
+      fetchFromApi<any>(`/catalog/regions/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
+    // Admin: Delete region
+    deleteRegion: (id: number, token: string) =>
+      fetchFromApi<{ message: string }>(`/catalog/regions/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
   },
   auth: {
     signup: (payload: SignupPayload) =>
@@ -778,5 +768,225 @@ export const api = {
         },
         cache: 'no-store',
       }),
+    // Upload image - converts File to base64 and sends as JSON
+    uploadImage: async (file: File, token: string): Promise<string> => {
+      // Convert file to base64 data URL
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (typeof reader.result === 'string') {
+            resolve(reader.result);
+          } else {
+            reject(new Error('Failed to read file'));
+          }
+        };
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
+
+      const base64Data = await base64Promise;
+      
+      return fetchFromApi<{ url: string }>('/admin/upload-image', {
+        method: 'POST',
+        body: JSON.stringify({
+          image: base64Data,
+          filename: file.name,
+          mimeType: file.type,
+        }),
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+      }).then(data => data.url);
+    },
+    // Categories management
+    categories: {
+      list: (token: string) =>
+        fetchFromApi<any[]>('/catalog/categories', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      get: (id: number, token: string) =>
+        fetchFromApi<any>(`/catalog/categories/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      create: (payload: any, token: string) =>
+        fetchFromApi<any>('/catalog/categories', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      update: (id: number, payload: any, token: string) =>
+        fetchFromApi<any>(`/catalog/categories/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      delete: (id: number, token: string) =>
+        fetchFromApi<{ message: string }>(`/catalog/categories/${id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+    },
+    // Regions management
+    regions: {
+      list: (token: string) =>
+        fetchFromApi<any[]>('/catalog/regions', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      get: (id: number, token: string) =>
+        fetchFromApi<any>(`/catalog/regions/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      create: (payload: any, token: string) =>
+        fetchFromApi<any>('/catalog/regions', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      update: (id: number, payload: any, token: string) =>
+        fetchFromApi<any>(`/catalog/regions/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      delete: (id: number, token: string) =>
+        fetchFromApi<{ message: string }>(`/catalog/regions/${id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+    },
+    // Suppliers management (already exists, but ensure it's comprehensive)
+    suppliers: {
+      list: (token: string, params?: { search?: string; page?: number; limit?: number }) =>
+        fetchFromApi<{ items: any[]; pagination: any }>(`/suppliers/admin/all${buildQueryString(params)}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      get: (id: number, token: string) =>
+        fetchFromApi<any>(`/suppliers/admin/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      create: (payload: any, token: string) =>
+        fetchFromApi<any>('/suppliers', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      update: (id: number, payload: any, token: string) =>
+        fetchFromApi<any>(`/suppliers/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      delete: (id: number, token: string) =>
+        fetchFromApi<{ message: string }>(`/suppliers/${id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+    },
+    // Reviews management (already exists, but ensure it's comprehensive)
+    reviews: {
+      list: (token: string, params?: { status?: 'approved' | 'pending' | 'rejected'; page?: number; limit?: number }) =>
+        fetchFromApi<{ items: any[]; pagination: any }>(`/reviews/admin/all${buildQueryString(params)}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      get: (id: number, token: string) =>
+        fetchFromApi<any>(`/reviews/admin/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      create: (payload: any, token: string) =>
+        fetchFromApi<any>('/reviews/admin', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      update: (id: number, payload: any, token: string) =>
+        fetchFromApi<any>(`/reviews/admin/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      delete: (id: number, token: string) =>
+        fetchFromApi<{ message: string }>(`/reviews/${id}/admin`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      approve: (id: number, token: string) =>
+        fetchFromApi<any>(`/reviews/${id}/approve`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      unapprove: (id: number, token: string) =>
+        fetchFromApi<any>(`/reviews/${id}/unapprove`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+    },
   },
 };

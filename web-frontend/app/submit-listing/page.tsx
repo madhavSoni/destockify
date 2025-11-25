@@ -39,17 +39,6 @@ function SubmitListingForm() {
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [documentFiles, setDocumentFiles] = useState<File[]>([]);
 
-  // Hours of operation
-  const [hours, setHours] = useState({
-    monday: { open: '', close: '' },
-    tuesday: { open: '', close: '' },
-    wednesday: { open: '', close: '' },
-    thursday: { open: '', close: '' },
-    friday: { open: '', close: '' },
-    saturday: { open: '', close: '' },
-    sunday: { open: '', close: '' },
-  });
-
   // Social media
   const [socialMedia, setSocialMedia] = useState({
     instagram: '',
@@ -83,11 +72,6 @@ function SubmitListingForm() {
         setWebsite(submission.website || '');
         setDescription(submission.description);
         setNotes(submission.notes || '');
-        
-        // Set hours if they exist
-        if (submission.hoursOfOperation) {
-          setHours(submission.hoursOfOperation);
-        }
         
         // Set social media if it exists
         if (submission.socialMedia) {
@@ -165,10 +149,6 @@ function SubmitListingForm() {
         website: website || undefined,
         description,
         notes: notes || undefined,
-        // Hours of operation (only include if at least one day has times)
-        hoursOfOperation: Object.values(hours).some(day => day.open || day.close) 
-          ? hours 
-          : undefined,
         // Social media (only include if at least one field is filled)
         socialMedia: Object.values(socialMedia).some(val => val) 
           ? socialMedia 
@@ -192,10 +172,10 @@ function SubmitListingForm() {
 
   if (authLoading || isLoadingData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-          <p className="mt-4 text-slate-600">{isLoadingData ? 'Loading submission...' : 'Loading...'}</p>
+          <p className="mt-4 text-black/70">{isLoadingData ? 'Loading submission...' : 'Loading...'}</p>
         </div>
       </div>
     );
@@ -203,17 +183,17 @@ function SubmitListingForm() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="text-center max-w-md">
-          <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-md bg-blue-600">
+            <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-3">
+          <h2 className="text-2xl font-bold text-black mb-3">
             {isEditMode ? 'Changes Saved!' : 'Submission Successful!'}
           </h2>
-          <p className="text-slate-600 mb-6">
+          <p className="text-black/70 mb-6">
             {isEditMode 
               ? 'Your listing changes have been saved and will be reviewed by our team.'
               : 'Your listing has been submitted for review. Our team will review it within 2 business days.'
@@ -221,7 +201,7 @@ function SubmitListingForm() {
           </p>
           <Link
             href="/my-listings"
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
           >
             View My Listings
           </Link>
@@ -231,23 +211,23 @@ function SubmitListingForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+    <div className="min-h-screen bg-white">
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <div className="mb-6 text-sm font-medium text-slate-600">
+        <div className="mb-6 text-sm font-medium text-black/70">
           <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
           <span className="mx-2">›</span>
           <Link href="/my-listings" className="hover:text-blue-600 transition-colors">My Listings</Link>
           <span className="mx-2">›</span>
-          <span className="font-semibold text-slate-900">{isEditMode ? 'Edit' : 'Submit'} Listing</span>
+          <span className="font-semibold text-black">{isEditMode ? 'Edit' : 'Submit'} Listing</span>
         </div>
 
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-slate-900 mb-3">
+          <h1 className="text-3xl font-bold text-black mb-3">
             {isEditMode ? 'Edit Your Business Listing' : 'Submit Your Business Listing'}
           </h1>
-          <p className="text-slate-600 max-w-2xl mx-auto">
+          <p className="text-black/70 max-w-2xl mx-auto">
             {isEditMode
               ? 'Update your company details below. Changes will be reviewed by our team.'
               : 'Fill out the form below with your company details and proof of ownership. Your submission will be reviewed by our team before it appears publicly.'
@@ -258,54 +238,54 @@ function SubmitListingForm() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-8">
           {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            <div className="rounded-md border border-black/10 bg-black/5 p-4 text-sm text-black">
               {error}
             </div>
           )}
 
           {/* Basic Information */}
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
-            <h2 className="text-xl font-semibold text-slate-900 mb-4">Basic Information</h2>
+          <div className="rounded-md border border-black/10 bg-white p-6">
+            <h2 className="text-xl font-semibold text-black mb-4">Basic Information</h2>
             <div className="space-y-4">
               <div>
-                <label htmlFor="companyName" className="block text-sm font-medium text-slate-700 mb-1">
-                  Company Name <span className="text-red-500">*</span>
+                <label htmlFor="companyName" className="block text-sm font-medium text-black mb-1">
+                  Company Name <span className="text-black">*</span>
                 </label>
                 <input
                   type="text"
                   id="companyName"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="companyAddress" className="block text-sm font-medium text-slate-700 mb-1">
-                  Company Address <span className="text-red-500">*</span>
+                <label htmlFor="companyAddress" className="block text-sm font-medium text-black mb-1">
+                  Company Address <span className="text-black">*</span>
                 </label>
                 <input
                   type="text"
                   id="companyAddress"
                   value={companyAddress}
                   onChange={(e) => setCompanyAddress(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
                   placeholder="123 Main St, City, State, ZIP"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-1">
-                  Company Description <span className="text-red-500">*</span>
+                <label htmlFor="description" className="block text-sm font-medium text-black mb-1">
+                  Company Description <span className="text-black">*</span>
                 </label>
                 <textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={4}
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
                   placeholder="Describe your products, services, and what makes your business unique..."
                   required
                 />
@@ -314,25 +294,25 @@ function SubmitListingForm() {
           </div>
 
           {/* Contact Details */}
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
-            <h2 className="text-xl font-semibold text-slate-900 mb-4">Contact Details</h2>
+          <div className="rounded-md border border-black/10 bg-white p-6">
+            <h2 className="text-xl font-semibold text-black mb-4">Contact Details</h2>
             <div className="space-y-4">
               <div>
-                <label htmlFor="contactEmail" className="block text-sm font-medium text-slate-700 mb-1">
-                  Contact Email <span className="text-red-500">*</span>
+                <label htmlFor="contactEmail" className="block text-sm font-medium text-black mb-1">
+                  Contact Email <span className="text-black">*</span>
                 </label>
                 <input
                   type="email"
                   id="contactEmail"
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="contactPhone" className="block text-sm font-medium text-slate-700 mb-1">
+                <label htmlFor="contactPhone" className="block text-sm font-medium text-black mb-1">
                   Contact Phone
                 </label>
                 <input
@@ -340,13 +320,13 @@ function SubmitListingForm() {
                   id="contactPhone"
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
                   placeholder="(555) 123-4567"
                 />
               </div>
 
               <div>
-                <label htmlFor="website" className="block text-sm font-medium text-slate-700 mb-1">
+                <label htmlFor="website" className="block text-sm font-medium text-black mb-1">
                   Website URL
                 </label>
                 <input
@@ -354,7 +334,7 @@ function SubmitListingForm() {
                   id="website"
                   value={website}
                   onChange={(e) => setWebsite(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
                   placeholder="https://www.example.com"
                 />
               </div>
@@ -362,16 +342,16 @@ function SubmitListingForm() {
           </div>
 
           {/* Branding */}
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
-            <h2 className="text-xl font-semibold text-slate-900 mb-4">Branding</h2>
+          <div className="rounded-md border border-black/10 bg-white p-6">
+            <h2 className="text-xl font-semibold text-black mb-4">Branding</h2>
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-black mb-2">
                   Company Logo
                 </label>
                 <div className="flex items-center gap-4">
                   {logoPreview && (
-                    <div className="h-24 w-24 rounded-lg border border-slate-200 overflow-hidden">
+                    <div className="h-24 w-24 rounded-md border border-black/10 overflow-hidden">
                       <img src={logoPreview} alt="Logo preview" className="h-full w-full object-cover" />
                     </div>
                   )}
@@ -380,20 +360,20 @@ function SubmitListingForm() {
                       type="file"
                       accept="image/*"
                       onChange={handleLogoChange}
-                      className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-lg file:border file:border-slate-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-50"
+                      className="block w-full text-sm text-black/70 file:mr-4 file:rounded-md file:border file:border-black/10 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-black hover:file:bg-black/5"
                     />
-                    <p className="mt-1 text-xs text-slate-500">PNG, JPG up to 5MB (Square images work best)</p>
+                    <p className="mt-1 text-xs text-black/50">PNG, JPG up to 5MB (Square images work best)</p>
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-black mb-2">
                   Banner Image
                 </label>
                 <div className="space-y-4">
                   {bannerPreview && (
-                    <div className="w-full h-48 rounded-lg border border-slate-200 overflow-hidden">
+                    <div className="w-full h-48 rounded-md border border-black/10 overflow-hidden">
                       <img src={bannerPreview} alt="Banner preview" className="h-full w-full object-cover" />
                     </div>
                   )}
@@ -401,54 +381,21 @@ function SubmitListingForm() {
                     type="file"
                     accept="image/*"
                     onChange={handleBannerChange}
-                    className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-lg file:border file:border-slate-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-50"
+                    className="block w-full text-sm text-black/70 file:mr-4 file:rounded-md file:border file:border-black/10 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-black hover:file:bg-black/5"
                   />
-                  <p className="text-xs text-slate-500">PNG, JPG up to 5MB (Recommended: 1200x400px)</p>
+                  <p className="text-xs text-black/50">PNG, JPG up to 5MB (Recommended: 1200x400px)</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Hours of Operation */}
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
-            <h2 className="text-xl font-semibold text-slate-900 mb-4">Hours of Operation</h2>
-            <p className="text-sm text-slate-600 mb-4">Leave blank for days you're closed</p>
-            <div className="space-y-3">
-              {Object.keys(hours).map((day) => (
-                <div key={day} className="grid grid-cols-3 gap-4 items-center">
-                  <label className="text-sm font-medium text-slate-700 capitalize">{day}</label>
-                  <input
-                    type="time"
-                    value={hours[day as keyof typeof hours].open}
-                    onChange={(e) => setHours(prev => ({
-                      ...prev,
-                      [day]: { ...prev[day as keyof typeof hours], open: e.target.value }
-                    }))}
-                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    placeholder="Open"
-                  />
-                  <input
-                    type="time"
-                    value={hours[day as keyof typeof hours].close}
-                    onChange={(e) => setHours(prev => ({
-                      ...prev,
-                      [day]: { ...prev[day as keyof typeof hours], close: e.target.value }
-                    }))}
-                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    placeholder="Close"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Social Media */}
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
-            <h2 className="text-xl font-semibold text-slate-900 mb-4">Social Media Links</h2>
+          <div className="rounded-md border border-black/10 bg-white p-6">
+            <h2 className="text-xl font-semibold text-black mb-4">Social Media Links</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Object.keys(socialMedia).map((platform) => (
                 <div key={platform}>
-                  <label htmlFor={platform} className="block text-sm font-medium text-slate-700 mb-1 capitalize">
+                  <label htmlFor={platform} className="block text-sm font-medium text-black mb-1 capitalize">
                     {platform}
                   </label>
                   <input
@@ -459,7 +406,7 @@ function SubmitListingForm() {
                       ...prev,
                       [platform]: e.target.value
                     }))}
-                    className="w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
                     placeholder={`https://...`}
                   />
                 </div>
@@ -468,11 +415,11 @@ function SubmitListingForm() {
           </div>
 
           {/* Ownership Proof */}
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
-            <h2 className="text-xl font-semibold text-slate-900 mb-4">
-              Proof of Ownership <span className="text-red-500">*</span>
+          <div className="rounded-md border border-black/10 bg-white p-6">
+            <h2 className="text-xl font-semibold text-black mb-4">
+              Proof of Ownership <span className="text-black">*</span>
             </h2>
-            <p className="text-sm text-slate-600 mb-4">
+            <p className="text-sm text-black/70 mb-4">
               Upload documents proving you own or represent this business (Tax ID, business license, 
               incorporation documents, official letterhead, etc.)
             </p>
@@ -481,20 +428,20 @@ function SubmitListingForm() {
               accept=".pdf,.jpg,.jpeg,.png"
               multiple
               onChange={handleDocumentsChange}
-              className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-lg file:border file:border-slate-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-50"
+              className="block w-full text-sm text-black/70 file:mr-4 file:rounded-md file:border file:border-black/10 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-black hover:file:bg-black/5"
             />
-            <p className="mt-2 text-xs text-slate-500">Accepted: PDF, JPG, PNG (up to 10MB each)</p>
+            <p className="mt-2 text-xs text-black/50">Accepted: PDF, JPG, PNG (up to 10MB each)</p>
             
             {documentFiles.length > 0 && (
               <div className="mt-4 space-y-2">
-                <p className="text-sm font-medium text-slate-700">Uploaded documents:</p>
+                <p className="text-sm font-medium text-black">Uploaded documents:</p>
                 {documentFiles.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-                    <span className="text-sm text-slate-700">{file.name}</span>
+                  <div key={index} className="flex items-center justify-between rounded-md border border-black/10 bg-black/5 px-3 py-2">
+                    <span className="text-sm text-black">{file.name}</span>
                     <button
                       type="button"
                       onClick={() => removeDocument(index)}
-                      className="text-red-600 hover:text-red-700 text-sm font-medium"
+                      className="text-black hover:text-blue-600 text-sm font-medium"
                     >
                       Remove
                     </button>
@@ -505,13 +452,13 @@ function SubmitListingForm() {
           </div>
 
           {/* Optional Notes */}
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
-            <h2 className="text-xl font-semibold text-slate-900 mb-4">Additional Notes</h2>
+          <div className="rounded-md border border-black/10 bg-white p-6">
+            <h2 className="text-xl font-semibold text-black mb-4">Additional Notes</h2>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={4}
-              className="w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
               placeholder="Any additional information you'd like to share with our review team..."
             />
           </div>
@@ -520,14 +467,14 @@ function SubmitListingForm() {
           <div className="flex items-center justify-between">
             <Link
               href="/my-listings"
-              className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              className="text-sm font-medium text-black/70 hover:text-blue-600 transition-colors"
             >
               ← Back
             </Link>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-lg bg-blue-600 px-6 py-3 text-base font-semibold text-white hover:bg-blue-700 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
+              className="rounded-md bg-blue-600 px-6 py-3 text-base font-semibold text-white hover:bg-blue-700 transition-colors disabled:bg-black/20 disabled:cursor-not-allowed"
             >
               {isSubmitting 
                 ? (isEditMode ? 'Saving...' : 'Submitting...') 
@@ -544,10 +491,10 @@ function SubmitListingForm() {
 export default function SubmitListingPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-          <p className="mt-4 text-slate-600">Loading...</p>
+          <p className="mt-4 text-black/70">Loading...</p>
         </div>
       </div>
     }>

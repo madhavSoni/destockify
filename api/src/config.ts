@@ -112,12 +112,12 @@ export const config: AppConfig = {
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
   gcs: {
-    bucketName: process.env.GCS_BUCKET_NAME || 'muse-media',
+    bucketName: process.env.GCS_BUCKET_NAME || 'destockify-media',
     projectId: process.env.GCS_PROJECT_ID,
     credentialsPath: process.env.GOOGLE_APPLICATION_CREDENTIALS,
   },
   email: {
-    from: process.env.EMAIL_FROM || 'Muse <noreply@muse.app>',
+    from: process.env.EMAIL_FROM || 'Destockify <noreply@destockify.app>',
     user: process.env.EMAIL_USER,
     password: process.env.EMAIL_PASSWORD,
   },
@@ -125,7 +125,7 @@ export const config: AppConfig = {
     // Default allowlist includes localhost and the deployed frontend; can be overridden via CORS_ORIGINS
     origins: process.env.CORS_ORIGINS
       ? process.env.CORS_ORIGINS.split(',')
-      : ['http://localhost:3000', 'https://muse-frontend-881749700707.us-central1.run.app'],
+      : ['http://localhost:3000'],
   },
   rateLimit: {
     windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000),

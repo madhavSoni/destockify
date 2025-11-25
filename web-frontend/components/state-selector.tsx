@@ -51,7 +51,7 @@ export function StateSelector({ regions }: { regions: Region[] }) {
           <select
             value={selectedState}
             onChange={(e) => setSelectedState(e.target.value)}
-            className="h-14 w-full appearance-none rounded-xl border-2 border-slate-300 bg-white px-5 pr-12 text-base text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all"
+            className="h-14 w-full appearance-none rounded-md border-2 border-black/10 bg-white px-5 pr-12 text-base text-black shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
           >
             <option value="">Shop by State</option>
             {ALL_US_STATES.map((state) => (
@@ -61,14 +61,14 @@ export function StateSelector({ regions }: { regions: Region[] }) {
             ))}
           </select>
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
-            <svg className="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </div>
         </div>
         <button
           onClick={handleGo}
-          className="group h-14 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-8 text-base font-semibold text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-500/40 transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2"
+          className="group h-14 rounded-md bg-blue-600 px-8 text-base font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all flex items-center gap-2"
         >
           Go
           <svg 

@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { api } from '@/lib/api';
+import { SupplierCard } from '@/components/supplier-card';
 
 // Helper function to categorize states into regions
 function getRegionGroup(stateCode: string | null | undefined): string {
@@ -27,7 +27,6 @@ export default async function SuppliersPage(props: any) {
     search: typeof searchParams.search === 'string' ? searchParams.search : '',
     category: typeof searchParams.category === 'string' ? searchParams.category : '',
     region: typeof searchParams.region === 'string' ? searchParams.region : '',
-    lotSize: typeof searchParams['lot-size'] === 'string' ? searchParams['lot-size'] : '',
     verified: typeof searchParams.verified === 'string' ? searchParams.verified : '',
     regionGroup: typeof searchParams['region-group'] === 'string' ? searchParams['region-group'] : '',
     page: typeof searchParams.page === 'string' ? Math.max(1, Number(searchParams.page)) : 1,
@@ -36,22 +35,17 @@ export default async function SuppliersPage(props: any) {
   const itemsPerPage = 18;
   const cursor = filters.page > 1 ? (filters.page - 1) * itemsPerPage : undefined;
 
-  const [result, categories, regions, lotSizes] = await Promise.all([
+  const [result, categories, regions] = await Promise.all([
     api.suppliers.list({
       search: filters.search,
       category: filters.category || undefined,
       region: filters.region || undefined,
-      lotSize: filters.lotSize || undefined,
       verified: filters.verified === 'true' ? true : filters.verified === 'false' ? false : undefined,
-      regionGroup: filters.regionGroup && ['south', 'west', 'northeast', 'midwest', 'other'].includes(filters.regionGroup) 
-        ? filters.regionGroup as 'south' | 'west' | 'northeast' | 'midwest' | 'other'
-        : undefined,
       cursor: cursor,
       limit: itemsPerPage,
     }),
     api.catalog.categories(),
     api.catalog.regions(),
-    api.catalog.lotSizes(),
   ]);
 
   // Group regions by region group
@@ -82,7 +76,6 @@ export default async function SuppliersPage(props: any) {
     if (filters.search) params.set('search', filters.search);
     if (filters.category) params.set('category', filters.category);
     if (filters.region) params.set('region', filters.region);
-    if (filters.lotSize) params.set('lot-size', filters.lotSize);
     if (filters.verified) params.set('verified', filters.verified);
     if (filters.regionGroup) params.set('region-group', filters.regionGroup);
     if (page > 1) params.set('page', String(page));
@@ -98,14 +91,14 @@ export default async function SuppliersPage(props: any) {
     : 'Find Trusted Suppliers Near You';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+    <div className="min-h-screen bg-white">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <div className="mb-8 rounded-lg border border-slate-200 bg-gradient-to-br from-blue-500 to-blue-600 p-8 sm:p-12">
+        <div className="mb-8 rounded-md border border-black/10 bg-blue-600 p-8 sm:p-12">
           <h1 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-white mb-4">
             {headerTitle}
           </h1>
-          <p className="font-normal text-lg text-blue-50 max-w-3xl">
+          <p className="font-normal text-lg text-white/90 max-w-3xl">
             Browse hundreds of verified liquidators and wholesalers across the United States. Connect with suppliers offering returned, overstock, and brand new merchandise.
           </p>
         </div>
@@ -118,8 +111,8 @@ export default async function SuppliersPage(props: any) {
               <input type="hidden" name="search" defaultValue={filters.search} />
               
               {/* State Filter with Expandable Region Groups */}
-              <div className="rounded-lg border border-slate-200 bg-white p-6">
-                <h3 className="font-semibold text-lg text-slate-900 mb-4">Filter by State</h3>
+              <div className="rounded-md border border-black/10 bg-white p-6">
+                <h3 className="font-semibold text-lg text-black mb-4">Filter by State</h3>
                 <div className="space-y-2 max-h-[500px] overflow-y-auto">
                   {Object.entries(regionsByGroup).map(([groupName, groupRegions]) => {
                     if (groupRegions.length === 0) return null;
@@ -132,12 +125,12 @@ export default async function SuppliersPage(props: any) {
                     };
                     return (
                       <details key={groupName} className="group">
-                        <summary className="flex items-center justify-between p-2 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors list-none">
-                          <span className="font-semibold text-sm text-slate-900 group-hover:text-blue-600">
+                        <summary className="flex items-center justify-between p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors list-none">
+                          <span className="font-semibold text-sm text-black group-hover:text-blue-600">
                             {groupLabels[groupName]}
                           </span>
                           <svg
-                            className="w-4 h-4 text-slate-500 group-open:rotate-180 transition-transform"
+                            className="w-4 h-4 text-black/50 group-open:rotate-180 transition-transform"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -145,20 +138,20 @@ export default async function SuppliersPage(props: any) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </summary>
-                        <div className="mt-1 ml-2 space-y-1 border-l-2 border-slate-200 pl-3">
+                        <div className="mt-1 ml-2 space-y-1 border-l-2 border-black/5 pl-3">
                           {groupRegions.map((r) => (
                             <label
                               key={r.slug}
-                              className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors group"
+                              className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors group"
                             >
                               <input
                                 type="radio"
                                 name="region"
                                 value={r.slug}
                                 defaultChecked={filters.region === r.slug}
-                                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                                className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600 cursor-pointer"
                               />
-                              <span className="font-normal text-sm text-slate-700 group-hover:text-blue-600">
+                              <span className="font-normal text-sm text-black/70 group-hover:text-blue-600">
                                 {r.name}
                               </span>
                             </label>
@@ -170,33 +163,9 @@ export default async function SuppliersPage(props: any) {
                 </div>
               </div>
 
-              {/* Lot Size Filter */}
-              <div className="rounded-lg border border-slate-200 bg-white p-6">
-                <h3 className="font-semibold text-lg text-slate-900 mb-4">Filter by Lot Size</h3>
-                <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                  {lotSizes.map((ls) => (
-                    <label
-                      key={ls.slug}
-                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors group"
-                    >
-                      <input
-                        type="radio"
-                        name="lot-size"
-                        value={ls.slug}
-                        defaultChecked={filters.lotSize === ls.slug}
-                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                      />
-                      <span className="font-normal text-sm text-slate-700 group-hover:text-blue-600">
-                        {ls.name}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
               {/* Verified Filter */}
-              <div className="rounded-lg border border-slate-200 bg-white p-6">
-                <h3 className="font-semibold text-lg text-slate-900 mb-4">Verification Status</h3>
+              <div className="rounded-md border border-black/10 bg-white p-6">
+                <h3 className="font-semibold text-lg text-black mb-4">Verification Status</h3>
                 <div className="space-y-2">
                   {[
                     { value: 'true', label: 'Verified' },
@@ -204,16 +173,16 @@ export default async function SuppliersPage(props: any) {
                   ].map((option) => (
                     <label
                       key={option.value}
-                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors group"
+                      className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors group"
                     >
                       <input
                         type="radio"
                         name="verified"
                         value={option.value}
                         defaultChecked={filters.verified === option.value}
-                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                        className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600 cursor-pointer"
                       />
-                      <span className="font-normal text-sm text-slate-700 group-hover:text-blue-600">
+                      <span className="font-normal text-sm text-black/70 group-hover:text-blue-600">
                         {option.label}
                       </span>
                     </label>
@@ -221,16 +190,16 @@ export default async function SuppliersPage(props: any) {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-200 flex flex-col gap-2">
+              <div className="pt-4 border-t border-black/5 flex flex-col gap-2">
                 <button
                   type="submit"
-                  className="w-full font-semibold rounded-lg bg-blue-600 px-4 py-2.5 text-white hover:bg-blue-700 transition-colors duration-200"
+                  className="w-full font-semibold rounded-md bg-blue-600 px-4 py-2.5 text-white hover:bg-blue-700 transition-colors duration-200"
                 >
                   Apply Filters
                 </button>
                 <Link
                   href="/suppliers"
-                  className="w-full text-center font-normal text-sm text-slate-600 hover:text-slate-900 py-2 hover:underline underline-offset-2"
+                  className="w-full text-center font-normal text-sm text-black/50 hover:text-black py-2 hover:underline underline-offset-2"
                 >
                   Clear All Filters
                 </Link>
@@ -242,98 +211,18 @@ export default async function SuppliersPage(props: any) {
           <section>
             {/* Results Count */}
             <div className="mb-6">
-              <p className="font-bold text-lg text-slate-900">
+              <p className="font-bold text-lg text-black">
                 {total} Suppliers Found
                 {filters.region && regions.find(r => r.slug === filters.region) && (
-                  <span className="font-medium text-slate-600"> in {regions.find(r => r.slug === filters.region)?.name}</span>
+                  <span className="font-medium text-black/50"> in {regions.find(r => r.slug === filters.region)?.name}</span>
                 )}
               </p>
             </div>
 
             {/* Cards Grid */}
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
               {result.items.map((s) => (
-                <Link
-                  key={s.slug}
-                  href={`/suppliers/${s.slug}`}
-                  className="group block overflow-hidden rounded-lg border border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm transition-all duration-200"
-                >
-                  {/* Header with gradient */}
-                  <div className="relative h-32 bg-gradient-to-br from-blue-50 to-blue-100 border-b border-slate-200">
-                    {/* Company Name Badge */}
-                    <div className="absolute inset-0 flex items-center justify-center p-4">
-                      <div className="bg-white rounded-lg px-5 py-2.5 border border-slate-200 max-w-full">
-                        <div className="font-semibold text-base text-slate-900 text-center truncate">
-                          {s.name}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Flags from API */}
-                    {s.flags && s.flags.length > 0 && (
-                      <div className="absolute top-3 right-3 flex flex-col gap-1">
-                        {s.flags.map((flag, idx) => (
-                          <div 
-                            key={idx}
-                            className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
-                              flag.variant === 'verified' 
-                                ? 'bg-green-500 text-white border-green-600' 
-                                : 'bg-red-500 text-white border-red-600'
-                            }`}
-                          >
-                            {flag.variant === 'verified' ? '✓' : '⚠'} {flag.text}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Card Content */}
-                  <div className="p-4 space-y-3">
-                    {/* Location */}
-                    <div className="flex items-start gap-2">
-                      <svg className="w-5 h-5 text-slate-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      <div className="font-medium text-sm text-slate-700">
-                        {s.region?.name || 'United States'}
-                      </div>
-                    </div>
-
-                    {/* Rating */}
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <svg
-                            key={i}
-                            className={`w-4 h-4 ${s.averageRating && i < Math.round(s.averageRating) ? 'text-yellow-400' : 'text-slate-300'}`}
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                        ))}
-                      </div>
-                      <span className="font-bold text-sm text-slate-900">
-                        {s.averageRating ? s.averageRating.toFixed(1) : '0.0'}
-                      </span>
-                      <span className="font-medium text-xs text-slate-500">
-                        ({s.reviewCount ?? 0} {(s.reviewCount ?? 0) === 1 ? 'review' : 'reviews'})
-                      </span>
-                    </div>
-
-                    {/* View Details Button */}
-                    <div className="pt-2">
-                      <div className="font-bold text-sm text-blue-600 group-hover:text-blue-700 flex items-center gap-1">
-                        View Details
-                        <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
+                <SupplierCard key={s.slug} supplier={s} />
               ))}
             </div>
 
@@ -469,17 +358,17 @@ export default async function SuppliersPage(props: any) {
 
         {/* Bottom CTA */}
         <section className="mt-16">
-          <div className="mx-auto max-w-4xl rounded-3xl border-2 border-slate-900/80 bg-gradient-to-br from-slate-800 to-slate-900 p-8 sm:p-12 text-white shadow-[6px_7px_0_0_rgba(2,6,23,0.85)]">
+          <div className="mx-auto max-w-4xl rounded-md border-2 border-black/10 bg-black p-8 sm:p-12 text-white shadow-md">
             <div className="text-center">
               <h3 className="font-black text-3xl sm:text-4xl mb-4">
                 List Your Business
               </h3>
-              <p className="font-medium text-lg text-slate-200 mb-8 max-w-2xl mx-auto">
+              <p className="font-medium text-lg text-white/80 mb-8 max-w-2xl mx-auto">
                 Get discovered by thousands of buyers looking for quality merchandise from trusted suppliers across the United States.
               </p>
               <Link
                 href="/list-your-business"
-                className="inline-flex items-center justify-center font-bold rounded-xl bg-blue-600 px-8 py-4 text-lg text-white shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-blue-700 active:translate-y-0 transition-all duration-200"
+                className="inline-flex items-center justify-center font-bold rounded-md bg-blue-600 px-8 py-4 text-lg text-white hover:bg-blue-700 transition-all duration-200"
               >
                 Get Started Today
                 <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

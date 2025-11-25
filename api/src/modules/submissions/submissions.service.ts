@@ -40,7 +40,6 @@ export async function createSubmission(
     description: string;
     logoUrl?: string;
     bannerUrl?: string;
-    hoursOfOperation?: any;
     socialMedia?: any;
     ownershipDocuments?: string[];
     notes?: string;
@@ -72,7 +71,6 @@ export async function createSubmission(
       description: payload.description,
       logoUrl: payload.logoUrl,
       bannerUrl: payload.bannerUrl,
-      hoursOfOperation: payload.hoursOfOperation,
       socialMedia: payload.socialMedia,
       ownershipDocuments: payload.ownershipDocuments || [],
       notes: payload.notes,
@@ -157,7 +155,6 @@ export async function updateSubmission(
     description?: string;
     logoUrl?: string;
     bannerUrl?: string;
-    hoursOfOperation?: any;
     socialMedia?: any;
     ownershipDocuments?: string[];
     notes?: string;
@@ -192,7 +189,6 @@ export async function updateSubmission(
       description: payload.description,
       logoUrl: payload.logoUrl,
       bannerUrl: payload.bannerUrl,
-      hoursOfOperation: payload.hoursOfOperation,
       socialMedia: payload.socialMedia,
       ownershipDocuments: payload.ownershipDocuments,
       notes: payload.notes,
@@ -313,9 +309,6 @@ export async function approveSubmission(submissionId: number, adminNotes?: strin
       logoImage: submission.logoUrl,
       heroImage: submission.bannerUrl,
       // Initialize with default values
-      averageRating: 0,
-      reviewCount: 0,
-      trustScore: 0,
       homeRank: 0,
     },
   });

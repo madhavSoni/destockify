@@ -19,18 +19,60 @@ export default function NewCompanyPage() {
     email: '',
     heroImage: '',
     logoImage: '',
-    minimumOrder: '',
-    leadTime: '',
-    specialties: [] as string[],
-    certifications: [] as string[],
-    badges: [] as string[],
-    logisticsNotes: '',
-    pricingNotes: '',
-    trustScore: 0,
     isVerified: false,
     isScam: false,
     homeRank: 0,
   });
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !authToken) return;
+
+    setLogoFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setLogoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    setUploadingLogo(true);
+    try {
+      const url = await api.admin.uploadImage(file, authToken);
+      setFormData({ ...formData, logoImage: url });
+    } catch (error: any) {
+      alert(error.message || 'Failed to upload logo');
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !authToken) return;
+
+    setBannerFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setBannerPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    setUploadingBanner(true);
+    try {
+      const url = await api.admin.uploadImage(file, authToken);
+      setFormData({ ...formData, heroImage: url });
+    } catch (error: any) {
+      alert(error.message || 'Failed to upload banner');
+    } finally {
+      setUploadingBanner(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,114 +197,63 @@ export default function NewCompanyPage() {
           
           <div className="grid gap-6 sm:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-slate-700">Logo Image URL</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Logo Image</label>
+              {logoPreview && (
+                <div className="mb-3 w-full h-32 rounded-lg border border-slate-300 overflow-hidden bg-slate-50">
+                  <img src={logoPreview} alt="Logo preview" className="h-full w-full object-contain" />
+                </div>
+              )}
               <input
-                type="url"
-                value={formData.logoImage}
-                onChange={(e) => setFormData({ ...formData, logoImage: e.target.value })}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
+                type="file"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                disabled={uploadingLogo}
+                className="block w-full text-sm text-slate-700 file:mr-4 file:rounded-md file:border file:border-slate-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-50 disabled:opacity-50"
               />
+              {uploadingLogo && <p className="mt-1 text-xs text-slate-500">Uploading...</p>}
+              <div className="mt-2">
+                <label className="block text-sm font-medium text-slate-700 mb-1">Or enter URL</label>
+                <input
+                  type="url"
+                  value={formData.logoImage}
+                  onChange={(e) => {
+                    setFormData({ ...formData, logoImage: e.target.value });
+                    setLogoPreview(e.target.value || null);
+                  }}
+                  className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
+                  placeholder="https://example.com/logo.png"
+                />
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700">Hero Image URL</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Banner/Hero Image</label>
+              {bannerPreview && (
+                <div className="mb-3 w-full h-32 rounded-lg border border-slate-300 overflow-hidden bg-slate-50">
+                  <img src={bannerPreview} alt="Banner preview" className="h-full w-full object-cover" />
+                </div>
+              )}
               <input
-                type="url"
-                value={formData.heroImage}
-                onChange={(e) => setFormData({ ...formData, heroImage: e.target.value })}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
+                type="file"
+                accept="image/*"
+                onChange={handleBannerUpload}
+                disabled={uploadingBanner}
+                className="block w-full text-sm text-slate-700 file:mr-4 file:rounded-md file:border file:border-slate-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-50 disabled:opacity-50"
               />
+              {uploadingBanner && <p className="mt-1 text-xs text-slate-500">Uploading...</p>}
+              <div className="mt-2">
+                <label className="block text-sm font-medium text-slate-700 mb-1">Or enter URL</label>
+                <input
+                  type="url"
+                  value={formData.heroImage}
+                  onChange={(e) => {
+                    setFormData({ ...formData, heroImage: e.target.value });
+                    setBannerPreview(e.target.value || null);
+                  }}
+                  className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
+                  placeholder="https://example.com/banner.jpg"
+                />
+              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Business Details */}
-        <div className="space-y-6">
-          <h3 className="text-lg font-semibold text-slate-900 border-b pb-2">Business Details</h3>
-          
-          <div className="grid gap-6 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-slate-700">Minimum Order</label>
-              <input
-                type="text"
-                value={formData.minimumOrder}
-                onChange={(e) => setFormData({ ...formData, minimumOrder: e.target.value })}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-                placeholder="e.g., 1 pallet, $500, etc."
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700">Lead Time</label>
-              <input
-                type="text"
-                value={formData.leadTime}
-                onChange={(e) => setFormData({ ...formData, leadTime: e.target.value })}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-                placeholder="e.g., 2-3 days, 1 week, etc."
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700">Logistics Notes</label>
-            <textarea
-              value={formData.logisticsNotes}
-              onChange={(e) => setFormData({ ...formData, logisticsNotes: e.target.value })}
-              rows={3}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-              placeholder="Shipping methods, delivery areas, freight details, etc."
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700">Pricing Notes</label>
-            <textarea
-              value={formData.pricingNotes}
-              onChange={(e) => setFormData({ ...formData, pricingNotes: e.target.value })}
-              rows={3}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-              placeholder="Pricing structure, payment terms, volume discounts, etc."
-            />
-          </div>
-        </div>
-
-        {/* Tags & Classifications */}
-        <div className="space-y-6">
-          <h3 className="text-lg font-semibold text-slate-900 border-b pb-2">Tags & Classifications</h3>
-          
-          <div>
-            <label className="block text-sm font-medium text-slate-700">Specialties</label>
-            <input
-              type="text"
-              value={formData.specialties.join(', ')}
-              onChange={(e) => setFormData({ ...formData, specialties: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-              placeholder="Electronics, Apparel, Home Goods (comma-separated)"
-            />
-            <p className="mt-1 text-xs text-slate-500">Separate multiple items with commas</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700">Certifications</label>
-            <input
-              type="text"
-              value={formData.certifications.join(', ')}
-              onChange={(e) => setFormData({ ...formData, certifications: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-              placeholder="ISO 9001, BBB Accredited, etc. (comma-separated)"
-            />
-            <p className="mt-1 text-xs text-slate-500">Separate multiple items with commas</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700">Badges</label>
-            <input
-              type="text"
-              value={formData.badges.join(', ')}
-              onChange={(e) => setFormData({ ...formData, badges: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-              placeholder="Top Rated, Fast Shipping, etc. (comma-separated)"
-            />
-            <p className="mt-1 text-xs text-slate-500">Separate multiple items with commas</p>
           </div>
         </div>
 
@@ -270,19 +261,7 @@ export default function NewCompanyPage() {
         <div className="space-y-6">
           <h3 className="text-lg font-semibold text-slate-900 border-b pb-2">Status & Ranking</h3>
           
-          <div className="grid gap-6 sm:grid-cols-3">
-            <div>
-              <label className="block text-sm font-medium text-slate-700">Trust Score</label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={formData.trustScore}
-                onChange={(e) => setFormData({ ...formData, trustScore: parseInt(e.target.value) || 0 })}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-              />
-              <p className="mt-1 text-xs text-slate-500">0-100 score</p>
-            </div>
+          <div className="grid gap-6 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-slate-700">Home Page Rank</label>
               <input

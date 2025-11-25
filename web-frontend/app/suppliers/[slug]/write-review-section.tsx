@@ -26,14 +26,8 @@ export function WriteReviewSection({
   const [success, setSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
-    title: '',
     ratingOverall: 5,
-    ratingAccuracy: 5,
-    ratingLogistics: 5,
-    ratingValue: 5,
-    ratingCommunication: 5,
     body: '',
-    highlights: [] as string[],
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,28 +49,16 @@ export function WriteReviewSection({
     try {
       const payload: CreateReviewPayload = {
         supplierId: supplier.id,
-        title: formData.title || undefined,
         ratingOverall: formData.ratingOverall,
-        ratingAccuracy: formData.ratingAccuracy,
-        ratingLogistics: formData.ratingLogistics,
-        ratingValue: formData.ratingValue,
-        ratingCommunication: formData.ratingCommunication,
         body: formData.body,
-        highlights: formData.highlights.length > 0 ? formData.highlights : undefined,
       };
 
       await api.reviews.create(payload, authToken);
       
       setSuccess(true);
       setFormData({
-        title: '',
         ratingOverall: 5,
-        ratingAccuracy: 5,
-        ratingLogistics: 5,
-        ratingValue: 5,
-        ratingCommunication: 5,
         body: '',
-        highlights: [],
       });
 
       // Trigger immediate refresh of reviews section
@@ -97,46 +79,28 @@ export function WriteReviewSection({
     }
   };
 
-  const handleHighlightToggle = (highlight: string) => {
-    setFormData(prev => ({
-      ...prev,
-      highlights: prev.highlights.includes(highlight)
-        ? prev.highlights.filter(h => h !== highlight)
-        : [...prev.highlights, highlight],
-    }));
-  };
-
-  const commonHighlights = [
-    'Great Communication',
-    'Fast Shipping',
-    'Quality Products',
-    'Good Pricing',
-    'Reliable',
-    'Professional',
-  ];
-
   if (!isAuthenticated) {
     return (
-      <section className="rounded-lg border border-slate-200 bg-gradient-to-br from-blue-50 to-blue-100 p-6 sm:p-8 text-center">
+      <section className="rounded-md border border-black/10 bg-blue-600/10 p-6 sm:p-8 text-center">
         <svg className="w-16 h-16 mx-auto mb-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
         </svg>
-        <h2 className="font-semibold text-2xl text-slate-900 mb-3">
+        <h2 className="font-semibold text-2xl text-black mb-3">
           Write a Review
         </h2>
-        <p className="text-slate-700 font-medium mb-6 max-w-md mx-auto text-sm sm:text-base">
+        <p className="text-black/70 font-medium mb-6 max-w-md mx-auto text-sm sm:text-base">
           Share your experience with {supplier.name}! Create an account to leave a verified review.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
             onClick={() => router.push('/signup')}
-            className="w-full sm:w-auto h-12 rounded-lg border border-blue-600 bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700 transition-all"
+            className="w-full sm:w-auto h-12 rounded-md border border-blue-600 bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700 transition-all"
           >
             Sign Up
           </button>
           <button
             onClick={() => router.push('/login')}
-            className="w-full sm:w-auto h-12 rounded-lg border border-slate-300 bg-white px-6 py-3 font-medium text-slate-900 hover:bg-slate-50 transition-all"
+            className="w-full sm:w-auto h-12 rounded-md border border-black/10 bg-white px-6 py-3 font-medium text-black hover:bg-black/5 transition-all"
           >
             Login
           </button>
@@ -147,14 +111,14 @@ export function WriteReviewSection({
 
   if (!user?.isVerified) {
     return (
-      <section className="rounded-lg border-2 border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50 p-6 sm:p-8 text-center">
-        <svg className="w-16 h-16 mx-auto mb-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <section className="rounded-md border-2 border-black/10 bg-black/5 p-6 sm:p-8 text-center">
+        <svg className="w-16 h-16 mx-auto mb-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
-        <h2 className="font-semibold text-2xl text-slate-900 mb-3">
+        <h2 className="font-semibold text-2xl text-black mb-3">
           Verify Your Email
         </h2>
-        <p className="text-slate-700 font-medium text-sm sm:text-base">
+        <p className="text-black/70 font-medium text-sm sm:text-base">
           Check your email to verify your account before posting your review.
         </p>
       </section>
@@ -163,16 +127,16 @@ export function WriteReviewSection({
 
   if (success) {
     return (
-      <section className="rounded-lg border-2 border-emerald-500 bg-gradient-to-br from-emerald-50 to-green-50 p-6 sm:p-8 text-center">
-        <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <section className="rounded-md border-2 border-blue-600 bg-blue-600/10 p-6 sm:p-8 text-center">
+        <div className="w-16 h-16 rounded-md bg-blue-600 flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="font-semibold text-2xl text-slate-900 mb-3">
+        <h2 className="font-semibold text-2xl text-black mb-3">
           Thank You!
         </h2>
-        <p className="text-slate-700 font-medium text-sm sm:text-base">
+        <p className="text-black/70 font-medium text-sm sm:text-base">
           Your review has been submitted and will be visible after admin approval.
         </p>
       </section>
@@ -180,28 +144,28 @@ export function WriteReviewSection({
   }
 
   return (
-    <section className="rounded-xl border-2 border-slate-200 bg-white shadow-lg overflow-hidden">
+    <section className="rounded-md border-2 border-black/10 bg-white shadow-md overflow-hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-6 sm:p-8 text-left hover:bg-slate-50 transition-all group"
+        className="w-full p-6 sm:p-8 text-left hover:bg-black/5 transition-all group"
       >
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4 flex-1 min-w-0">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 group-hover:bg-slate-200 transition-colors flex-shrink-0">
-              <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-black/5 group-hover:bg-black/10 transition-colors flex-shrink-0">
+              <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-bold text-xl sm:text-2xl text-slate-900 mb-1">
+              <h2 className="font-bold text-xl sm:text-2xl text-black mb-1">
                 Write a Review
               </h2>
-              <p className="text-slate-600 font-medium text-sm sm:text-base">
+              <p className="text-black/70 font-medium text-sm sm:text-base">
                 Share your experience with {supplier.name}
               </p>
             </div>
           </div>
-          <div className="text-slate-400 transform transition-transform duration-200 flex-shrink-0" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)' }}>
+          <div className="text-black/50 transform transition-transform duration-200 flex-shrink-0" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)' }}>
             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
@@ -210,16 +174,16 @@ export function WriteReviewSection({
       </button>
 
       {isOpen && (
-        <form onSubmit={handleSubmit} className="border-t border-slate-200 p-4 sm:p-6 space-y-4 sm:space-y-6 bg-slate-50">
+        <form onSubmit={handleSubmit} className="border-t border-black/5 p-4 sm:p-6 space-y-4 sm:space-y-6 bg-black/5">
           {error && (
-            <div className="rounded-lg border border-red-300 bg-red-50 p-3 sm:p-4 text-red-800 font-medium text-sm">
+            <div className="rounded-md border border-black/10 bg-black/5 p-3 sm:p-4 text-black font-medium text-sm">
               {error}
             </div>
           )}
 
           {/* Overall Rating */}
           <div>
-            <label className="block text-base font-medium text-slate-900 mb-3">
+            <label className="block text-base font-medium text-black mb-3">
               Overall Rating *
             </label>
             <div className="flex flex-wrap items-center gap-2">
@@ -232,8 +196,8 @@ export function WriteReviewSection({
                 >
                   <svg
                     className="w-9 h-9 sm:w-10 sm:h-10"
-                    fill={star <= formData.ratingOverall ? "#facc15" : "none"}
-                    stroke="#facc15"
+                    fill={star <= formData.ratingOverall ? "#2563eb" : "none"}
+                    stroke="#2563eb"
                     strokeWidth={star <= formData.ratingOverall ? 0 : 1.5}
                     viewBox="0 0 24 24"
                   >
@@ -241,89 +205,15 @@ export function WriteReviewSection({
                   </svg>
                 </button>
               ))}
-              <span className="ml-2 text-xl font-semibold text-slate-900">
+              <span className="ml-2 text-xl font-semibold text-black">
                 {formData.ratingOverall}.0
               </span>
             </div>
           </div>
 
-          {/* Title */}
-          <div>
-            <label className="block text-base font-medium text-slate-900 mb-2">
-              Review Title (Optional)
-            </label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="e.g., Great supplier with fast shipping"
-              className="w-full h-12 rounded-lg border border-slate-300 px-4 py-2 font-medium text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-            />
-          </div>
-
-          {/* Detailed Ratings */}
-          <div className="grid gap-3 sm:grid-cols-2">
-            {[
-              { key: 'ratingAccuracy' as const, label: 'Product Accuracy' },
-              { key: 'ratingLogistics' as const, label: 'Logistics & Shipping' },
-              { key: 'ratingValue' as const, label: 'Value for Money' },
-              { key: 'ratingCommunication' as const, label: 'Communication' },
-            ].map(({ key, label }) => (
-              <div key={key} className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4">
-                <label className="block text-sm font-medium text-slate-900 mb-2">
-                  {label}
-                </label>
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, [key]: star }))}
-                      className="transition-transform hover:scale-110 active:scale-95"
-                    >
-                      <svg
-                        className="w-6 h-6 sm:w-7 sm:h-7"
-                        fill={star <= (formData[key] as number) ? "#facc15" : "none"}
-                        stroke="#facc15"
-                        strokeWidth={star <= (formData[key] as number) ? 0 : 1.5}
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                      </svg>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Highlights */}
-          <div>
-            <label className="block text-base font-medium text-slate-900 mb-3">
-              Highlights (Optional)
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {commonHighlights.map((highlight) => (
-                <button
-                  key={highlight}
-                  type="button"
-                  onClick={() => handleHighlightToggle(highlight)}
-                  className={`rounded-lg border px-3 py-2 text-sm font-medium transition-all ${
-                    formData.highlights.includes(highlight)
-                      ? 'border-blue-500 bg-blue-100 text-blue-700'
-                      : 'border-slate-300 bg-white text-slate-700 hover:border-blue-500'
-                  }`}
-                >
-                  {formData.highlights.includes(highlight) && <span className="mr-1">✓</span>}
-                  {highlight}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Review Body */}
           <div>
-            <label className="block text-base font-medium text-slate-900 mb-2">
+            <label className="block text-base font-medium text-black mb-2">
               Your Review *
             </label>
             <textarea
@@ -332,7 +222,7 @@ export function WriteReviewSection({
               placeholder="Tell others about your experience with this supplier..."
               required
               rows={6}
-              className="w-full rounded-lg border border-slate-300 px-4 py-3 font-medium text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none resize-none"
+              className="w-full rounded-md border border-black/10 px-4 py-3 font-medium text-black placeholder:text-black/50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none resize-none"
             />
           </div>
 
@@ -341,14 +231,14 @@ export function WriteReviewSection({
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="w-full sm:w-auto h-12 rounded-lg border border-slate-300 bg-white px-6 py-2 font-medium text-slate-700 hover:bg-slate-50 transition-all"
+              className="w-full sm:w-auto h-12 rounded-md border border-black/10 bg-white px-6 py-2 font-medium text-black hover:bg-black/5 transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !formData.body.trim()}
-              className="w-full sm:w-auto h-12 rounded-lg border border-blue-600 bg-blue-600 px-6 py-2 font-semibold text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full sm:w-auto h-12 rounded-md border border-blue-600 bg-blue-600 px-6 py-2 font-semibold text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Review'}
             </button>

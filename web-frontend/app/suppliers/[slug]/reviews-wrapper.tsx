@@ -20,20 +20,11 @@ type ReviewSummary = {
     fourStar: number;
     fiveStar: number;
   };
-  aspects: {
-    accuracy: number | null;
-    logistics: number | null;
-    value: number | null;
-    communication: number | null;
-  };
 };
 
 type RecentReview = {
-  title: string;
   author: string;
-  company?: string | null;
   ratingOverall: number;
-  highlights?: string[];
   body: string;
   publishedAt?: string;
 };

@@ -1,366 +1,895 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
+import Link from 'next/link';
 
-// ---------- Types ----------
-type DashboardStats = {
-  stats: {
-    totalSuppliers: number;
-    totalReviews: number;
-    pendingReviews: number;
+type AdminTab = 'dashboard' | 'suppliers' | 'reviews' | 'categories' | 'regions';
+
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  headline?: string | null;
+  description?: string | null;
+  icon?: string | null;
+  supplierCount: number;
+}
+
+interface Region {
+  id: number;
+  name: string;
+  slug: string;
+  headline?: string | null;
+  description?: string | null;
+  stateCode?: string | null;
+  marketStats?: any;
+  mapImage?: string | null;
+  supplierCount: number;
+}
+
+interface SupplierSummary {
+  id: number;
+  name: string;
+  slug: string;
+  isVerified: boolean;
+  isScam: boolean;
+  createdAt: string;
+}
+
+interface ReviewSummary {
+  id: number;
+  author: string;
+  ratingOverall: number;
+  body: string;
+  isApproved: boolean;
+  createdAt: string;
+  supplier: {
+    id: number;
+    name: string;
+    slug: string;
   };
-  recentActivity: {
-    suppliers: Array<{
-      id: number;
-      name: string;
-      slug: string;
-      createdAt: string;
-    }>;
-    reviews: Array<{
-      id: number;
-      title: string;
-      rating: number;
-      isApproved: boolean;
-      createdAt: string;
-      supplier: {
-        id: number;
-        name: string;
-        slug: string;
-      };
-      reviewer: string;
-    }>;
-  };
-};
-
-const DEV_MOCK_DASHBOARD: DashboardStats = {
-  stats: { totalSuppliers: 0, totalReviews: 0, pendingReviews: 0 },
-  recentActivity: { suppliers: [], reviews: [] },
-};
-
-// ---------- Utilities ----------
-function timeAgo(iso: string) {
-  const diff = Date.now() - new Date(iso).getTime();
-  const s = Math.floor(diff / 1000);
-  if (s < 60) return `${s}s ago`;
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  return `${d}d ago`;
 }
 
-function classNames(...a: Array<string | false | null | undefined>) {
-  return a.filter(Boolean).join(' ');
-}
-
-// ---------- Small UI bits ----------
-function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={classNames('animate-pulse rounded-md bg-slate-200/60', className)} />;
-}
-
-function Badge({ color = 'slate', children }: { color?: 'slate' | 'amber' | 'green' | 'blue' | 'rose'; children: React.ReactNode }) {
-  const map: Record<string, string> = {
-    slate: 'bg-slate-100 text-slate-800',
-    amber: 'bg-amber-100 text-amber-900',
-    green: 'bg-emerald-100 text-emerald-800',
-    blue: 'bg-blue-100 text-blue-800',
-    rose: 'bg-rose-100 text-rose-800',
-  };
-  return (
-    <span className={classNames('inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium', map[color])}>
-      {children}
-    </span>
-  );
-}
-
-function EmptyState({
-  title,
-  actionHref,
-  actionLabel,
-}: {
-  title: string;
-  actionHref?: string;
-  actionLabel?: string;
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50/60 py-10">
-      <div className="text-sm text-slate-600">{title}</div>
-      {actionHref && actionLabel && (
-        <Link
-          href={actionHref}
-          className="mt-3 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
-          {actionLabel}
-        </Link>
-      )}
-    </div>
-  );
-}
-
-// ---------- Cards ----------
-function StatCard({
-  label,
-  value,
-  icon,
-  accent = 'blue',
-  href,
-}: {
-  label: string;
-  value: number | string;
-  icon: React.ReactNode;
-  accent?: 'blue' | 'emerald' | 'amber';
-  href?: string;
-}) {
-  const accentRing =
-    accent === 'blue'
-      ? 'ring-blue-100'
-      : accent === 'emerald'
-      ? 'ring-emerald-100'
-      : 'ring-amber-100';
-
-  const content = (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm transition hover:shadow-md">
-      <div className="flex items-center justify-between">
-        <div className="text-xs sm:text-sm font-medium text-slate-600">{label}</div>
-        <div className={classNames('flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full ring-4 sm:ring-8', accentRing)}>{icon}</div>
-      </div>
-      <div className="mt-2 text-2xl sm:text-3xl font-semibold text-slate-900">{value}</div>
-    </div>
-  );
-
-  if (href) {
-    return (
-      <Link href={href} className="block focus:outline-none focus:ring-4 focus:ring-blue-500/20 rounded-xl">
-        {content}
-      </Link>
-    );
-  }
-  return content;
-}
-
-function StarRow({ rating }: { rating: number }) {
-  const r = Math.max(0, Math.min(5, Math.round(rating)));
-  return (
-    <div aria-label={`Rating ${r} out of 5`} className="inline-flex items-center gap-0.5">
-      {new Array(5).fill(0).map((_, i) => (
-        <svg
-          key={i}
-          className={classNames('h-4 w-4', i < r ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200')}
-          viewBox="0 0 20 20"
-        >
-          <path d="M10 15l-5.878 3.09 1.123-6.545L.49 6.91l6.561-.953L10 0l2.949 5.957 6.562.953-4.755 4.635 1.122 6.545z" />
-        </svg>
-      ))}
-    </div>
-  );
-}
-
-// ---------- Page ----------
-export default function AdminDashboard() {
+export default function AdminPage() {
   const { authToken } = useAuth();
-  const initialData = authToken ? null : DEV_MOCK_DASHBOARD;
-  const [data, setData] = useState<DashboardStats | null>(initialData);
-  const [loading, setLoading] = useState<boolean>(!!authToken);
-  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
 
-  const hasData = useMemo(() => !!data, [data]);
+  // Dashboard state
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
 
+  // Suppliers state
+  const [suppliers, setSuppliers] = useState<SupplierSummary[]>([]);
+  const [suppliersLoading, setSuppliersLoading] = useState(false);
+  const [supplierSearch, setSupplierSearch] = useState('');
+
+  // Reviews state
+  const [reviews, setReviews] = useState<ReviewSummary[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewFilter, setReviewFilter] = useState<'all' | 'pending' | 'approved'>('all');
+
+  // Categories state
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [categoryEditingId, setCategoryEditingId] = useState<number | null>(null);
+  const [categoryFormData, setCategoryFormData] = useState({
+    name: '',
+    slug: '',
+    headline: '',
+    description: '',
+    icon: '',
+  });
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [categoryError, setCategoryError] = useState<string | null>(null);
+
+  // Regions state
+  const [regions, setRegions] = useState<Region[]>([]);
+  const [regionsLoading, setRegionsLoading] = useState(false);
+  const [regionEditingId, setRegionEditingId] = useState<number | null>(null);
+  const [regionFormData, setRegionFormData] = useState({
+    name: '',
+    slug: '',
+    headline: '',
+    description: '',
+    stateCode: '',
+    mapImage: '',
+    marketStats: '',
+  });
+  const [isCreatingRegion, setIsCreatingRegion] = useState(false);
+  const [regionError, setRegionError] = useState<string | null>(null);
+
+  // Load dashboard data
   useEffect(() => {
-    if (!authToken) return;
+    if (authToken && activeTab === 'dashboard') {
+      setDashboardLoading(true);
+      api.admin
+        .dashboard(authToken)
+        .then(setDashboardData)
+        .catch(console.error)
+        .finally(() => setDashboardLoading(false));
+    }
+  }, [authToken, activeTab]);
 
-    setLoading(true);
-    setError(null);
-    api.admin
-      .dashboard(authToken)
-      .then(setData)
-      .catch((e: any) => {
-        console.error(e);
-        setError('Failed to load dashboard');
-      })
-      .finally(() => setLoading(false));
-  }, [authToken]);
+  // Load suppliers
+  useEffect(() => {
+    if (authToken && activeTab === 'suppliers') {
+      setSuppliersLoading(true);
+      api.admin.suppliers
+        .list(authToken, { search: supplierSearch || undefined, limit: 100 })
+        .then((result) => setSuppliers(result.items || []))
+        .catch(console.error)
+        .finally(() => setSuppliersLoading(false));
+    }
+  }, [authToken, activeTab, supplierSearch]);
+
+  // Load reviews
+  useEffect(() => {
+    if (authToken && activeTab === 'reviews') {
+      setReviewsLoading(true);
+      const status = reviewFilter === 'all' ? undefined : reviewFilter === 'pending' ? 'pending' : 'approved';
+      api.reviews
+        .getAllAdmin(authToken, { status: status as any, limit: 100 })
+        .then((result) => setReviews(result.items || []))
+        .catch(console.error)
+        .finally(() => setReviewsLoading(false));
+    }
+  }, [authToken, activeTab, reviewFilter]);
+
+  // Load categories
+  useEffect(() => {
+    if (authToken && activeTab === 'categories') {
+      setCategoriesLoading(true);
+      api.admin.categories
+        .list(authToken)
+        .then(setCategories)
+        .catch((err: any) => {
+          setCategoryError(err.message);
+          setCategories([]);
+        })
+        .finally(() => setCategoriesLoading(false));
+    }
+  }, [authToken, activeTab]);
+
+  // Load regions
+  useEffect(() => {
+    if (authToken && activeTab === 'regions') {
+      setRegionsLoading(true);
+      api.admin.regions
+        .list(authToken)
+        .then(setRegions)
+        .catch((err: any) => {
+          setRegionError(err.message);
+          setRegions([]);
+        })
+        .finally(() => setRegionsLoading(false));
+    }
+  }, [authToken, activeTab]);
+
+  // Category handlers
+  const handleCreateCategory = async () => {
+    if (!authToken || !categoryFormData.name.trim()) return;
+    try {
+      setCategoryError(null);
+      const newCategory = await api.admin.categories.create(categoryFormData, authToken);
+      setCategories([...categories, newCategory]);
+      setCategoryFormData({ name: '', slug: '', headline: '', description: '', icon: '' });
+      setIsCreatingCategory(false);
+    } catch (err: any) {
+      setCategoryError(err.message || 'Failed to create category');
+    }
+  };
+
+  const handleUpdateCategory = async (id: number) => {
+    if (!authToken) return;
+    try {
+      setCategoryError(null);
+      const updated = await api.admin.categories.update(id, categoryFormData, authToken);
+      setCategories(categories.map((c) => (c.id === id ? updated : c)));
+      setCategoryEditingId(null);
+      setCategoryFormData({ name: '', slug: '', headline: '', description: '', icon: '' });
+    } catch (err: any) {
+      setCategoryError(err.message || 'Failed to update category');
+    }
+  };
+
+  const handleDeleteCategory = async (id: number) => {
+    if (!authToken || !confirm('Are you sure you want to delete this category?')) return;
+    try {
+      setCategoryError(null);
+      await api.admin.categories.delete(id, authToken);
+      setCategories(categories.filter((c) => c.id !== id));
+    } catch (err: any) {
+      setCategoryError(err.message || 'Failed to delete category');
+    }
+  };
+
+  const startEditCategory = (category: Category) => {
+    setCategoryEditingId(category.id);
+    setCategoryFormData({
+      name: category.name,
+      slug: category.slug,
+      headline: category.headline || '',
+      description: category.description || '',
+      icon: category.icon || '',
+    });
+    setIsCreatingCategory(false);
+  };
+
+  const cancelEditCategory = () => {
+    setCategoryEditingId(null);
+    setIsCreatingCategory(false);
+    setCategoryFormData({ name: '', slug: '', headline: '', description: '', icon: '' });
+  };
+
+  // Region handlers
+  const handleCreateRegion = async () => {
+    if (!authToken || !regionFormData.name.trim()) return;
+    try {
+      setRegionError(null);
+      const payload: any = { ...regionFormData };
+      if (payload.marketStats) {
+        try {
+          payload.marketStats = JSON.parse(payload.marketStats);
+        } catch {
+          payload.marketStats = null;
+        }
+      } else {
+        payload.marketStats = null;
+      }
+      const newRegion = await api.admin.regions.create(payload, authToken);
+      setRegions([...regions, newRegion]);
+      setRegionFormData({ name: '', slug: '', headline: '', description: '', stateCode: '', mapImage: '', marketStats: '' });
+      setIsCreatingRegion(false);
+    } catch (err: any) {
+      setRegionError(err.message || 'Failed to create region');
+    }
+  };
+
+  const handleUpdateRegion = async (id: number) => {
+    if (!authToken) return;
+    try {
+      setRegionError(null);
+      const payload: any = { ...regionFormData };
+      if (payload.marketStats) {
+        try {
+          payload.marketStats = JSON.parse(payload.marketStats);
+        } catch {
+          payload.marketStats = null;
+        }
+      }
+      const updated = await api.admin.regions.update(id, payload, authToken);
+      setRegions(regions.map((r) => (r.id === id ? updated : r)));
+      setRegionEditingId(null);
+      setRegionFormData({ name: '', slug: '', headline: '', description: '', stateCode: '', mapImage: '', marketStats: '' });
+    } catch (err: any) {
+      setRegionError(err.message || 'Failed to update region');
+    }
+  };
+
+  const handleDeleteRegion = async (id: number) => {
+    if (!authToken || !confirm('Are you sure you want to delete this region?')) return;
+    try {
+      setRegionError(null);
+      await api.admin.regions.delete(id, authToken);
+      setRegions(regions.filter((r) => r.id !== id));
+    } catch (err: any) {
+      setRegionError(err.message || 'Failed to delete region');
+    }
+  };
+
+  const startEditRegion = (region: Region) => {
+    setRegionEditingId(region.id);
+    setRegionFormData({
+      name: region.name,
+      slug: region.slug,
+      headline: region.headline || '',
+      description: region.description || '',
+      stateCode: region.stateCode || '',
+      mapImage: region.mapImage || '',
+      marketStats: region.marketStats ? JSON.stringify(region.marketStats, null, 2) : '',
+    });
+    setIsCreatingRegion(false);
+  };
+
+  const cancelEditRegion = () => {
+    setRegionEditingId(null);
+    setIsCreatingRegion(false);
+    setRegionFormData({ name: '', slug: '', headline: '', description: '', stateCode: '', mapImage: '', marketStats: '' });
+  };
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Dashboard</h1>
-          <p className="mt-1 text-sm sm:text-base text-slate-600">Overview of your directory</p>
-        </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Link
-            href="/admin/companies/new"
-            className="w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 text-center"
-          >
-            + Add Company
-          </Link>
-          <Link
-            href="/admin/reviews?filter=pending"
-            className="w-full sm:w-auto rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 text-center"
-          >
-            Review Queue
-          </Link>
-        </div>
+    <div className="space-y-6">
+      {/* Tabs */}
+      <div className="border-b border-slate-200">
+        <nav className="-mb-px flex space-x-8">
+          {(['dashboard', 'suppliers', 'reviews', 'categories', 'regions'] as AdminTab[]).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium capitalize ${
+                activeTab === tab
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </nav>
       </div>
 
-      {/* Error */}
-      {error && (
-        <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-          {error}
+      {/* Dashboard Tab */}
+      {activeTab === 'dashboard' && (
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+            <p className="mt-1 text-sm text-slate-600">Overview of your directory</p>
+          </div>
+
+          {dashboardLoading ? (
+            <div className="text-center py-12 text-slate-500">Loading...</div>
+          ) : dashboardData ? (
+            <>
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+                <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="text-sm font-medium text-slate-600">Total Companies</div>
+                  <div className="mt-2 text-3xl font-semibold text-slate-900">{dashboardData.stats.totalSuppliers}</div>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="text-sm font-medium text-slate-600">Total Reviews</div>
+                  <div className="mt-2 text-3xl font-semibold text-slate-900">{dashboardData.stats.totalReviews}</div>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="text-sm font-medium text-slate-600">Pending Reviews</div>
+                  <div className="mt-2 text-3xl font-semibold text-slate-900">{dashboardData.stats.pendingReviews}</div>
+                </div>
+              </div>
+
+              <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+                <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="text-lg font-semibold text-slate-900 mb-4">Recent Companies</h2>
+                  <ul className="divide-y divide-slate-100">
+                    {dashboardData.recentActivity.suppliers.slice(0, 5).map((s: any) => (
+                      <li key={s.id} className="py-3">
+                        <Link href={`/admin/companies/${s.id}`} className="text-sm font-semibold text-slate-900 hover:text-blue-700">
+                          {s.name}
+                        </Link>
+                        <div className="text-xs text-slate-500 mt-1">{new Date(s.createdAt).toLocaleDateString()}</div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="text-lg font-semibold text-slate-900 mb-4">Recent Reviews</h2>
+                  <ul className="divide-y divide-slate-100">
+                    {dashboardData.recentActivity.reviews.slice(0, 5).map((r: any) => (
+                      <li key={r.id} className="py-3">
+                        <div className="text-sm font-semibold text-slate-900">{r.reviewer}</div>
+                        <div className="text-xs text-slate-500 mt-1">{r.supplier.name} • {new Date(r.createdAt).toLocaleDateString()}</div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </>
+          ) : null}
         </div>
       )}
 
-      {/* Stats */}
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-3">
-        {loading ? (
-          <>
-            <Skeleton className="h-28" />
-            <Skeleton className="h-28" />
-            <Skeleton className="h-28" />
-          </>
-        ) : hasData ? (
-          <>
-            <StatCard
-              label="Total Companies"
-              value={data!.stats.totalSuppliers}
-              icon={<svg className="h-4 w-4 text-blue-600" viewBox="0 0 24 24"><path d="M3 21h18v-2H3v2Zm2-4h14V7H5v10Zm2-8h10v6H7V9Zm7-6H10v2h4V3Z"/></svg>}
-              accent="blue"
-              href="/admin/companies"
+      {/* Suppliers Tab */}
+      {activeTab === 'suppliers' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">Suppliers</h1>
+              <p className="mt-1 text-sm text-slate-600">Manage suppliers and companies</p>
+            </div>
+            <Link
+              href="/admin/companies/new"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              + Add Supplier
+            </Link>
+          </div>
+
+          <div>
+            <input
+              type="text"
+              value={supplierSearch}
+              onChange={(e) => setSupplierSearch(e.target.value)}
+              placeholder="Search suppliers..."
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             />
-            <StatCard
-              label="Total Reviews"
-              value={data!.stats.totalReviews}
-              icon={<svg className="h-4 w-4 text-emerald-600" viewBox="0 0 24 24"><path d="M21 6h-2v9H7v2a1 1 0 0 0 1 1h9l4 4V7a1 1 0 0 0-1-1ZM17 2H3a1 1 0 0 0-1 1v14l4-4h11a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/></svg>}
-              accent="emerald"
+          </div>
+
+          {suppliersLoading ? (
+            <div className="text-center py-12 text-slate-500">Loading...</div>
+          ) : (
+            <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+              <table className="min-w-full divide-y divide-slate-200">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Created</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 bg-white">
+                  {suppliers.map((supplier) => (
+                    <tr key={supplier.id} className="hover:bg-slate-50">
+                      <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-slate-900">{supplier.name}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm">
+                        {supplier.isVerified && (
+                          <span className="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800">
+                            Verified
+                          </span>
+                        )}
+                        {supplier.isScam && (
+                          <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800 ml-2">
+                            Scam
+                          </span>
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-500">
+                        {new Date(supplier.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium">
+                        <Link
+                          href={`/admin/companies/${supplier.id}`}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          Edit
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Reviews Tab */}
+      {activeTab === 'reviews' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">Reviews</h1>
+              <p className="mt-1 text-sm text-slate-600">Manage customer reviews</p>
+            </div>
+            <Link
               href="/admin/reviews"
-            />
-            <StatCard
-              label="Pending Reviews"
-              value={data!.stats.pendingReviews}
-              icon={<svg className="h-4 w-4 text-amber-600" viewBox="0 0 24 24"><path d="M12 2 1 21h22L12 2Zm1 15h-2v-2h2v2Zm0-4h-2V9h2v4Z"/></svg>}
-              accent="amber"
-              href="/admin/reviews?filter=pending"
-            />
-          </>
-        ) : null}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
-        <h2 className="text-base sm:text-lg font-semibold text-slate-900">Quick Actions</h2>
-        <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:gap-3">
-          <Link
-            href="/admin/companies/new"
-            className="w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 text-center"
-          >
-            ➕ Add Company
-          </Link>
-          <Link
-            href="/admin/reviews"
-            className="w-full sm:w-auto rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 text-center"
-          >
-            🗂️ View All Reviews
-          </Link>
-          <Link
-            href="/admin/companies"
-            className="w-full sm:w-auto rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 text-center"
-          >
-            ⚙️ Manage Companies
-          </Link>
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
-        {/* Companies */}
-        <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
-          <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <h2 className="text-base sm:text-lg font-semibold text-slate-900">Recently Added Companies</h2>
-            <Link href="/admin/companies" className="text-sm font-medium text-blue-700 hover:underline">
-              View all →
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              View All
             </Link>
           </div>
 
-          {loading ? (
-            <div className="space-y-3">
-              <Skeleton className="h-16" />
-              <Skeleton className="h-16" />
-              <Skeleton className="h-16" />
-            </div>
-          ) : data!.recentActivity.suppliers.length === 0 ? (
-            <EmptyState title="No companies added yet." actionHref="/admin/companies/new" actionLabel="Add your first company" />
-          ) : (
-            <ul className="divide-y divide-slate-100">
-              {data!.recentActivity.suppliers.slice(0, 6).map((s) => (
-                <li key={s.id} className="flex items-center justify-between gap-2 sm:gap-3 py-3">
-                  <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-                    <div className="flex h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs sm:text-sm font-semibold text-slate-700">
-                      {s.name.slice(0, 2).toUpperCase()}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <Link href={`/admin/companies/${s.id}`} className="block truncate text-sm font-semibold text-slate-900 hover:text-blue-700">
-                        {s.name}
-                      </Link>
-                      <div className="text-xs text-slate-500">{timeAgo(s.createdAt)}</div>
-                    </div>
-                  </div>
-                  <Badge color="blue">New</Badge>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        {/* Reviews */}
-        <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
-          <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <h2 className="text-base sm:text-lg font-semibold text-slate-900">Recently Submitted Reviews</h2>
-            <Link href="/admin/reviews" className="text-sm font-medium text-blue-700 hover:underline">
-              View all →
-            </Link>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setReviewFilter('all')}
+              className={`rounded-lg px-4 py-2 text-sm font-medium ${
+                reviewFilter === 'all'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setReviewFilter('pending')}
+              className={`rounded-lg px-4 py-2 text-sm font-medium ${
+                reviewFilter === 'pending'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              Pending
+            </button>
+            <button
+              onClick={() => setReviewFilter('approved')}
+              className={`rounded-lg px-4 py-2 text-sm font-medium ${
+                reviewFilter === 'approved'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              Approved
+            </button>
           </div>
 
-          {loading ? (
-            <div className="space-y-3">
-              <Skeleton className="h-16" />
-              <Skeleton className="h-16" />
-              <Skeleton className="h-16" />
-            </div>
-          ) : data!.recentActivity.reviews.length === 0 ? (
-            <EmptyState title="No reviews yet." actionHref="/admin/reviews" actionLabel="Open reviews" />
+          {reviewsLoading ? (
+            <div className="text-center py-12 text-slate-500">Loading...</div>
           ) : (
-            <ul className="divide-y divide-slate-100">
-              {data!.recentActivity.reviews.slice(0, 6).map((r) => (
-                <li key={r.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 py-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <div className="truncate text-sm font-semibold text-slate-900">{r.title || 'Untitled Review'}</div>
-                      <StarRow rating={r.rating} />
-                    </div>
-                    <div className="mt-1 truncate text-xs text-slate-500">
-                      {r.reviewer} • {r.supplier.name} • {timeAgo(r.createdAt)}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {!r.isApproved ? <Badge color="amber">Pending</Badge> : <Badge color="green">Approved</Badge>}
-                    <Link
-                      href={`/admin/reviews`}
-                      className="text-sm font-medium text-blue-700 hover:underline whitespace-nowrap"
-                    >
-                      Open
-                    </Link>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+              <table className="min-w-full divide-y divide-slate-200">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Author</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Supplier</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Rating</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Status</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 bg-white">
+                  {reviews.map((review) => (
+                    <tr key={review.id} className="hover:bg-slate-50">
+                      <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-slate-900">{review.author}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-500">{review.supplier.name}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-500">{review.ratingOverall}/5</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm">
+                        {review.isApproved ? (
+                          <span className="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800">
+                            Approved
+                          </span>
+                        ) : (
+                          <span className="inline-flex rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">
+                            Pending
+                          </span>
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium">
+                        <Link
+                          href="/admin/reviews"
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          View
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
-      </div>
+      )}
+
+      {/* Categories Tab */}
+      {activeTab === 'categories' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">Categories</h1>
+              <p className="mt-1 text-sm text-slate-600">Manage supplier categories</p>
+            </div>
+            <button
+              onClick={() => {
+                setIsCreatingCategory(true);
+                setCategoryEditingId(null);
+                setCategoryFormData({ name: '', slug: '', headline: '', description: '', icon: '' });
+              }}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              + Add Category
+            </button>
+          </div>
+
+          {categoryError && (
+            <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+              {categoryError}
+            </div>
+          )}
+
+          {(isCreatingCategory || categoryEditingId !== null) && (
+            <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-semibold mb-4">
+                {isCreatingCategory ? 'Create Category' : 'Edit Category'}
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={categoryFormData.name}
+                    onChange={(e) => {
+                      const name = e.target.value;
+                      setCategoryFormData({
+                        ...categoryFormData,
+                        name,
+                        slug: categoryFormData.slug || name.toLowerCase().replace(/\s+/g, '-'),
+                      });
+                    }}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder="Category Name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Slug</label>
+                  <input
+                    type="text"
+                    value={categoryFormData.slug}
+                    onChange={(e) => setCategoryFormData({ ...categoryFormData, slug: e.target.value })}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder="category-slug"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Headline</label>
+                  <input
+                    type="text"
+                    value={categoryFormData.headline}
+                    onChange={(e) => setCategoryFormData({ ...categoryFormData, headline: e.target.value })}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder="Category headline"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                  <textarea
+                    value={categoryFormData.description}
+                    onChange={(e) => setCategoryFormData({ ...categoryFormData, description: e.target.value })}
+                    rows={3}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder="Category description"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Icon URL</label>
+                  <input
+                    type="text"
+                    value={categoryFormData.icon}
+                    onChange={(e) => setCategoryFormData({ ...categoryFormData, icon: e.target.value })}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder="https://example.com/icon.png"
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() =>
+                      isCreatingCategory ? handleCreateCategory() : categoryEditingId && handleUpdateCategory(categoryEditingId)
+                    }
+                    className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  >
+                    {isCreatingCategory ? 'Create' : 'Save'}
+                  </button>
+                  <button
+                    onClick={cancelEditCategory}
+                    className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {categoriesLoading ? (
+            <div className="text-center py-12 text-slate-500">Loading...</div>
+          ) : (
+            <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+              <table className="min-w-full divide-y divide-slate-200">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Slug</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Suppliers</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 bg-white">
+                  {categories.map((category) => (
+                    <tr key={category.id} className="hover:bg-slate-50">
+                      <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-slate-900">{category.name}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-500">{category.slug}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-500">{category.supplierCount}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium">
+                        <button
+                          onClick={() => startEditCategory(category)}
+                          className="text-blue-600 hover:text-blue-900 mr-4"
+                        >
+                          Edit
+                        </button>
+                        {category.supplierCount === 0 ? (
+                          <button
+                            onClick={() => handleDeleteCategory(category.id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            Delete
+                          </button>
+                        ) : (
+                          <span className="text-slate-400 text-xs" title="Cannot delete: has suppliers">
+                            Delete
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Regions Tab */}
+      {activeTab === 'regions' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">Regions</h1>
+              <p className="mt-1 text-sm text-slate-600">Manage supplier regions</p>
+            </div>
+            <button
+              onClick={() => {
+                setIsCreatingRegion(true);
+                setRegionEditingId(null);
+                setRegionFormData({ name: '', slug: '', headline: '', description: '', stateCode: '', mapImage: '', marketStats: '' });
+              }}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              + Add Region
+            </button>
+          </div>
+
+          {regionError && (
+            <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+              {regionError}
+            </div>
+          )}
+
+          {(isCreatingRegion || regionEditingId !== null) && (
+            <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-semibold mb-4">
+                {isCreatingRegion ? 'Create Region' : 'Edit Region'}
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={regionFormData.name}
+                    onChange={(e) => {
+                      const name = e.target.value;
+                      setRegionFormData({
+                        ...regionFormData,
+                        name,
+                        slug: regionFormData.slug || name.toLowerCase().replace(/\s+/g, '-'),
+                      });
+                    }}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder="Region Name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Slug</label>
+                  <input
+                    type="text"
+                    value={regionFormData.slug}
+                    onChange={(e) => setRegionFormData({ ...regionFormData, slug: e.target.value })}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder="region-slug"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Headline</label>
+                  <input
+                    type="text"
+                    value={regionFormData.headline}
+                    onChange={(e) => setRegionFormData({ ...regionFormData, headline: e.target.value })}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder="Region headline"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                  <textarea
+                    value={regionFormData.description}
+                    onChange={(e) => setRegionFormData({ ...regionFormData, description: e.target.value })}
+                    rows={3}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder="Region description"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">State Code</label>
+                  <input
+                    type="text"
+                    value={regionFormData.stateCode}
+                    onChange={(e) => setRegionFormData({ ...regionFormData, stateCode: e.target.value })}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder="NY"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Map Image URL</label>
+                  <input
+                    type="text"
+                    value={regionFormData.mapImage}
+                    onChange={(e) => setRegionFormData({ ...regionFormData, mapImage: e.target.value })}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder="https://example.com/map.png"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Market Stats (JSON)</label>
+                  <textarea
+                    value={regionFormData.marketStats}
+                    onChange={(e) => setRegionFormData({ ...regionFormData, marketStats: e.target.value })}
+                    rows={5}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    placeholder='{"key": "value"}'
+                  />
+                  <p className="mt-1 text-xs text-slate-500">Enter valid JSON or leave empty</p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() =>
+                      isCreatingRegion ? handleCreateRegion() : regionEditingId && handleUpdateRegion(regionEditingId)
+                    }
+                    className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  >
+                    {isCreatingRegion ? 'Create' : 'Save'}
+                  </button>
+                  <button
+                    onClick={cancelEditRegion}
+                    className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {regionsLoading ? (
+            <div className="text-center py-12 text-slate-500">Loading...</div>
+          ) : (
+            <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+              <table className="min-w-full divide-y divide-slate-200">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Slug</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">State</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Suppliers</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 bg-white">
+                  {regions.map((region) => (
+                    <tr key={region.id} className="hover:bg-slate-50">
+                      <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-slate-900">{region.name}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-500">{region.slug}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-500">{region.stateCode || '—'}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-500">{region.supplierCount}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium">
+                        <button
+                          onClick={() => startEditRegion(region)}
+                          className="text-blue-600 hover:text-blue-900 mr-4"
+                        >
+                          Edit
+                        </button>
+                        {region.supplierCount === 0 ? (
+                          <button
+                            onClick={() => handleDeleteRegion(region.id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            Delete
+                          </button>
+                        ) : (
+                          <span className="text-slate-400 text-xs" title="Cannot delete: has suppliers">
+                            Delete
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

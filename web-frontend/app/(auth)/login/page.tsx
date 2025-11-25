@@ -48,16 +48,16 @@ export default function LoginPage() {
     }
   };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Main card */}
-        <div className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-[8px_9px_0_0_rgba(2,6,23,0.85)] p-8 sm:p-12 animate-in fade-in zoom-in-95 duration-500">
+        <div className="rounded-md border-2 border-black/10 bg-white shadow-md p-8 sm:p-12 animate-in fade-in zoom-in-95 duration-500">
           {/* Logo/Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl sm:text-5xl font-black text-slate-900 mb-3">
+            <h1 className="text-4xl sm:text-5xl font-black text-black mb-3">
               Welcome Back
             </h1>
-            <p className="text-base font-medium text-slate-600">
+            <p className="text-base font-medium text-black/70">
               Sign in to access your account
             </p>
           </div>
@@ -66,7 +66,7 @@ export default function LoginPage() {
           <form className="space-y-5" onSubmit={handleSubmit}>
             {/* Email field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-bold text-slate-900 mb-2">
+              <label htmlFor="email" className="block text-sm font-bold text-black mb-2">
                 Email Address
               </label>
               <input
@@ -74,16 +74,16 @@ export default function LoginPage() {
                 id="email"
                 name="email"
                 placeholder="you@example.com"
-                className={`w-full h-14 px-5 rounded-2xl border-2 ${errors.email ? 'border-red-500 ring-2 ring-red-200' : 'border-slate-900/80'} bg-white text-slate-900 text-base font-medium placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-600 transition-all duration-200`}
+                className={`w-full h-14 px-5 rounded-md border-2 ${errors.email ? 'border-black ring-2 ring-black/20' : 'border-black/10'} bg-white text-black text-base font-medium placeholder:text-black/50 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200`}
               />
               {errors.email && (
-                <p className="mt-2 text-sm font-semibold text-red-600">{errors.email}</p>
+                <p className="mt-2 text-sm font-semibold text-black">{errors.email}</p>
               )}
             </div>
 
             {/* Password field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-bold text-slate-900 mb-2">
+              <label htmlFor="password" className="block text-sm font-bold text-black mb-2">
                 Password
               </label>
               <div className="relative">
@@ -92,12 +92,12 @@ export default function LoginPage() {
                   id="password"
                   name="password"
                   placeholder="••••••••"
-                  className={`w-full h-14 px-5 pr-14 rounded-2xl border-2 ${errors.password ? 'border-red-500 ring-2 ring-red-200' : 'border-slate-900/80'} bg-white text-slate-900 text-base font-medium placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-600 transition-all duration-200`}
+                  className={`w-full h-14 px-5 pr-14 rounded-md border-2 ${errors.password ? 'border-black ring-2 ring-black/20' : 'border-black/10'} bg-white text-black text-base font-medium placeholder:text-black/50 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-900 focus:outline-none transition-colors p-1.5 rounded-lg hover:bg-slate-100"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-black/50 hover:text-black focus:outline-none transition-colors p-1.5 rounded-md hover:bg-black/5"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
@@ -113,7 +113,7 @@ export default function LoginPage() {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-2 text-sm font-semibold text-red-600">{errors.password}</p>
+                <p className="mt-2 text-sm font-semibold text-black">{errors.password}</p>
               )}
             </div>
 
@@ -123,9 +123,9 @@ export default function LoginPage() {
                 <input
                   type="checkbox"
                   name="remember"
-                  className="w-5 h-5 rounded border-2 border-slate-900/80 text-blue-600 focus:ring-4 focus:ring-blue-200 transition-all cursor-pointer"
+                  className="w-5 h-5 rounded border-2 border-black/10 text-blue-600 focus:ring-2 focus:ring-blue-600 transition-all cursor-pointer"
                 />
-                <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
+                <span className="text-sm font-medium text-black/70 group-hover:text-black transition-colors">
                   Remember me
                 </span>
               </label>
@@ -141,21 +141,21 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full h-14 rounded-2xl bg-blue-600 text-white text-base font-bold shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] border-2 border-slate-900/80 hover:translate-y-[-3px] hover:shadow-[6px_8px_0_0_rgba(2,6,23,0.85)] hover:bg-blue-700 active:translate-y-0 active:shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] mt-6"
+              className="w-full h-14 rounded-md bg-blue-600 text-white text-base font-bold hover:bg-blue-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
             >
               {isLoading ? 'Signing In...' : 'Sign In'}
             </button>
 
             {/* General error message */}
             {errors.general && (
-              <div className="mt-4 p-4 rounded-xl bg-red-50 border-2 border-red-200">
-                <p className="text-sm font-semibold text-red-600 text-center">{errors.general}</p>
+              <div className="mt-4 p-4 rounded-md bg-black/5 border-2 border-black/10">
+                <p className="text-sm font-semibold text-black text-center">{errors.general}</p>
               </div>
             )}
           </form>
 
           {/* Sign up link */}
-          <div className="text-center mt-6 text-base font-medium text-slate-600">
+          <div className="text-center mt-6 text-base font-medium text-black/70">
             Don't have an account?{' '}
             <Link
               href="/signup"
@@ -170,7 +170,7 @@ export default function LoginPage() {
         <div className="text-center mt-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-bold text-black/50 hover:text-black transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />

@@ -86,24 +86,24 @@ export default function SignupPage() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-start justify-center px-4 pt-12 pb-8">
+      <div className="min-h-screen bg-white flex items-start justify-center px-4 pt-12 pb-8">
         <div className="w-full max-w-md">
-          <div className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-[6px_7px_0_0_rgba(2,6,23,0.85)] p-8 sm:p-10 animate-in fade-in duration-500">
+          <div className="rounded-md border-2 border-black/10 bg-white shadow-md p-8 sm:p-10 animate-in fade-in duration-500">
             <div className="text-center">
-              <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 border-2 border-slate-900/80">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-md bg-blue-600/10 border-2 border-black/10">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h1 className="font-black text-3xl sm:text-4xl text-slate-900 mb-3">
+              <h1 className="font-black text-3xl sm:text-4xl text-black mb-3">
                 Check Your Email
               </h1>
-              <p className="font-medium text-base text-slate-600 mb-6">
+              <p className="font-medium text-base text-black/70 mb-6">
                 We've sent a verification link to your email address. Please check your inbox and click the link to verify your account.
               </p>
               <Link
                 href="/login"
-                className="font-bold inline-block px-6 py-3 rounded-2xl bg-[#2f6feb] text-white text-base shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200"
+                className="font-bold inline-block px-6 py-3 rounded-md bg-blue-600 text-white text-base hover:bg-blue-700 transition-all duration-200"
               >
                 Go to Login
               </Link>
@@ -115,16 +115,16 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-start justify-center px-4 pt-12 pb-8">
+    <div className="min-h-screen bg-white flex items-start justify-center px-4 pt-12 pb-8">
       <div className="w-full max-w-md">
         {/* Main card */}
-        <div className="rounded-3xl border-2 border-slate-900/80 bg-white shadow-[6px_7px_0_0_rgba(2,6,23,0.85)] p-8 sm:p-10 animate-in fade-in duration-500">
+        <div className="rounded-md border-2 border-black/10 bg-white shadow-md p-8 sm:p-10 animate-in fade-in duration-500">
           {/* Logo/Header */}
           <div className="text-center mb-6">
-            <h1 className="font-black text-4xl sm:text-5xl text-slate-900 mb-1">
+            <h1 className="font-black text-4xl sm:text-5xl text-black mb-1">
               Create Account
             </h1>
-            <p className="font-medium text-base text-slate-600">
+            <p className="font-medium text-base text-black/70">
               Join our liquidation marketplace
             </p>
           </div>
@@ -134,7 +134,7 @@ export default function SignupPage() {
             {/* First Name and Last Name fields */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label htmlFor="firstName" className="block text-sm font-bold text-slate-900 mb-1.5">
+                <label htmlFor="firstName" className="block text-sm font-bold text-black mb-1.5">
                   First Name
                 </label>
                 <input
@@ -142,16 +142,16 @@ export default function SignupPage() {
                   id="firstName"
                   name="firstName"
                   placeholder="John"
-                  className={`w-full h-14 px-4 rounded-2xl border-2 ${errors.firstName ? 'border-red-500' : 'border-slate-900/80'} bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-600 transition-all duration-200 shadow-sm`}
+                  className={`w-full h-14 px-4 rounded-md border-2 ${errors.firstName ? 'border-black' : 'border-black/10'} bg-white text-black placeholder:text-black/50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200 shadow-sm`}
                 />
                 {errors.firstName && (
-                  <div className="mt-2 rounded-xl bg-red-50 border-2 border-red-200 p-3">
-                    <p className="text-sm font-medium text-red-600">{errors.firstName}</p>
+                  <div className="mt-2 rounded-md bg-black/5 border-2 border-black/10 p-3">
+                    <p className="text-sm font-medium text-black">{errors.firstName}</p>
                   </div>
                 )}
               </div>
               <div>
-                <label htmlFor="lastName" className="block text-sm font-bold text-slate-900 mb-1.5">
+                <label htmlFor="lastName" className="block text-sm font-bold text-black mb-1.5">
                   Last Name
                 </label>
                 <input
@@ -159,11 +159,11 @@ export default function SignupPage() {
                   id="lastName"
                   name="lastName"
                   placeholder="Doe"
-                  className={`w-full h-14 px-4 rounded-2xl border-2 ${errors.lastName ? 'border-red-500' : 'border-slate-900/80'} bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-600 transition-all duration-200 shadow-sm`}
+                  className={`w-full h-14 px-4 rounded-md border-2 ${errors.lastName ? 'border-black' : 'border-black/10'} bg-white text-black placeholder:text-black/50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200 shadow-sm`}
                 />
                 {errors.lastName && (
-                  <div className="mt-2 rounded-xl bg-red-50 border-2 border-red-200 p-3">
-                    <p className="text-sm font-medium text-red-600">{errors.lastName}</p>
+                  <div className="mt-2 rounded-md bg-black/5 border-2 border-black/10 p-3">
+                    <p className="text-sm font-medium text-black">{errors.lastName}</p>
                   </div>
                 )}
               </div>
@@ -171,7 +171,7 @@ export default function SignupPage() {
 
             {/* Email field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-bold text-slate-900 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-bold text-black mb-1.5">
                 Email Address
               </label>
               <input
@@ -179,18 +179,18 @@ export default function SignupPage() {
                 id="email"
                 name="email"
                 placeholder="you@example.com"
-                className={`w-full h-14 px-4 rounded-2xl border-2 ${errors.email ? 'border-red-500' : 'border-slate-900/80'} bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-600 transition-all duration-200 shadow-sm`}
+                className={`w-full h-14 px-4 rounded-md border-2 ${errors.email ? 'border-black' : 'border-black/10'} bg-white text-black placeholder:text-black/50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200 shadow-sm`}
               />
               {errors.email && (
-                <div className="mt-2 rounded-xl bg-red-50 border-2 border-red-200 p-3">
-                  <p className="text-sm font-medium text-red-600">{errors.email}</p>
+                <div className="mt-2 rounded-md bg-black/5 border-2 border-black/10 p-3">
+                  <p className="text-sm font-medium text-black">{errors.email}</p>
                 </div>
               )}
             </div>
 
             {/* Password field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-bold text-slate-900 mb-1.5">
+              <label htmlFor="password" className="block text-sm font-bold text-black mb-1.5">
                 Password
               </label>
               <div className="relative">
@@ -199,12 +199,12 @@ export default function SignupPage() {
                   id="password"
                   name="password"
                   placeholder="••••••••"
-                  className={`w-full h-14 px-4 pr-12 rounded-2xl border-2 ${errors.password ? 'border-red-500' : 'border-slate-900/80'} bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-600 transition-all duration-200 shadow-sm`}
+                  className={`w-full h-14 px-4 pr-12 rounded-md border-2 ${errors.password ? 'border-black' : 'border-black/10'} bg-white text-black placeholder:text-black/50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200 shadow-sm`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none focus:text-slate-600 transition-colors p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-black/50 hover:text-black focus:outline-none focus:text-black transition-colors p-1"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
@@ -220,15 +220,15 @@ export default function SignupPage() {
                 </button>
               </div>
               {errors.password && (
-                <div className="mt-2 rounded-xl bg-red-50 border-2 border-red-200 p-3">
-                  <p className="text-sm font-medium text-red-600">{errors.password}</p>
+                <div className="mt-2 rounded-md bg-black/5 border-2 border-black/10 p-3">
+                  <p className="text-sm font-medium text-black">{errors.password}</p>
                 </div>
               )}
             </div>
 
             {/* Confirm Password field */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-bold text-slate-900 mb-1.5">
+              <label htmlFor="confirmPassword" className="block text-sm font-bold text-black mb-1.5">
                 Confirm Password
               </label>
               <div className="relative">
@@ -237,12 +237,12 @@ export default function SignupPage() {
                   id="confirmPassword"
                   name="confirmPassword"
                   placeholder="••••••••"
-                  className={`w-full h-14 px-4 pr-12 rounded-2xl border-2 ${errors.confirmPassword ? 'border-red-500' : 'border-slate-900/80'} bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-600 transition-all duration-200 shadow-sm`}
+                  className={`w-full h-14 px-4 pr-12 rounded-md border-2 ${errors.confirmPassword ? 'border-black' : 'border-black/10'} bg-white text-black placeholder:text-black/50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200 shadow-sm`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none focus:text-slate-600 transition-colors p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-black/50 hover:text-black focus:outline-none focus:text-black transition-colors p-1"
                   aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                 >
                   {showConfirmPassword ? (
@@ -258,8 +258,8 @@ export default function SignupPage() {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <div className="mt-2 rounded-xl bg-red-50 border-2 border-red-200 p-3">
-                  <p className="text-sm font-medium text-red-600">{errors.confirmPassword}</p>
+                <div className="mt-2 rounded-md bg-black/5 border-2 border-black/10 p-3">
+                  <p className="text-sm font-medium text-black">{errors.confirmPassword}</p>
                 </div>
               )}
             </div>
@@ -270,9 +270,9 @@ export default function SignupPage() {
                 <input
                   type="checkbox"
                   name="terms"
-                  className="w-5 h-5 mt-0.5 rounded border-2 border-slate-900/80 text-blue-600 focus:ring-4 focus:ring-blue-200 transition-all cursor-pointer flex-shrink-0"
+                  className="w-5 h-5 mt-0.5 rounded border-2 border-black/10 text-blue-600 focus:ring-2 focus:ring-blue-600 transition-all cursor-pointer flex-shrink-0"
                 />
-                <span className="font-medium text-sm text-slate-700 group-hover:text-slate-900 transition-colors">
+                <span className="font-medium text-sm text-black/70 group-hover:text-black transition-colors">
                   I agree to the{' '}
                   <Link href="/terms" className="text-blue-600 hover:text-blue-700 hover:underline underline-offset-2">
                     Terms of Service
@@ -284,8 +284,8 @@ export default function SignupPage() {
                 </span>
               </label>
               {errors.terms && (
-                <div className="mt-2 rounded-xl bg-red-50 border-2 border-red-200 p-3">
-                  <p className="text-sm font-medium text-red-600">{errors.terms}</p>
+                <div className="mt-2 rounded-md bg-black/5 border-2 border-black/10 p-3">
+                  <p className="text-sm font-medium text-black">{errors.terms}</p>
                 </div>
               )}
             </div>
@@ -294,21 +294,21 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="font-bold w-full h-14 rounded-2xl bg-[#2f6feb] text-white text-lg shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              className="font-bold w-full h-14 rounded-md bg-blue-600 text-white text-lg hover:bg-blue-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Creating Account...' : 'Create Account'}
             </button>
 
             {/* General error message */}
             {errors.general && (
-              <div className="mt-3 rounded-xl bg-red-50 border-2 border-red-200 p-3">
-                <p className="text-sm font-medium text-red-600 text-center">{errors.general}</p>
+              <div className="mt-3 rounded-md bg-black/5 border-2 border-black/10 p-3">
+                <p className="text-sm font-medium text-black text-center">{errors.general}</p>
               </div>
             )}
           </form>
 
           {/* Login link */}
-          <div className="font-medium text-center mt-5 text-base text-slate-600">
+          <div className="font-medium text-center mt-5 text-base text-black/70">
             Already have an account?{' '}
             <Link
               href="/login"
@@ -323,7 +323,7 @@ export default function SignupPage() {
         <div className="text-center mt-4">
           <Link
             href="/"
-            className="font-medium inline-flex items-center gap-2 text-base text-slate-700 hover:text-slate-900 transition-colors"
+            className="font-medium inline-flex items-center gap-2 text-base text-black/50 hover:text-black transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />

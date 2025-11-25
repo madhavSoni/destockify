@@ -2,7 +2,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import { api } from '@/lib/api';
-import { FaqAccordion } from '@/components/faq-accordion';
 import { TrendingSuppliersRail } from '@/components/trending-suppliers-rail';
 import { generateWebsiteSchema, generateOrganizationSchema, schemaToJsonLd } from '@/lib/schema';
 import { StateSelector } from '@/components/state-selector';
@@ -15,13 +14,31 @@ const inter = Inter({
 
 export type HomepageData = Awaited<ReturnType<typeof api.home.get>>;
 type SupplierSummaryList = Awaited<ReturnType<typeof api.suppliers.featured>>;
-type GuideList = Awaited<ReturnType<typeof api.guides.list>>;
 type CategoryList = Awaited<ReturnType<typeof api.catalog.categories>>;
-type FaqList = Awaited<ReturnType<typeof api.faq.list>>;
 
 export default async function HomePage() {
-  const data = await api.home.get();
-  const regions = await api.catalog.regions();
+  // Fetch data with error handling for build time
+  let data: HomepageData;
+  let regions: CategoryList;
+  
+  try {
+    data = await api.home.get();
+  } catch (error) {
+    // Fallback data if API is not available during build
+    data = {
+      stats: { suppliers: 0, reviews: 0, categories: 0 },
+      featuredSuppliers: [],
+      spotlightReviews: [],
+      categories: [],
+      regions: [],
+    };
+  }
+
+  try {
+    regions = await api.catalog.regions();
+  } catch (error) {
+    regions = [];
+  }
 
   // Generate Schema.org structured data for homepage
   const websiteSchema = generateWebsiteSchema();
@@ -39,11 +56,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: schemaToJsonLd(organizationSchema) }}
       />
 
-      <div className={`${inter.className} bg-slate-50 scroll-smooth`} style={{
-        WebkitFontSmoothing: 'antialiased',
-        textTransform: 'none',
-        fontFamily: '"Object Sans", "Adjusted Arial", Tahoma, Geneva, sans-serif',
-      }}>
+      <div className={`${inter.className} bg-white scroll-smooth`}>
         <HeroSection />
 
         {/* Trending rail with half-peek card */}
@@ -55,7 +68,6 @@ export default async function HomePage() {
 
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
           <ListBusinessCta />
-          <FaqSection faqs={data.faqs} />
         </div>
       </div>
     </>
@@ -65,7 +77,7 @@ export default async function HomePage() {
 /* --------------------------- HERO --------------------------- */
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden border-b border-slate-200 min-h-[450px] sm:min-h-[500px]">
+    <section className="relative overflow-hidden border-b border-black/10 min-h-[450px] sm:min-h-[500px]">
       {/* Background image */}
       <div className="absolute inset-0">
         <Image
@@ -77,33 +89,33 @@ function HeroSection() {
           quality={90}
         />
         {/* Dark overlay for text readability - lighter for more vibrant image */}
-        <div className="absolute inset-0 bg-slate-900/30" />
+        <div className="absolute inset-0 bg-black/30" />
       </div>
 
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
         {/* Left-anchored content block like Zillow */}
         <div className="max-w-xl space-y-4 sm:space-y-5">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight text-center sm:text-left antialiased m-0" style={{ fontFamily: '"Object Sans", "Adjusted Arial", Tahoma, Geneva, sans-serif', WebkitFontSmoothing: 'antialiased' }}>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight text-center sm:text-left antialiased m-0">
         Suppliers. Pallets. Truckloads. Deals.
           </h1>
 
-          <p className="text-sm sm:text-base lg:text-lg leading-6 sm:leading-7 text-blue-50/90">
+          <p className="text-sm sm:text-base lg:text-lg leading-6 sm:leading-7 text-white/90">
             Discover vetted suppliers offering truckloads and pallets of returns, overstock and liquidations in your area.
           </p>
 
-          {/* Search bar – Zillow-style, clean & simple */}
+          {/* Search bar – clean & simple */}
           <form action="/suppliers" method="get" className="mt-6 sm:mt-8">
-            <div className="relative flex items-center rounded-lg bg-white shadow-xl">
+            <div className="relative flex items-center rounded-md bg-white shadow-lg border border-black/10">
               <input
                 type="search"
                 name="search"
                 placeholder="Search supplier or keywords"
-                className="h-14 sm:h-16 w-full bg-transparent border-0 text-sm sm:text-base text-slate-900 placeholder:text-slate-500 focus:outline-none px-4 sm:px-6 pr-12 sm:pr-14"
+                className="h-14 sm:h-16 w-full bg-transparent border-0 text-sm sm:text-base text-black placeholder:text-black/50 focus:outline-none px-4 sm:px-6 pr-12 sm:pr-14"
               />
               <button
                 type="submit"
-                className="absolute right-2 sm:right-3 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900/30 transition-colors"
+                className="absolute right-2 sm:right-3 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-md text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-colors"
                 aria-label="Search"
               >
                 <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,27 +166,24 @@ function QuickActionsBar() {
   ];
 
   return (
-    <section className="border-y border-slate-200 bg-gradient-to-br from-slate-50 via-white to-blue-50/30 py-12 sm:py-16">
+    <section className="border-y border-black/10 bg-white py-12 sm:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item, index) => (
             <Link
               key={`${item.href}-${index}`}
               href={item.href}
-              className="group relative flex flex-col items-center rounded-2xl border-2 border-slate-200 bg-gradient-to-br from-white to-slate-50/50 p-6 sm:p-8 text-center transition-all hover:shadow-2xl hover:-translate-y-2 hover:border-blue-400 hover:from-blue-50/50"
+              className="group relative flex flex-col items-center rounded-md border-2 border-black/10 bg-white p-6 sm:p-8 text-center transition-all hover:shadow-lg hover:border-blue-600"
             >
-              {/* Subtle background decoration */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/80 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-              
-              <div className="relative mb-4 sm:mb-5 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 shadow-sm transition-all group-hover:bg-blue-100 group-hover:shadow-md group-hover:scale-110 group-hover:rotate-3">
+              <div className="relative mb-4 sm:mb-5 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-md bg-blue-600 text-white transition-all group-hover:bg-blue-700">
                 {item.icon}
               </div>
               
-              <h3 className="relative text-lg sm:text-xl font-bold text-slate-900 transition-colors group-hover:text-blue-600">
+              <h3 className="relative text-lg sm:text-xl font-bold text-black transition-colors group-hover:text-blue-600">
                 {item.label}
               </h3>
               
-              <p className="relative mt-2 sm:mt-3 text-sm leading-relaxed text-slate-600">
+              <p className="relative mt-2 sm:mt-3 text-sm leading-relaxed text-black/70">
                 {item.description}
               </p>
               
@@ -196,8 +205,8 @@ function QuickActionsBar() {
 function ConnectByState({ regions }: { regions: any[] }) {
   return (
     <section className="mx-auto w-full max-w-3xl px-4 py-12 sm:py-16 text-center sm:px-6 lg:px-8">
-      <h3 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-900">Connect with Verified Suppliers</h3>
-      <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-sm sm:text-base text-slate-700">
+      <h3 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-black">Connect with Verified Suppliers</h3>
+      <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-sm sm:text-base text-black/70">
         Search for overstock, returns and liquidations by the pallet or truckload.
       </p>
       <StateSelector regions={regions} />
@@ -211,7 +220,7 @@ function TwoUpFeatures() {
     <section className="mx-auto max-w-7xl px-4 py-12 sm:py-16 lg:py-20 sm:px-6 lg:px-8">
       <div className="space-y-6 sm:space-y-8">
         {/* Feature 1: Split Layout - Image Left, Content Right */}
-        <article className="grid gap-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg md:grid-cols-2 md:h-[450px] lg:h-[500px]">
+        <article className="grid gap-0 overflow-hidden rounded-md border border-black/10 bg-white shadow-md md:grid-cols-2 md:h-[450px] lg:h-[500px]">
           <div className="relative h-64 sm:h-80 w-full md:h-full">
             <Image
               src="/feature-desk.png"
@@ -222,16 +231,16 @@ function TwoUpFeatures() {
             />
           </div>
           <div className="flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12">
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
+            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">
               Buy Truckload Liquidation Direct from Vetted Liquidators Near You
             </h3>
-            <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-6 sm:leading-7 text-slate-600">
+            <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-6 sm:leading-7 text-black/70">
               Source by the pallet or truckload for your bin stores, discount store, auction house and more! Buy
               truckloads of returns, overstock and liquidations directly from Amazon, Target, Walmart, Home Depot and more.
             </p>
             <Link
               href="/suppliers"
-              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-lg bg-slate-900 px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white shadow-md transition-all hover:bg-slate-800 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-slate-900/20"
+              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-black px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all hover:bg-black/90 focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
               Browse Suppliers
               <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -242,17 +251,17 @@ function TwoUpFeatures() {
         </article>
 
         {/* Feature 2: Split Layout - Content Left, Image Right */}
-        <article className="grid gap-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg md:grid-cols-2 md:h-[450px] lg:h-[500px]">
+        <article className="grid gap-0 overflow-hidden rounded-md border border-black/10 bg-white shadow-md md:grid-cols-2 md:h-[450px] lg:h-[500px]">
           <div className="order-2 flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12 md:order-1">
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
+            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">
               Read Real Reviews from Buyers
             </h3>
-            <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-6 sm:leading-7 text-slate-600">
+            <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-6 sm:leading-7 text-black/70">
               Find liquidation pallets, wholesale inventory, and merchandise for live auctions from trusted suppliers.
             </p>
             <Link
               href="/suppliers"
-              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-lg bg-slate-900 px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white shadow-md transition-all hover:bg-slate-800 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-slate-900/20"
+              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-black px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all hover:bg-black/90 focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
               Browse Reviews
               <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,10 +287,7 @@ function TwoUpFeatures() {
 function ListBusinessCta() {
   return (
     <section className="my-12 sm:my-16 lg:my-20">
-      <div className="relative mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-slate-900 p-6 sm:p-8 lg:p-10 text-white shadow-lg transition hover:shadow-xl">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-blue-500 blur-3xl" />
-        </div>
+      <div className="relative mx-auto max-w-6xl rounded-md border border-black/10 bg-black p-6 sm:p-8 lg:p-10 text-white shadow-md transition hover:shadow-lg">
         <div className="relative">
           <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold">List your Business</h3>
           <p className="mt-3 sm:mt-4 text-lg sm:text-xl lg:text-2xl leading-7 sm:leading-8">
@@ -289,7 +295,7 @@ function ListBusinessCta() {
           </p>
           <Link
             href="/list-your-business"
-            className="mt-6 sm:mt-8 inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/30 transition-colors"
+            className="mt-6 sm:mt-8 inline-flex items-center justify-center rounded-md bg-blue-600 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-colors"
           >
             Get Started
           </Link>
@@ -299,14 +305,3 @@ function ListBusinessCta() {
   );
 }
 
-/* ---------------------------------- FAQ -------------------------------------- */
-function FaqSection({ faqs }: { faqs: FaqList }) {
-  return (
-    <section className="py-12 sm:py-16">
-      <h2 className="mb-8 sm:mb-10 text-center text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900">FAQ</h2>
-      <div className="mx-auto w-full max-w-6xl px-0">
-        <FaqAccordion faqs={faqs} />
-      </div>
-    </section>
-  );
-}

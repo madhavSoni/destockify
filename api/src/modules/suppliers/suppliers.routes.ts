@@ -16,19 +16,15 @@ const router = Router();
 
 router.get('/', async (req, res) => {
   try {
-    const { category, region, lotSize, search, cursor, limit, verified, regionGroup } = req.query;
+    const { category, region, search, cursor, limit, verified } = req.query;
 
     const result = await listSuppliers({
       category: typeof category === 'string' ? category : undefined,
       region: typeof region === 'string' ? region : undefined,
-      lotSize: typeof lotSize === 'string' ? lotSize : undefined,
       search: typeof search === 'string' ? search : undefined,
       cursor: cursor ? Number(cursor) : undefined,
       limit: limit ? Number(limit) : undefined,
       verified: verified === 'true' ? true : verified === 'false' ? false : undefined,
-      regionGroup: typeof regionGroup === 'string' && ['south', 'west', 'northeast', 'midwest', 'other'].includes(regionGroup) 
-        ? regionGroup as 'south' | 'west' | 'northeast' | 'midwest' | 'other'
-        : undefined,
     });
 
     res.json(result);

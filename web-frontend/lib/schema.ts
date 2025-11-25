@@ -13,8 +13,8 @@ export function generateWebsiteSchema(): WithContext<WebSite> {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Destockify',
-    alternateName: 'Destockify - Wholesale Liquidation Supplier Directory',
+    name: 'Trust Pallet',
+    alternateName: 'Trust Pallet - Wholesale Liquidation Supplier Directory',
     url: 'https://destockify.com',
     description: 'Find trusted wholesale liquidation suppliers offering truckloads and pallets. Browse verified suppliers, read reviews, and discover guides to scale your sourcing.',
     potentialAction: ({
@@ -32,10 +32,10 @@ export function generateOrganizationSchema(): WithContext<Organization> {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Destockify',
+    name: 'Trust Pallet',
     url: 'https://destockify.com',
     logo: 'https://destockify.com/logo.png', // TODO: Update with actual logo URL
-    description: 'Destockify is a wholesale liquidation supplier directory helping buyers find vetted suppliers with transparent reviews and guides.',
+    description: 'Trust Pallet is a wholesale liquidation supplier directory helping buyers find vetted suppliers with transparent reviews and guides.',
     sameAs: [
       // TODO: Add social media URLs when available
       // 'https://twitter.com/destockify',
@@ -112,8 +112,7 @@ export function generateSupplierSchema(
         worstRating: 1
       },
       reviewBody: review.body,
-      datePublished: review.createdAt,
-      ...(review.title && { headline: review.title })
+      datePublished: review.publishedAt || review.createdAt
     } as Review));
   }
 
@@ -138,11 +137,11 @@ export function generateArticleSchema(guide: any): WithContext<Article> {
     dateModified: guide.updatedAt || guide.createdAt,
     author: {
       '@type': 'Organization',
-      name: 'Destockify'
+      name: 'Trust Pallet'
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Destockify',
+      name: 'Trust Pallet',
       logo: {
         '@type': 'ImageObject',
         url: 'https://destockify.com/logo.png' // TODO: Update

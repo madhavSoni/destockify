@@ -4,29 +4,22 @@ import prisma from '../../lib/prismaClient';
 export async function createReview(payload: {
   customerId: number;
   supplierId: number;
-  title?: string;
-  ratingOverall: number;
-  ratingAccuracy?: number;
-  ratingLogistics?: number;
-  ratingValue?: number;
-  ratingCommunication?: number;
-  highlights?: string[];
+  ratingOverall: number; // Single 1-5 integer rating
   body: string;
   images?: string[];
 }) {
   const {
     customerId,
     supplierId,
-    title,
     ratingOverall,
-    ratingAccuracy,
-    ratingLogistics,
-    ratingValue,
-    ratingCommunication,
-    highlights,
     body,
     images,
   } = payload;
+
+  // Validate rating is between 1 and 5 and is an integer
+  if (!Number.isInteger(ratingOverall) || ratingOverall < 1 || ratingOverall > 5) {
+    throw new Error('Rating must be an integer between 1 and 5');
+  }
 
   // Validate customer exists and is verified
   const customer = await prisma.customer.findUnique({
@@ -57,17 +50,10 @@ export async function createReview(payload: {
     data: {
       customerId,
       supplierId,
-      author: authorName, // Required field in database
-      company: null, // Optional field
-      title: title || null,
-      ratingOverall,
-      ratingAccuracy: ratingAccuracy || null,
-      ratingLogistics: ratingLogistics || null,
-      ratingValue: ratingValue || null,
-      ratingCommunication: ratingCommunication || null,
-      highlights: highlights || [],
-      body,
-      images: images || [],
+      author: authorName, // Required field in database (reviewer_name)
+      ratingOverall: Math.round(ratingOverall), // Single 1-5 integer rating
+      body, // review_text
+      images: images || [], // review_images
       isApproved: false,
     },
     include: {
@@ -99,17 +85,16 @@ export async function createReview(payload: {
 export async function updateReview(payload: {
   reviewId: number;
   customerId: number;
-  title?: string;
-  ratingOverall?: number;
-  ratingAccuracy?: number;
-  ratingLogistics?: number;
-  ratingValue?: number;
-  ratingCommunication?: number;
-  highlights?: string[];
+  ratingOverall?: number; // Single 1-5 integer rating
   body?: string;
   images?: string[];
 }) {
-  const { reviewId, customerId, ...updateData } = payload;
+  const { reviewId, customerId, ratingOverall, ...updateData } = payload;
+
+  // Validate rating if provided
+  if (ratingOverall !== undefined && (!Number.isInteger(ratingOverall) || ratingOverall < 1 || ratingOverall > 5)) {
+    throw new Error('Rating must be an integer between 1 and 5');
+  }
 
   // Find review and verify ownership
   const review = await prisma.review.findUnique({
@@ -129,8 +114,8 @@ export async function updateReview(payload: {
     where: { id: reviewId },
     data: {
       ...updateData,
+      ...(ratingOverall !== undefined && { ratingOverall: Math.round(ratingOverall) }),
       isApproved: false, // Reset approval when edited
-      approvedAt: null,
     },
     include: {
       customer: {
@@ -224,7 +209,6 @@ export async function approveReview(reviewId: number) {
     where: { id: reviewId },
     data: {
       isApproved: true,
-      approvedAt: new Date(),
     },
     include: {
       customer: {
@@ -277,8 +261,6 @@ export async function unapproveReview(payload: {
     where: { id: reviewId },
     data: {
       isApproved: false,
-      approvedAt: null,
-      moderationNotes: moderationNotes || null,
     },
     include: {
       customer: {
@@ -346,10 +328,7 @@ export async function getAllReviewsAdmin(params: {
           },
         },
       },
-      orderBy: [
-        { isTrending: 'desc' }, // Trending reviews first
-        { createdAt: 'desc' },
-      ],
+      orderBy: { createdAt: 'desc' },
       skip,
       take: limit,
     }),
@@ -359,13 +338,12 @@ export async function getAllReviewsAdmin(params: {
   return {
     items: reviews.map((r) => ({
       id: r.id,
-      title: r.title,
+      author: r.author,
       body: r.body,
       ratingOverall: r.ratingOverall,
+      images: r.images,
       isApproved: r.isApproved,
-      isTrending: r.isTrending,
       createdAt: r.createdAt.toISOString(),
-      approvedAt: r.approvedAt?.toISOString() || null,
       customer: {
         id: r.customer.id,
         name: `${r.customer.firstName} ${r.customer.lastName}`,
@@ -429,22 +407,13 @@ export async function getReviewsBySupplierAdmin(supplierId: number) {
 
   return reviews.map((r) => ({
     id: r.id,
-    title: r.title,
-    author: r.author,
-    company: r.company,
-    ratingOverall: r.ratingOverall,
-    ratingAccuracy: r.ratingAccuracy,
-    ratingLogistics: r.ratingLogistics,
-    ratingValue: r.ratingValue,
-    ratingCommunication: r.ratingCommunication,
-    highlights: r.highlights,
-    body: r.body,
-    images: r.images,
+    author: r.author, // reviewer_name
+    ratingOverall: r.ratingOverall, // review_rating (1-5 integer)
+    body: r.body, // review_text
+    images: r.images, // review_images
     isApproved: r.isApproved,
-    moderationNotes: r.moderationNotes,
-    createdAt: r.createdAt.toISOString(),
+    createdAt: r.createdAt.toISOString(), // review_date
     updatedAt: r.updatedAt.toISOString(),
-    approvedAt: r.approvedAt?.toISOString() || null,
     customer: {
       id: r.customer.id,
       name: `${r.customer.firstName} ${r.customer.lastName}`,
@@ -456,20 +425,19 @@ export async function getReviewsBySupplierAdmin(supplierId: number) {
 // Admin: Update any review
 export async function adminUpdateReview(payload: {
   reviewId: number;
-  title?: string;
+  author?: string;
   body?: string;
-  ratingOverall?: number;
-  ratingAccuracy?: number;
-  ratingLogistics?: number;
-  ratingValue?: number;
-  ratingCommunication?: number;
-  highlights?: string[];
+  ratingOverall?: number; // Single 1-5 integer rating
   images?: string[];
   createdAt?: string; // ISO date string
   isApproved?: boolean;
-  isTrending?: boolean;
 }) {
-  const { reviewId, createdAt, ...updateData } = payload;
+  const { reviewId, createdAt, ratingOverall, ...updateData } = payload;
+
+  // Validate rating if provided
+  if (ratingOverall !== undefined && (!Number.isInteger(ratingOverall) || ratingOverall < 1 || ratingOverall > 5)) {
+    throw new Error('Rating must be an integer between 1 and 5');
+  }
 
   const review = await prisma.review.findUnique({
     where: { id: reviewId },
@@ -480,6 +448,11 @@ export async function adminUpdateReview(payload: {
   }
 
   const data: any = { ...updateData };
+  
+  // Add rating if provided (ensure it's an integer)
+  if (ratingOverall !== undefined) {
+    data.ratingOverall = Math.round(ratingOverall);
+  }
   
   // Handle date update - accept both ISO strings and date strings (YYYY-MM-DD)
   if (createdAt) {
@@ -495,14 +468,6 @@ export async function adminUpdateReview(payload: {
     }
     
     data.createdAt = dateValue;
-    console.log('Updating review date:', { input: createdAt, parsed: dateValue.toISOString(), date: dateValue.toDateString() });
-  }
-
-  // If approving, set approvedAt
-  if (updateData.isApproved === true && !review.isApproved) {
-    data.approvedAt = new Date();
-  } else if (updateData.isApproved === false && review.isApproved) {
-    data.approvedAt = null;
   }
 
   const updatedReview = await prisma.review.update({
@@ -528,7 +493,7 @@ export async function adminUpdateReview(payload: {
   });
 
   // Update supplier ratings if rating changed or approval status changed
-  if (updateData.ratingOverall !== undefined || updateData.isApproved !== undefined) {
+  if (ratingOverall !== undefined || updateData.isApproved !== undefined) {
     await updateSupplierRatings(review.supplierId);
   }
 
@@ -542,37 +507,28 @@ export async function adminUpdateReview(payload: {
 export async function adminCreateReview(payload: {
   supplierId: number;
   customerId?: number; // Optional - can create without customer
-  title?: string;
-  author: string;
-  company?: string;
-  ratingOverall: number;
-  ratingAccuracy?: number;
-  ratingLogistics?: number;
-  ratingValue?: number;
-  ratingCommunication?: number;
-  highlights?: string[];
-  body: string;
-  images?: string[];
+  author: string; // reviewer_name
+  ratingOverall: number; // Single 1-5 integer rating
+  body: string; // review_text
+  images?: string[]; // review_images
   isApproved?: boolean;
-  createdAt?: string; // ISO date string
+  createdAt?: string; // ISO date string (review_date)
 }) {
   const {
     supplierId,
     customerId,
-    title,
     author,
-    company,
     ratingOverall,
-    ratingAccuracy,
-    ratingLogistics,
-    ratingValue,
-    ratingCommunication,
-    highlights,
     body,
     images,
     isApproved = true, // Admin-created reviews are approved by default
     createdAt,
   } = payload;
+
+  // Validate rating is between 1 and 5 and is an integer
+  if (!Number.isInteger(ratingOverall) || ratingOverall < 1 || ratingOverall > 5) {
+    throw new Error('Rating must be an integer between 1 and 5');
+  }
 
   // Validate supplier exists
   const supplier = await prisma.supplier.findUnique({
@@ -596,19 +552,11 @@ export async function adminCreateReview(payload: {
   const data: any = {
     supplierId,
     customerId: customerId || 1, // Use a default customer if none provided (you may want to create a system customer)
-    author,
-    company: company || null,
-    title: title || null,
-    ratingOverall,
-    ratingAccuracy: ratingAccuracy || null,
-    ratingLogistics: ratingLogistics || null,
-    ratingValue: ratingValue || null,
-    ratingCommunication: ratingCommunication || null,
-    highlights: highlights || [],
-    body,
-    images: images || [],
+    author, // reviewer_name
+    ratingOverall: Math.round(ratingOverall), // Single 1-5 integer rating
+    body, // review_text
+    images: images || [], // review_images
     isApproved,
-    approvedAt: isApproved ? new Date() : null,
   };
 
   if (createdAt) {
@@ -646,27 +594,8 @@ export async function adminCreateReview(payload: {
 }
 
 // Helper: Update supplier's average rating and review count
+// Note: These fields no longer exist in the schema, but keeping function for potential future use
 async function updateSupplierRatings(supplierId: number) {
-  const approvedReviews = await prisma.review.findMany({
-    where: {
-      supplierId,
-      isApproved: true,
-    },
-    select: {
-      ratingOverall: true,
-    },
-  });
-
-  const reviewCount = approvedReviews.length;
-  const averageRating = reviewCount > 0
-    ? approvedReviews.reduce((sum, r) => sum + r.ratingOverall, 0) / reviewCount
-    : 0;
-
-  await prisma.supplier.update({
-    where: { id: supplierId },
-    data: {
-      reviewCount,
-      averageRating: Math.round(averageRating * 10) / 10, // Round to 1 decimal
-    },
-  });
+  // This function is kept for compatibility but doesn't update anything
+  // since averageRating and reviewCount fields were removed from Supplier model
 }

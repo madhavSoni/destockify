@@ -49,30 +49,30 @@ export default function ProfilePage() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-          <p className="mt-4 text-slate-600">Loading...</p>
+          <p className="mt-4 text-black/70">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+    <div className="min-h-screen bg-white">
       <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <div className="mb-6 text-sm font-medium text-slate-600">
+        <div className="mb-6 text-sm font-medium text-black/70">
           <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
           <span className="mx-2">›</span>
-          <span className="font-semibold text-slate-900">My Profile</span>
+          <span className="font-semibold text-black">My Profile</span>
         </div>
 
         {/* Profile Header */}
-        <div className="mb-8 rounded-lg border border-slate-200 bg-white p-4 sm:p-8">
+        <div className="mb-8 rounded-md border border-black/10 bg-white p-4 sm:p-8">
           <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
             {/* Avatar */}
-            <div className="flex h-20 w-20 sm:h-24 sm:w-24 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-3xl sm:text-4xl font-bold text-white border-4 border-white shadow-lg">
+            <div className="flex h-20 w-20 sm:h-24 sm:w-24 flex-shrink-0 items-center justify-center rounded-md bg-blue-600 text-3xl sm:text-4xl font-bold text-white border-4 border-white shadow-lg">
               {user.firstName.charAt(0).toUpperCase()}
               {user.lastName.charAt(0).toUpperCase()}
             </div>
@@ -80,12 +80,12 @@ export default function ProfilePage() {
             {/* User Info */}
             <div className="flex-1 w-full sm:w-auto">
               <div className="flex flex-wrap items-center gap-2 mb-2">
-                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+                <h1 className="text-2xl sm:text-3xl font-bold text-black">
                   {user.firstName} {user.lastName}
                 </h1>
                 {/* Verification Badge */}
                 {user.isVerified && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-green-50 border border-green-200 px-2.5 py-1 text-xs font-medium text-green-700">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-blue-600/10 border border-blue-600/20 px-2.5 py-1 text-xs font-medium text-blue-600">
                     <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
@@ -93,10 +93,10 @@ export default function ProfilePage() {
                   </span>
                 )}
               </div>
-              <p className="text-sm sm:text-base text-slate-600 mb-2 break-all">{user.email}</p>
+              <p className="text-sm sm:text-base text-black/70 mb-2 break-all">{user.email}</p>
               
               {/* Member Since */}
-              <p className="text-xs sm:text-sm text-slate-500">
+              <p className="text-xs sm:text-sm text-black/50">
                 Member since {new Date(user.createdAt).toLocaleDateString('en-US', { 
                   month: 'long', 
                   year: 'numeric' 
@@ -106,9 +106,9 @@ export default function ProfilePage() {
 
             {/* Stats */}
             <div className="w-full sm:w-auto mt-4 sm:mt-0">
-              <div className="rounded-lg border border-slate-200 bg-gradient-to-br from-blue-50 to-blue-100 px-6 py-4 text-center">
-                <div className="text-3xl font-bold text-slate-900 mb-1">{reviews.length}</div>
-                <div className="text-sm font-medium text-slate-600">
+              <div className="rounded-md border border-black/10 bg-blue-600/10 px-6 py-4 text-center">
+                <div className="text-3xl font-bold text-black mb-1">{reviews.length}</div>
+                <div className="text-sm font-medium text-black/70">
                   {reviews.length === 1 ? 'Review' : 'Reviews'}
                 </div>
               </div>
@@ -117,24 +117,24 @@ export default function ProfilePage() {
         </div>
 
         {/* Reviews Section */}
-        <div className="rounded-lg border border-slate-200 bg-white p-4 sm:p-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6">My Reviews</h2>
+        <div className="rounded-md border border-black/10 bg-white p-4 sm:p-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-black mb-6">My Reviews</h2>
 
           {isLoading ? (
             <div className="text-center py-12">
               <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-              <p className="mt-4 text-slate-600">Loading reviews...</p>
+              <p className="mt-4 text-black/70">Loading reviews...</p>
             </div>
           ) : reviews.length === 0 ? (
             <div className="text-center py-12">
-              <svg className="mx-auto h-16 w-16 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="mx-auto h-16 w-16 text-black/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
               </svg>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">No Reviews Yet</h3>
-              <p className="text-slate-600 mb-6">You haven't left any reviews yet. Start by reviewing a supplier!</p>
+              <h3 className="text-lg font-semibold text-black mb-2">No Reviews Yet</h3>
+              <p className="text-black/70 mb-6">You haven't left any reviews yet. Start by reviewing a supplier!</p>
               <Link
                 href="/suppliers"
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
               >
                 Browse Suppliers
               </Link>
@@ -143,7 +143,7 @@ export default function ProfilePage() {
             <div className="relative">
               {/* Review Carousel */}
               <div className="overflow-hidden">
-                <div className="rounded-lg border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6">
+                <div className="rounded-md border border-black/10 bg-white p-6">
                   {/* Supplier Name */}
                   <Link
                     href={`/suppliers/${reviews[currentReviewIndex].supplier.slug}`}
@@ -158,7 +158,7 @@ export default function ProfilePage() {
                       {[...Array(5)].map((_, i) => (
                         <svg
                           key={i}
-                          className={`w-5 h-5 ${i < reviews[currentReviewIndex].ratingOverall ? 'text-yellow-400' : 'text-slate-300'}`}
+                          className={`w-5 h-5 ${i < reviews[currentReviewIndex].ratingOverall ? 'text-blue-600' : 'text-black/20'}`}
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -166,32 +166,20 @@ export default function ProfilePage() {
                         </svg>
                       ))}
                     </div>
-                    <span className="text-sm font-medium text-slate-600">
+                    <span className="text-sm font-medium text-black/70">
                       {reviews[currentReviewIndex].ratingOverall}.0
                     </span>
                   </div>
 
-                  {/* Highlights */}
-                  {reviews[currentReviewIndex].highlights.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {reviews[currentReviewIndex].highlights.map((highlight, i) => (
-                        <span
-                          key={i}
-                          className="rounded-lg bg-blue-50 border border-blue-200 px-3 py-1 text-xs font-medium text-blue-700"
-                        >
-                          {highlight}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                  {/* Highlights - not available in ReviewResponse type */}
 
                   {/* Comment */}
-                  <p className="text-base text-slate-700 leading-relaxed mb-4">
+                  <p className="text-base text-black/70 leading-relaxed mb-4">
                     {reviews[currentReviewIndex].body}
                   </p>
 
                   {/* Date */}
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-black/50">
                     {new Date(reviews[currentReviewIndex].createdAt).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
@@ -206,7 +194,7 @@ export default function ProfilePage() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
                   <button
                     onClick={prevReview}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-md border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -221,7 +209,7 @@ export default function ProfilePage() {
                         key={i}
                         onClick={() => setCurrentReviewIndex(i)}
                         className={`h-2 w-2 rounded-full transition-all ${
-                          i === currentReviewIndex ? 'bg-blue-600 w-6' : 'bg-slate-300'
+                          i === currentReviewIndex ? 'bg-blue-600 w-6' : 'bg-black/20'
                         }`}
                         aria-label={`Go to review ${i + 1}`}
                       />
@@ -230,7 +218,7 @@ export default function ProfilePage() {
 
                   <button
                     onClick={nextReview}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-md border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 transition-colors"
                   >
                     Next
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

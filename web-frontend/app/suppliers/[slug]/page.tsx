@@ -25,15 +25,15 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
         dangerouslySetInnerHTML={{ __html: schemaToJsonLd(supplierSchema) }}
       />
 
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-white">
         <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
-          <div className="mb-8 text-sm font-medium text-slate-600">
+          <div className="mb-8 text-sm font-medium text-black/70">
             <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
             <span className="mx-2">›</span>
             <Link href="/suppliers" className="hover:text-blue-600 transition-colors">Suppliers</Link>
             <span className="mx-2">›</span>
-            <span className="font-bold text-slate-900">{supplier.name}</span>
+            <span className="font-bold text-black">{supplier.name}</span>
           </div>
 
         {/* Main Content Grid */}
@@ -76,10 +76,10 @@ function SupplierHeader({
   const count = reviewSummary.count ?? 0;
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-lg">
+    <section className="rounded-md border border-black/10 bg-white overflow-hidden shadow-md">
       {/* Hero Image */}
       {supplier.heroImage && (
-        <div className="relative h-56 w-full border-b-2 border-slate-200">
+        <div className="relative h-56 w-full border-b-2 border-black/10">
           <Image src={supplier.heroImage} alt={supplier.name} fill className="object-cover" priority />
         </div>
       )}
@@ -88,13 +88,13 @@ function SupplierHeader({
         {/* Logo and Name */}
         <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
           {supplier.logoImage && (
-            <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-white">
+            <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-black/10 bg-white">
               <Image src={supplier.logoImage} alt="" fill className="object-contain p-3" />
             </div>
           )}
           <div className="flex-1 min-w-0 w-full">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 flex-wrap mb-2">
-              <h1 className="font-bold text-2xl sm:text-3xl lg:text-4xl text-slate-900 break-words">
+              <h1 className="font-bold text-2xl sm:text-3xl lg:text-4xl text-black break-words">
                 {supplier.name}
               </h1>
               {/* Prominent Flags next to name */}
@@ -103,10 +103,10 @@ function SupplierHeader({
                   {supplier.flags.map((flag, i) => (
                     <div key={`flag-${i}`} className="group relative">
                       <span 
-                        className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold shadow-sm cursor-help transition-all hover:scale-105 ${
+                        className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-semibold shadow-sm cursor-help transition-all hover:scale-105 ${
                           flag.variant === 'verified' 
-                            ? 'bg-green-500 border-green-600 text-white' 
-                            : 'bg-red-500 border-red-600 text-white'
+                            ? 'bg-blue-600 border-blue-700 text-white' 
+                            : 'bg-black border-black text-white'
                         }`}
                       >
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -119,18 +119,18 @@ function SupplierHeader({
                         {flag.text}
                       </span>
                       {/* Hover tooltip */}
-                      <div className={`absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-2 rounded-lg text-sm font-medium text-white whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10 shadow-lg ${
+                      <div className={`absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-2 rounded-md text-sm font-medium text-white whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10 shadow-lg ${
                         flag.variant === 'verified' 
-                          ? 'bg-green-700' 
-                          : 'bg-red-700'
+                          ? 'bg-blue-700' 
+                          : 'bg-black'
                       }`}>
                         {flag.variant === 'verified' 
                           ? 'This supplier has been verified by our team' 
                           : 'Warning: This supplier has been reported as fraudulent'}
                         <div className={`absolute left-1/2 -translate-x-1/2 -top-1 w-2 h-2 rotate-45 ${
                           flag.variant === 'verified' 
-                            ? 'bg-green-700' 
-                            : 'bg-red-700'
+                            ? 'bg-blue-700' 
+                            : 'bg-black'
                         }`}></div>
                       </div>
                     </div>
@@ -139,13 +139,13 @@ function SupplierHeader({
               )}
             </div>
             {supplier.shortDescription && (
-              <p className="font-normal text-sm sm:text-base text-slate-600">{supplier.shortDescription}</p>
+              <p className="font-normal text-sm sm:text-base text-black/70">{supplier.shortDescription}</p>
             )}
             
             {/* Region & Badges */}
             <div className="mt-4 flex flex-wrap items-center gap-2">
               {supplier.region && (
-                <span className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 border border-blue-200 px-3 py-1.5 text-sm font-medium text-blue-700">
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-blue-600/10 border border-blue-600/20 px-3 py-1.5 text-sm font-medium text-blue-600">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -153,25 +153,18 @@ function SupplierHeader({
                   {supplier.region.name}
                 </span>
               )}
-              {supplier.badges?.map((badge, i) => (
-                <span key={`badge-${i}`} className="inline-flex items-center gap-1.5 rounded-lg bg-slate-50 border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  {badge}
-                </span>
-              ))}
+              {/* Badges not available in supplier type */}
             </div>
           </div>
         </div>
 
         {/* Rating & Actions */}
-        <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t-2 border-slate-100 pt-6 bg-slate-50/50 -mx-6 sm:-mx-8 px-6 sm:px-8 py-6 rounded-b-xl">
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t-2 border-black/5 pt-6 bg-black/5 -mx-6 sm:-mx-8 px-6 sm:px-8 py-6 rounded-b-md">
           <div className="flex items-center gap-3">
             <RatingStars rating={rating} />
             <div className="flex items-center gap-2">
-              <span className="font-bold text-xl sm:text-2xl text-slate-900">{rating.toFixed(1)}</span>
-              <span className="font-normal text-sm text-slate-600">
+              <span className="font-bold text-xl sm:text-2xl text-black">{rating.toFixed(1)}</span>
+              <span className="font-normal text-sm text-black/50">
                 ({count} {count === 1 ? 'review' : 'reviews'})
               </span>
             </div>
@@ -183,7 +176,7 @@ function SupplierHeader({
                 href={supplier.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors duration-200"
+                className="inline-flex items-center gap-2 rounded-md border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 transition-colors duration-200"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
@@ -195,7 +188,7 @@ function SupplierHeader({
             {supplier.phone && (
               <a
                 href={`tel:${supplier.phone}`}
-                className="inline-flex items-center gap-2 rounded-lg border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 hover:border-blue-700 transition-colors duration-200"
+                className="inline-flex items-center gap-2 rounded-md border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 hover:border-blue-700 transition-colors duration-200"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -215,23 +208,15 @@ function SupplierHeader({
 
 function ReadyToOrderCard({ supplier }: { supplier: SupplierDetail['supplier'] }) {
   return (
-    <section className="rounded-xl border-2 p-8 sm:p-10 shadow-xl relative overflow-hidden">
-      {/* Decorative background pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{ 
-          backgroundImage: 'radial-gradient(circle at 2px 2px, rgb(59 130 246) 1px, transparent 0)',
-          backgroundSize: '32px 32px'
-        }}></div>
-      </div>
-      
+    <section className="rounded-md border-2 border-black/10 p-8 sm:p-10 shadow-md relative overflow-hidden bg-white">
       <div className="max-w-3xl mx-auto text-center relative">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-600 mb-4 shadow-lg">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-md bg-blue-600 mb-4">
           <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
         </div>
-        <h2 className="font-bold text-3xl text-slate-900 mb-3">Ready to Work with {supplier.name}?</h2>
-        <p className="text-base text-slate-700 mb-8 max-w-xl mx-auto">
+        <h2 className="font-bold text-3xl text-black mb-3">Ready to Work with {supplier.name}?</h2>
+        <p className="text-base text-black/70 mb-8 max-w-xl mx-auto">
           Get in touch to discuss your wholesale needs and start your order today
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -240,7 +225,7 @@ function ReadyToOrderCard({ supplier }: { supplier: SupplierDetail['supplier'] }
               href={supplier.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-lg bg-blue-600 px-8 py-4 text-base font-semibold text-white hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-md bg-blue-600 px-8 py-4 text-base font-semibold text-white hover:bg-blue-700 transition-all duration-200"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
@@ -251,7 +236,7 @@ function ReadyToOrderCard({ supplier }: { supplier: SupplierDetail['supplier'] }
           {supplier.email && (
             <a
               href={`mailto:${supplier.email}`}
-              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-lg border-2 border-blue-600 bg-white px-8 py-4 text-base font-semibold text-blue-600 hover:bg-blue-50 transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-md border-2 border-blue-600 bg-white px-8 py-4 text-base font-semibold text-blue-600 hover:bg-blue-600/10 transition-all duration-200"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -262,7 +247,7 @@ function ReadyToOrderCard({ supplier }: { supplier: SupplierDetail['supplier'] }
           {supplier.phone && (
             <a
               href={`tel:${supplier.phone}`}
-              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-lg border-2 border-slate-300 bg-white px-8 py-4 text-base font-semibold text-slate-700 hover:bg-slate-50 transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-md border-2 border-black/10 bg-white px-8 py-4 text-base font-semibold text-black hover:bg-black/5 transition-all duration-200"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -280,48 +265,49 @@ function ReadyToOrderCard({ supplier }: { supplier: SupplierDetail['supplier'] }
 
 function SupplierOverview({ supplier }: { supplier: SupplierDetail['supplier'] }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-8 sm:p-10 shadow-md">
-      <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-slate-100">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100">
-          <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <section className="rounded-md border border-black/10 bg-white p-8 sm:p-10 shadow-md">
+      <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-black/5">
+        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-black/5">
+          <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h2 className="font-bold text-2xl text-slate-900">About</h2>
+        <h2 className="font-bold text-2xl text-black">About</h2>
       </div>
       
       <div className="space-y-6">
         {supplier.description && (
-          <p className="font-normal text-base text-slate-700 leading-relaxed">{supplier.description}</p>
+          <p className="font-normal text-base text-black/70 leading-relaxed">{supplier.description}</p>
         )}
 
         {/* Key Details Grid */}
-        {(supplier.minimumOrder || supplier.leadTime) && (
+        {/* minimumOrder and leadTime not available in supplier type */}
+        {false && (
           <div className="grid gap-4 sm:grid-cols-2 pt-4">
-            {supplier.minimumOrder && (
-              <div className="rounded-lg border-2 border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 transition-all hover:border-slate-400 hover:shadow-md">
+            {false && (
+              <div className="rounded-md border-2 border-black/10 bg-white p-6 transition-all hover:border-blue-600 hover:shadow-md">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100">
-                    <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-md bg-black/5">
+                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <div className="text-sm font-semibold text-slate-500 uppercase tracking-wide">Minimum Order</div>
+                  <div className="text-sm font-semibold text-black/50 uppercase tracking-wide">Minimum Order</div>
                 </div>
-                <div className="text-2xl font-bold text-slate-900 tracking-tight">{supplier.minimumOrder}</div>
+                <div className="text-2xl font-bold text-black tracking-tight"></div>
               </div>
             )}
-            {supplier.leadTime && (
-              <div className="rounded-lg border-2 border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 transition-all hover:border-slate-400 hover:shadow-md">
+            {false && (
+              <div className="rounded-md border-2 border-black/10 bg-white p-6 transition-all hover:border-blue-600 hover:shadow-md">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100">
-                    <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-md bg-black/5">
+                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <div className="text-sm font-semibold text-slate-500 uppercase tracking-wide">Lead Time</div>
+                  <div className="text-sm font-semibold text-black/50 uppercase tracking-wide">Lead Time</div>
                 </div>
-                <div className="text-2xl font-bold text-slate-900 tracking-tight">{supplier.leadTime}</div>
+                <div className="text-2xl font-bold text-black tracking-tight"></div>
               </div>
             )}
           </div>
@@ -347,8 +333,8 @@ function RatingStars({ rating }: { rating: number }) {
           <svg
             key={i}
             className="w-5 h-5"
-            fill={isFilled ? "#facc15" : isHalf ? "#facc15" : "none"}
-            stroke="#facc15"
+            fill={isFilled ? "#2563eb" : isHalf ? "#2563eb" : "none"}
+            stroke="#2563eb"
             strokeWidth={isFilled || isHalf ? 0 : 1.5}
             viewBox="0 0 24 24"
           >
@@ -356,13 +342,13 @@ function RatingStars({ rating }: { rating: number }) {
               <>
                 <defs>
                   <linearGradient id={`half-${i}`}>
-                    <stop offset="50%" stopColor="#facc15" />
+                    <stop offset="50%" stopColor="#2563eb" />
                     <stop offset="50%" stopColor="white" />
                   </linearGradient>
                 </defs>
                 <path
                   fill={`url(#half-${i})`}
-                  stroke="#facc15"
+                  stroke="#2563eb"
                   strokeWidth={1.5}
                   d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
                 />

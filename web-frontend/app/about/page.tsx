@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'About Us | Destockify',
-  description: 'Learn about Destockify - your trusted platform for connecting with verified liquidation and wholesale suppliers across the United States.',
+  title: 'About Us | Trust Pallet',
+  description: 'Learn about Trust Pallet - your trusted platform for connecting with verified liquidation and wholesale suppliers across the United States.',
 };
 
 export default function AboutPage() {
@@ -13,7 +13,7 @@ export default function AboutPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-slate-900 sm:text-5xl mb-4">
-            About Destockify
+            About Trust Pallet
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
             Connecting buyers with verified liquidation and wholesale suppliers across the United States
@@ -26,7 +26,7 @@ export default function AboutPage() {
           <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4">Our Mission</h2>
             <p className="text-lg text-slate-700 leading-relaxed">
-              Destockify simplifies the process of finding reliable liquidation and wholesale suppliers. 
+              Trust Pallet simplifies the process of finding reliable liquidation and wholesale suppliers. 
               We provide a curated directory of vetted companies, complete with verified reviews and 
               detailed information to help you make informed business decisions.
             </p>

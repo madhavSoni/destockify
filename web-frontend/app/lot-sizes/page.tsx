@@ -5,7 +5,8 @@ import { api } from '@/lib/api';
 const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
 export default async function LotSizesPage() {
-  const lotSizes = await api.catalog.lotSizes();
+  // Lot sizes API not yet implemented
+  const lotSizes: any[] = [];
 
   // tiny icon map for the sketch cards
   const iconFor = (name: string) => {

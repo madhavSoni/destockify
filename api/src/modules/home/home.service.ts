@@ -1,27 +1,36 @@
 import prisma from '../../lib/prismaClient';
-import { listCategories, listLotSizes, listRegions } from '../catalog/catalog.service';
-import { listGuides } from '../guides/guides.service';
-import { listFaq } from '../faq/faq.service';
+import { listCategories, listRegions } from '../catalog/catalog.service';
 import { mapSupplierSummary, type SupplierSummaryPayload } from '../suppliers/suppliers.service';
 
 export async function getHomepageContent() {
-  const [featuredSuppliersRaw, latestReviews, featuredGuides, categories, regions, lotSizes, faqs, stats] =
+  // First try to get suppliers with homeRank > 0, if none found, get any suppliers
+  let featuredSuppliersRaw = await prisma.supplier.findMany({
+    where: { homeRank: { gt: 0 } },
+    include: {
+      region: true,
+      categories: { include: { category: true } },
+    },
+    orderBy: [{ homeRank: 'asc' }, { name: 'asc' }],
+    take: 6,
+  }) as SupplierSummaryPayload[];
+
+  // If no suppliers with homeRank, get any suppliers as fallback
+  if (featuredSuppliersRaw.length === 0) {
+    featuredSuppliersRaw = await prisma.supplier.findMany({
+      include: {
+        region: true,
+        categories: { include: { category: true } },
+      },
+      orderBy: [{ isVerified: 'desc' }, { createdAt: 'desc' }, { name: 'asc' }],
+      take: 6,
+    }) as SupplierSummaryPayload[];
+  }
+
+  const [latestReviews, categories, regions, stats] =
     await Promise.all([
-      prisma.supplier
-        .findMany({
-          where: { homeRank: { gt: 0 } },
-          include: {
-            region: true,
-            categories: { include: { category: true } },
-            lotSizes: { include: { lotSize: true } },
-          },
-          orderBy: [{ homeRank: 'asc' }, { reviewCount: 'desc' }],
-          take: 6,
-        })
-        .then((records) => records as SupplierSummaryPayload[]),
       prisma.review.findMany({
         where: { isApproved: true },
-        orderBy: { approvedAt: 'desc' },
+        orderBy: { createdAt: 'desc' },
         take: 5,
         include: {
           customer: {
@@ -36,42 +45,34 @@ export async function getHomepageContent() {
               name: true,
               heroImage: true,
               logoImage: true,
-              badges: true,
             },
           },
         },
       }),
-      listGuides({ featuredOnly: true, limit: 3 }),
       listCategories(),
       listRegions(),
-      listLotSizes(),
-      listFaq(),
       Promise.all([
         prisma.supplier.count(),
         prisma.review.count(),
-        prisma.guide.count(),
         prisma.category.count(),
       ]),
     ]);
 
-  const [supplierCount, reviewCount, guideCount, categoryCount] = stats;
+  const [supplierCount, reviewCount, categoryCount] = stats;
 
   const featuredSuppliers = featuredSuppliersRaw.map((supplier: SupplierSummaryPayload) => mapSupplierSummary(supplier));
 
   const spotlightReviews = latestReviews.map((review: (typeof latestReviews)[number]) => ({
-    title: review.title,
-    author: `${review.customer.firstName} ${review.customer.lastName}`,
-    company: null,
+    author: review.author,
     ratingOverall: review.ratingOverall,
-    highlights: review.highlights,
     body: review.body,
-    publishedAt: review.approvedAt?.toISOString() || review.createdAt.toISOString(),
+    images: review.images,
+    publishedAt: review.createdAt.toISOString(),
     supplier: {
       slug: review.supplier.slug,
       name: review.supplier.name,
       heroImage: review.supplier.heroImage,
       logoImage: review.supplier.logoImage,
-      badges: review.supplier.badges,
     },
   }));
 
@@ -85,24 +86,16 @@ export async function getHomepageContent() {
     .sort((a: (typeof regions)[number], b: (typeof regions)[number]) => b.supplierCount - a.supplierCount)
     .slice(0, 4);
 
-  const spotlightLotSizes = lotSizes.slice(0, 3);
-
-  const quickFaq = faqs.slice(0, 4);
-
   return {
     stats: {
       suppliers: supplierCount,
       reviews: reviewCount,
-      guides: guideCount,
       categories: categoryCount,
     },
     featuredSuppliers,
     spotlightReviews,
-    featuredGuides,
     categories: topCategories,
     regions: topRegions,
-    lotSizes: spotlightLotSizes,
-    faqs: quickFaq,
   };
 }
 

@@ -4,14 +4,15 @@ import { GuideCard } from '@/components/guide-card';
 import { SectionHeading } from '@/components/section-heading';
 
 export default async function GuidesPage() {
-  const guides = await api.guides.list();
+  // Guides API not yet implemented
+  const guides: any[] = [];
 
   return (
     <div className="bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Guides"
-          title="Playbooks from Destockify sourcing strategists"
+          title="Playbooks from Trust Pallet sourcing strategists"
           description="Practical frameworks covering supplier vetting, warehouse staffing, truckload modeling, and risk mitigation."
         />
 

@@ -56,7 +56,7 @@ export default async function LocationDetailPage(props: any) {
           />
           {suppliersResult.items.length === 0 ? (
             <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center text-sm text-slate-600">
-              No suppliers published for this region yet. Destockify is onboarding additional partners—reach out if you
+              No suppliers published for this region yet. Trust Pallet is onboarding additional partners—reach out if you
               need introductions in this market.
             </div>
           ) : (
@@ -80,7 +80,7 @@ export default async function LocationDetailPage(props: any) {
           <SectionHeading
             eyebrow="Popular Categories"
             title="Top categories leaving this market"
-            description="Based on the suppliers Destockify tracks, these categories see the highest load velocity from this hub."
+            description="Based on the suppliers Trust Pallet tracks, these categories see the highest load velocity from this hub."
           />
           <div className="grid gap-4 md:grid-cols-2">
             {categories

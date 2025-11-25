@@ -15,21 +15,26 @@ type SupplierItem = {
   description: string | null;
   heroImage: string | null;
   logoImage: string | null;
-  averageRating: number | null;
-  reviewCount: number;
   isVerified?: boolean;
   isScam?: boolean;
   createdAt: string;
-  region: { name: string; slug: string } | null;
+  streetAddress?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  region?: {
+    id: number;
+    name: string;
+    slug: string;
+  } | null;
 };
 
 type Review = {
   id: number;
-  title: string | null;
   author: string;
-  company: string | null;
   ratingOverall: number;
   body: string;
+  images: string[];
   isApproved: boolean;
   createdAt: string;
   customer: {
@@ -60,18 +65,20 @@ export default function CompaniesPage() {
     email: '',
     heroImage: '',
     logoImage: '',
-    minimumOrder: '',
-    leadTime: '',
-    specialties: [] as string[],
-    certifications: [] as string[],
-    badges: [] as string[],
-    logisticsNotes: '',
-    pricingNotes: '',
-    trustScore: 0,
     isVerified: false,
     isScam: false,
     homeRank: 0,
+    socialLink: '',
+    images: [] as Array<{ id?: number; url: string; caption: string; isPrimary: boolean; order: number }>,
+    streetAddress: '',
+    city: '',
+    state: '',
+    country: '',
+    regionId: null as number | null,
+    categoryIds: [] as number[],
   });
+  const [categories, setCategories] = useState<Array<{ id: number; slug: string; name: string }>>([]);
+  const [regions, setRegions] = useState<Array<{ id: number; slug: string; name: string }>>([]);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -83,6 +90,24 @@ export default function CompaniesPage() {
         .finally(() => setLoading(false));
     }
   }, [authToken, search]);
+
+  useEffect(() => {
+    const loadCatalog = async () => {
+      try {
+        const [cats, regs] = await Promise.all([
+          api.catalog.categories(),
+          api.catalog.regions(),
+        ]);
+        // We need IDs but API returns slugs - we'll need to map or fetch differently
+        // For now, store with slug and we'll handle ID mapping when needed
+        setCategories(cats.map((c, idx) => ({ id: idx + 1, slug: c.slug, name: c.name })));
+        setRegions(regs.map((r, idx) => ({ id: idx + 1, slug: r.slug, name: r.name })));
+      } catch (error) {
+        console.error('Failed to load catalog:', error);
+      }
+    };
+    loadCatalog();
+  }, []);
 
   const handleSelectSupplier = async (supplier: SupplierItem) => {
     setSelectedSupplier(supplier);
@@ -103,17 +128,17 @@ export default function CompaniesPage() {
         email: fullSupplier.email || '',
         heroImage: fullSupplier.heroImage || '',
         logoImage: fullSupplier.logoImage || '',
-        minimumOrder: fullSupplier.minimumOrder || '',
-        leadTime: fullSupplier.leadTime || '',
-        specialties: fullSupplier.specialties || [],
-        certifications: fullSupplier.certifications || [],
-        badges: fullSupplier.badges || [],
-        logisticsNotes: fullSupplier.logisticsNotes || '',
-        pricingNotes: fullSupplier.pricingNotes || '',
-        trustScore: fullSupplier.trustScore || 0,
         isVerified: fullSupplier.isVerified || false,
         isScam: fullSupplier.isScam || false,
         homeRank: fullSupplier.homeRank || 0,
+        socialLink: fullSupplier.socialLink || '',
+        images: fullSupplier.images || [],
+        streetAddress: fullSupplier.streetAddress || '',
+        city: fullSupplier.city || '',
+        state: fullSupplier.state || '',
+        country: fullSupplier.country || '',
+        regionId: fullSupplier.regionId || null,
+        categoryIds: fullSupplier.categoryIds || [],
       });
 
       // Fetch reviews
@@ -133,7 +158,17 @@ export default function CompaniesPage() {
 
     setSaving(true);
     try {
-      await api.suppliers.update(selectedSupplier.id, formData, authToken);
+      // Prepare payload with all fields including new ones
+      const payload = {
+        ...formData,
+        socialLink: formData.socialLink || undefined,
+        images: formData.images.map((img, idx) => ({
+          ...img,
+          order: idx,
+        })),
+      };
+      
+      await api.suppliers.update(selectedSupplier.id, payload, authToken);
       
       // Update the supplier in the list
       setSuppliers(suppliers.map(s => 
@@ -207,17 +242,15 @@ export default function CompaniesPage() {
                   }`}
                 >
                   <div className="font-medium text-slate-900 text-sm">{supplier.name}</div>
-                  <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
-                    {supplier.averageRating ? (
-                      <span>{supplier.averageRating.toFixed(1)}⭐</span>
-                    ) : (
-                      <span>No rating</span>
-                    )}
-                    <span>•</span>
-                    <span>{supplier.reviewCount} reviews</span>
-                  </div>
                   {supplier.region && (
-                    <div className="text-xs text-slate-500 mt-1">{supplier.region.name}</div>
+                    <div className="text-xs text-slate-500 mt-1">
+                      {supplier.region.name}
+                    </div>
+                  )}
+                  {(supplier.city || supplier.state || supplier.country) && (
+                    <div className="text-xs text-slate-500 mt-1">
+                      {[supplier.city, supplier.state, supplier.country].filter(Boolean).join(', ')}
+                    </div>
                   )}
                 </button>
               ))
@@ -346,88 +379,93 @@ export default function CompaniesPage() {
                     </div>
                   </div>
 
-                  {/* Business Details */}
+                  {/* Address Information */}
                   <div className="pb-3 border-b border-slate-200">
-                    <h3 className="text-sm font-semibold text-slate-900 mb-3">Business Details</h3>
+                    <h3 className="text-sm font-semibold text-slate-900 mb-3">Address Information</h3>
                     <div className="space-y-3">
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-1">Minimum Order</label>
-                          <input
-                            type="text"
-                            value={formData.minimumOrder}
-                            onChange={(e) => setFormData({ ...formData, minimumOrder: e.target.value })}
-                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                            placeholder="e.g., 1 pallet"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-1">Lead Time</label>
-                          <input
-                            type="text"
-                            value={formData.leadTime}
-                            onChange={(e) => setFormData({ ...formData, leadTime: e.target.value })}
-                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                            placeholder="e.g., 2-3 days"
-                          />
-                        </div>
-                      </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Logistics Notes</label>
-                        <textarea
-                          value={formData.logisticsNotes}
-                          onChange={(e) => setFormData({ ...formData, logisticsNotes: e.target.value })}
-                          rows={2}
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Street Address</label>
+                        <input
+                          type="text"
+                          value={formData.streetAddress}
+                          onChange={(e) => setFormData({ ...formData, streetAddress: e.target.value })}
                           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                          placeholder="Shipping info..."
+                          placeholder="123 Main St"
                         />
                       </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">City</label>
+                          <input
+                            type="text"
+                            value={formData.city}
+                            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                            placeholder="New York"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">State</label>
+                          <input
+                            type="text"
+                            value={formData.state}
+                            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                            placeholder="NY"
+                          />
+                        </div>
+                      </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Pricing Notes</label>
-                        <textarea
-                          value={formData.pricingNotes}
-                          onChange={(e) => setFormData({ ...formData, pricingNotes: e.target.value })}
-                          rows={2}
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Country</label>
+                        <input
+                          type="text"
+                          value={formData.country}
+                          onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                          placeholder="Pricing structure..."
+                          placeholder="United States"
                         />
                       </div>
                     </div>
                   </div>
 
-                  {/* Tags & Classifications */}
+                  {/* Region & Categories */}
                   <div className="pb-3 border-b border-slate-200">
-                    <h3 className="text-sm font-semibold text-slate-900 mb-3">Tags & Classifications</h3>
+                    <h3 className="text-sm font-semibold text-slate-900 mb-3">Region & Categories</h3>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Specialties</label>
-                        <input
-                          type="text"
-                          value={formData.specialties.join(', ')}
-                          onChange={(e) => setFormData({ ...formData, specialties: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Region</label>
+                        <select
+                          value={formData.regionId || ''}
+                          onChange={(e) => setFormData({ ...formData, regionId: e.target.value ? Number(e.target.value) : null })}
                           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                          placeholder="Electronics, Apparel (comma-separated)"
-                        />
+                        >
+                          <option value="">No region</option>
+                          {regions.map((r) => (
+                            <option key={r.id} value={r.id}>{r.name}</option>
+                          ))}
+                        </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Certifications</label>
-                        <input
-                          type="text"
-                          value={formData.certifications.join(', ')}
-                          onChange={(e) => setFormData({ ...formData, certifications: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
-                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                          placeholder="ISO 9001, BBB (comma-separated)"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Badges</label>
-                        <input
-                          type="text"
-                          value={formData.badges.join(', ')}
-                          onChange={(e) => setFormData({ ...formData, badges: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
-                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                          placeholder="Top Rated, Fast Shipping (comma-separated)"
-                        />
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Categories</label>
+                        <div className="space-y-2">
+                          {categories.map((cat) => (
+                            <label key={cat.id} className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={formData.categoryIds.includes(cat.id)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setFormData({ ...formData, categoryIds: [...formData.categoryIds, cat.id] });
+                                  } else {
+                                    setFormData({ ...formData, categoryIds: formData.categoryIds.filter(id => id !== cat.id) });
+                                  }
+                                }}
+                                className="rounded border-slate-300"
+                              />
+                              <span className="text-sm text-slate-700">{cat.name}</span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -436,31 +474,121 @@ export default function CompaniesPage() {
                   <div>
                     <h3 className="text-sm font-semibold text-slate-900 mb-3">Status & Ranking</h3>
                     <div className="space-y-3">
-                      <div className="grid gap-3 grid-cols-2">
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-1">Trust Score</label>
-                          <input
-                            type="number"
-                            min="0"
-                            max="100"
-                            value={formData.trustScore}
-                            onChange={(e) => setFormData({ ...formData, trustScore: parseInt(e.target.value) || 0 })}
-                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-1">Home Rank</label>
-                          <input
-                            type="number"
-                            min="0"
-                            value={formData.homeRank}
-                            onChange={(e) => setFormData({ ...formData, homeRank: parseInt(e.target.value) || 0 })}
-                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                          />
-                        </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Home Rank</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={formData.homeRank}
+                          onChange={(e) => setFormData({ ...formData, homeRank: parseInt(e.target.value) || 0 })}
+                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          placeholder="0 = not featured, higher = more prominent"
+                        />
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Social Link */}
+              <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="text-xl font-semibold text-slate-900 mb-4">Social Link</h2>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Social Media URL</label>
+                  <input
+                    type="url"
+                    value={formData.socialLink}
+                    onChange={(e) => setFormData({ ...formData, socialLink: e.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                    placeholder="https://facebook.com/company or https://instagram.com/company"
+                  />
+                </div>
+              </div>
+
+              {/* Company Images */}
+              <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="text-xl font-semibold text-slate-900 mb-4">Company Images</h2>
+                <div className="space-y-4">
+                  {formData.images.map((img, idx) => (
+                    <div key={idx} className="flex gap-4 items-start p-4 border border-slate-200 rounded-lg">
+                      <div className="flex-shrink-0 w-32 h-32 bg-slate-100 rounded-lg overflow-hidden">
+                        {img.url ? (
+                          <img src={img.url} alt={img.caption || `Image ${idx + 1}`} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">No image</div>
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <div>
+                          <label className="block text-xs font-medium text-slate-700 mb-1">Image URL</label>
+                          <input
+                            type="url"
+                            value={img.url}
+                            onChange={(e) => {
+                              const newImages = [...formData.images];
+                              newImages[idx] = { ...newImages[idx], url: e.target.value };
+                              setFormData({ ...formData, images: newImages });
+                            }}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                            placeholder="https://..."
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-slate-700 mb-1">Caption</label>
+                          <input
+                            type="text"
+                            value={img.caption || ''}
+                            onChange={(e) => {
+                              const newImages = [...formData.images];
+                              newImages[idx] = { ...newImages[idx], caption: e.target.value };
+                              setFormData({ ...formData, images: newImages });
+                            }}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                            placeholder="Image caption..."
+                          />
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={img.isPrimary}
+                              onChange={(e) => {
+                                const newImages = formData.images.map((im, i) => ({
+                                  ...im,
+                                  isPrimary: i === idx ? e.target.checked : false,
+                                }));
+                                setFormData({ ...formData, images: newImages });
+                              }}
+                              className="rounded border-slate-300"
+                            />
+                            <span className="text-xs text-slate-600">Primary image</span>
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newImages = formData.images.filter((_, i) => i !== idx);
+                              setFormData({ ...formData, images: newImages });
+                            }}
+                            className="text-xs text-red-600 hover:text-red-700"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData({
+                        ...formData,
+                        images: [...formData.images, { url: '', caption: '', isPrimary: formData.images.length === 0, order: formData.images.length }],
+                      });
+                    }}
+                    className="w-full rounded-lg border-2 border-dashed border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 hover:border-blue-500 hover:text-blue-600 transition-colors"
+                  >
+                    + Add Image
+                  </button>
                 </div>
               </div>
 
@@ -514,7 +642,7 @@ export default function CompaniesPage() {
                   <div>
                     <h2 className="text-xl font-semibold text-slate-900">Reviews</h2>
                     <p className="mt-1 text-sm text-slate-600">
-                      {reviews.length} total • Average: {selectedSupplier?.averageRating?.toFixed(1) || 'N/A'}⭐
+                      {reviews.length} total reviews
                     </p>
                   </div>
                   <button
@@ -589,7 +717,6 @@ function AddReviewForm({ supplierId, authToken, onSuccess, onCancel }: { supplie
 
   const [formData, setFormData] = useState({
     author: '',
-    title: '',
     body: '',
     ratingOverall: 5,
     createdAt: getLocalDateString(),
@@ -603,9 +730,8 @@ function AddReviewForm({ supplierId, authToken, onSuccess, onCancel }: { supplie
       await api.reviews.adminCreate({
         supplierId,
         author: formData.author,
-        title: formData.title || undefined,
         body: formData.body,
-        ratingOverall: formData.ratingOverall,
+        ratingOverall: formData.ratingOverall, // Single 1-5 integer rating
         isApproved: formData.isApproved,
         createdAt: formData.createdAt,
       }, authToken);
@@ -626,15 +752,6 @@ function AddReviewForm({ supplierId, authToken, onSuccess, onCancel }: { supplie
           required
           value={formData.author}
           onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
-        <input
-          type="text"
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
         />
       </div>
@@ -714,7 +831,7 @@ function ReviewItem({ review, authToken, isEditing, onEdit, onCancel, onSave, on
 }) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: review.title || '',
+    author: review.author,
     body: review.body,
     ratingOverall: review.ratingOverall,
     createdAt: review.createdAt.split('T')[0],
@@ -725,7 +842,7 @@ function ReviewItem({ review, authToken, isEditing, onEdit, onCancel, onSave, on
     setLoading(true);
     try {
       await api.reviews.adminUpdate(review.id, {
-        title: formData.title || undefined,
+        author: formData.author,
         body: formData.body,
         ratingOverall: formData.ratingOverall,
         createdAt: formData.createdAt,
@@ -757,11 +874,11 @@ function ReviewItem({ review, authToken, isEditing, onEdit, onCancel, onSave, on
       <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-4 space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">Title</label>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Author</label>
             <input
               type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              value={formData.author}
+              onChange={(e) => setFormData({ ...formData, author: e.target.value })}
               className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
             />
           </div>
@@ -835,18 +952,14 @@ function ReviewItem({ review, authToken, isEditing, onEdit, onCancel, onSave, on
           <div className="flex items-center gap-3 mb-2">
             <span className="text-lg font-semibold text-slate-900">{review.ratingOverall}⭐</span>
             {review.isApproved ? (
-              <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-800">Approved</span>
+              <span className="rounded-md bg-blue-600/10 px-2.5 py-1 text-xs font-medium text-blue-600">Approved</span>
             ) : (
-              <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">Pending</span>
+              <span className="rounded-md bg-black/5 px-2.5 py-1 text-xs font-medium text-black/70">Pending</span>
             )}
           </div>
-          {review.title && (
-            <h3 className="font-medium text-slate-900 mb-1">{review.title}</h3>
-          )}
           <p className="text-sm text-slate-700 mb-2">{review.body}</p>
           <div className="flex items-center gap-4 text-xs text-slate-500">
             <span>By: {review.author}</span>
-            {review.company && <span>• {review.company}</span>}
             <span>• {new Date(review.createdAt).toLocaleDateString()}</span>
           </div>
         </div>

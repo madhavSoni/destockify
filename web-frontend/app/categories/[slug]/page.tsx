@@ -7,10 +7,9 @@ import { SectionHeading } from '@/components/section-heading';
 
 export default async function CategoryDetailPage(props: any) {
   const { params } = props;
-  const [categories, suppliersResult, guides] = await Promise.all([
+  const [categories, suppliersResult] = await Promise.all([
     api.catalog.categories(),
     api.suppliers.list({ category: params.slug, limit: 12 }),
-    api.guides.list(),
   ]);
 
   const category = categories.find((item) => item.slug === params.slug);
@@ -18,7 +17,7 @@ export default async function CategoryDetailPage(props: any) {
     notFound();
   }
 
-  const relatedGuides = guides.filter((guide) => guide.categories?.some((entry) => entry.slug === category.slug));
+  const relatedGuides: any[] = [];
 
   return (
     <div className="bg-slate-50">
@@ -41,7 +40,7 @@ export default async function CategoryDetailPage(props: any) {
           />
           {suppliersResult.items.length === 0 ? (
             <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center text-sm text-slate-600">
-              No suppliers published in this category yet. Destockify is onboarding new partners weekly—check back soon or
+              No suppliers published in this category yet. Trust Pallet is onboarding new partners weekly—check back soon or
               request a sourcing consult.
             </div>
           ) : (

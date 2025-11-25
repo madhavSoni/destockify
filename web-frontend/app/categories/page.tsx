@@ -134,7 +134,7 @@ export default async function CategoriesPage() {
                   </span>
                 </summary>
                 <div className={`${hand.className} mt-4 px-5 pb-5 text-base text-slate-700 leading-relaxed`}>
-                  Supplier profiles, ratings, and lot availability are refreshed weekly by Destockify analysts. Subscribers receive alerts when new categories or truckload programs become available.
+                  Supplier profiles, ratings, and lot availability are refreshed weekly by Trust Pallet analysts. Subscribers receive alerts when new categories or truckload programs become available.
                 </div>
               </details>
 
@@ -142,7 +142,7 @@ export default async function CategoriesPage() {
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5">
                   <div>
                     <div className={`${hand.className} text-base font-semibold text-xl text-slate-900`}>
-                      How are Destockify suppliers vetted?
+                      How are Trust Pallet suppliers vetted?
                     </div>
                     <div className="text-sm uppercase tracking-wide text-slate-400">Getting Started</div>
                   </div>
@@ -176,7 +176,7 @@ export default async function CategoriesPage() {
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5">
                   <div>
                     <div className={`${hand.className} text-base font-semibold text-xl text-slate-900`}>
-                      Can Destockify help me negotiate freight?
+                      Can Trust Pallet help me negotiate freight?
                     </div>
                     <div className="text-sm uppercase tracking-wide text-slate-400">Logistics & Freight</div>
                   </div>
