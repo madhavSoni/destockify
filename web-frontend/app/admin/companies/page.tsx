@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import Link from 'next/link';
@@ -24,6 +25,7 @@ interface SupplierSummary {
 }
 
 export default function CompaniesPage() {
+  const router = useRouter();
   const { authToken } = useAuth();
   const [suppliers, setSuppliers] = useState<SupplierSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +84,11 @@ export default function CompaniesPage() {
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {suppliers.map((supplier) => (
-                <tr key={supplier.id} className="hover:bg-gray-50">
+                <tr
+                  key={supplier.id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => router.push(`/admin/companies/${supplier.id}`)}
+                >
                   <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{supplier.name}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
                     {supplier.region?.name || '—'}
@@ -110,7 +116,7 @@ export default function CompaniesPage() {
                   <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
                     {new Date(supplier.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium">
+                  <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium" onClick={(e) => e.stopPropagation()}>
                     <Link
                       href={`/admin/companies/${supplier.id}`}
                       className="text-blue-600 hover:text-blue-900"
