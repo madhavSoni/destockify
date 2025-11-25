@@ -19,3 +19,5 @@ echo "Or create a new project:"
 echo "  gcloud projects create destockify-prod --name='Destockify Production'"
 echo "  gcloud billing projects link destockify-prod --billing-account=YOUR_BILLING_ACCOUNT_ID"
 
+
+
