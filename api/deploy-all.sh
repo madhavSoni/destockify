@@ -61,13 +61,19 @@ echo ""
 echo "🔧 Updating backend CORS..."
 cd ../api
 
-# Get both frontend URLs
+# Get frontend URL
 FRONTEND_CUSTOM=$(gcloud run services describe destockify-frontend --region $REGION --format 'value(status.url)')
 
-# Update CORS to include frontend URL (properly escape the comma-separated value)
+# Build CORS origins list - include frontend URL and localhost for development
+CORS_ORIGINS="${FRONTEND_CUSTOM},http://localhost:3000"
+
+# Update CORS_ORIGINS - use alternate delimiter (^|^) to escape commas in the value
+# This tells gcloud to use | as the delimiter instead of comma
 gcloud run services update destockify-api \
   --region $REGION \
-  --update-env-vars "CORS_ORIGINS=${FRONTEND_CUSTOM},http://localhost:3000"
+  --update-env-vars "^|^CORS_ORIGINS=${CORS_ORIGINS}"
+
+echo "✅ CORS updated successfully"
 
 echo ""
 echo "✅ Deployment complete!"
