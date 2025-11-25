@@ -64,10 +64,10 @@ cd ../api
 # Get both frontend URLs
 FRONTEND_CUSTOM=$(gcloud run services describe destockify-frontend --region $REGION --format 'value(status.url)')
 
-# Update CORS to include frontend URL
+# Update CORS to include frontend URL (properly escape the comma-separated value)
 gcloud run services update destockify-api \
   --region $REGION \
-  --update-env-vars CORS_ORIGINS="${FRONTEND_CUSTOM},http://localhost:3000"
+  --update-env-vars "CORS_ORIGINS=${FRONTEND_CUSTOM},http://localhost:3000"
 
 echo ""
 echo "✅ Deployment complete!"
