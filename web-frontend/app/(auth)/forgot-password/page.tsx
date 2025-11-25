@@ -57,7 +57,7 @@ export default function ForgotPasswordPage() {
               </p>
               <Link
                 href="/login"
-                className="font-bold inline-block px-6 py-3 rounded-2xl bg-[#2f6feb] text-white text-base shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200"
+                className="font-bold inline-block px-6 py-3 rounded-2xl bg-[#3388FF] text-white text-base shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2670E6] active:translate-y-0 transition-all duration-200"
               >
                 Back to Login
               </Link>
@@ -103,7 +103,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="font-bold w-full h-14 rounded-2xl bg-[#2f6feb] text-white text-lg shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2563eb] active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              className="font-bold w-full h-14 rounded-2xl bg-[#3388FF] text-white text-lg shadow-[4px_5px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-2px] hover:shadow-[5px_6px_0_0_rgba(2,6,23,0.85)] hover:bg-[#2670E6] active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
               {isLoading ? 'Sending...' : 'Send Reset Link'}
             </button>

@@ -38,7 +38,7 @@ export async function sendVerificationEmail(email: string, verificationToken: st
                 background: white;
               }
               .header { 
-                background: linear-gradient(135deg, #2f6feb 0%, #1e40af 100%);
+                background: linear-gradient(135deg, #3388FF 0%, #2670E6 100%);
                 color: white; 
                 padding: 40px 30px; 
                 text-align: center; 
@@ -69,7 +69,7 @@ export async function sendVerificationEmail(email: string, verificationToken: st
               }
               .button { 
                 display: inline-block;
-                background: #2f6feb;
+                background: #3388FF;
                 color: white !important;
                 padding: 14px 32px;
                 text-decoration: none;
@@ -90,7 +90,7 @@ export async function sendVerificationEmail(email: string, verificationToken: st
                 padding: 12px;
                 border-radius: 8px;
                 word-break: break-all;
-                color: #2f6feb;
+                color: #3388FF;
                 font-size: 14px;
                 border: 2px solid #e2e8f0;
               }

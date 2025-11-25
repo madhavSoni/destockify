@@ -33,7 +33,7 @@ export default async function LotSizesPage() {
         <div className="mt-4 flex justify-center">
           <Link
             href="/suppliers"
-            className={`${hand.className} inline-flex items-center justify-center rounded-[12px] bg-[#2f6feb] px-4 py-2 text-white text-sm shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 transition hover:-translate-y-[1px]`}
+            className={`${hand.className} inline-flex items-center justify-center rounded-[12px] bg-[#3388FF] px-4 py-2 text-white text-sm shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 transition hover:-translate-y-[1px]`}
           >
             Marketplace
           </Link>

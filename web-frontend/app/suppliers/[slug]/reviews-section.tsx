@@ -167,7 +167,7 @@ export function ReviewsSection({
                   <div key={stars} className="flex items-center gap-3">
                     <div className="w-14 text-sm font-semibold text-black flex items-center gap-1.5">
                       {stars}
-                      <svg className="w-4 h-4" fill="#2563eb" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4" fill="#3388FF" viewBox="0 0 24 24">
                         <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                       </svg>
                     </div>
@@ -393,8 +393,8 @@ function RatingStars({ rating }: { rating: number }) {
           <svg
             key={i}
             className="w-5 h-5"
-            fill={isFilled ? "#2563eb" : isHalf ? "#2563eb" : "none"}
-            stroke="#2563eb"
+            fill={isFilled ? "#3388FF" : isHalf ? "#3388FF" : "none"}
+            stroke="#3388FF"
             strokeWidth={isFilled || isHalf ? 0 : 1.5}
             viewBox="0 0 24 24"
           >
@@ -402,13 +402,13 @@ function RatingStars({ rating }: { rating: number }) {
               <>
                 <defs>
                   <linearGradient id={`half-review-${i}`}>
-                    <stop offset="50%" stopColor="#2563eb" />
+                    <stop offset="50%" stopColor="#3388FF" />
                     <stop offset="50%" stopColor="white" />
                   </linearGradient>
                 </defs>
                 <path
                   fill={`url(#half-review-${i})`}
-                  stroke="#2563eb"
+                  stroke="#3388FF"
                   strokeWidth={1.5}
                   d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
                 />
@@ -437,8 +437,8 @@ function InteractiveStars({ rating, onRatingChange }: { rating: number; onRating
         >
           <svg
             className="w-7 h-7 sm:w-8 sm:h-8"
-            fill={star <= rating ? "#2563eb" : "none"}
-            stroke="#2563eb"
+            fill={star <= rating ? "#3388FF" : "none"}
+            stroke="#3388FF"
             strokeWidth={star <= rating ? 0 : 1.5}
             viewBox="0 0 24 24"
           >

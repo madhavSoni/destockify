@@ -196,8 +196,8 @@ export function WriteReviewSection({
                 >
                   <svg
                     className="w-9 h-9 sm:w-10 sm:h-10"
-                    fill={star <= formData.ratingOverall ? "#2563eb" : "none"}
-                    stroke="#2563eb"
+                    fill={star <= formData.ratingOverall ? "#3388FF" : "none"}
+                    stroke="#3388FF"
                     strokeWidth={star <= formData.ratingOverall ? 0 : 1.5}
                     viewBox="0 0 24 24"
                   >

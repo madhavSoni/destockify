@@ -34,7 +34,7 @@ export default async function CategoriesPage() {
         <div className="mt-4 flex justify-center">
           <Link
             href="/suppliers"
-            className={`${hand.className} inline-flex items-center justify-center rounded-[12px] bg-[#2f6feb] px-4 py-2 text-white text-sm shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-1px] transition`}
+            className={`${hand.className} inline-flex items-center justify-center rounded-[12px] bg-[#3388FF] px-4 py-2 text-white text-sm shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-1px] transition`}
           >
             Marketplace
           </Link>
@@ -82,7 +82,7 @@ export default async function CategoriesPage() {
                 </p>
                 <Link
                   href="/suppliers?category=electronics"
-                  className={`${hand.className} mt-5 inline-flex items-center justify-center rounded-[12px] bg-[#2f6feb] px-4 py-2 text-white text-sm shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-1px] transition`}
+                  className={`${hand.className} mt-5 inline-flex items-center justify-center rounded-[12px] bg-[#3388FF] px-4 py-2 text-white text-sm shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-1px] transition`}
                 >
                   Browse
                 </Link>
@@ -101,7 +101,7 @@ export default async function CategoriesPage() {
                 </p>
                 <Link
                   href="/suppliers?category=clothing"
-                  className={`${hand.className} mt-5 inline-flex items-center justify-center rounded-[12px] bg-[#2f6feb] px-4 py-2 text-white text-sm shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-1px] transition`}
+                  className={`${hand.className} mt-5 inline-flex items-center justify-center rounded-[12px] bg-[#3388FF] px-4 py-2 text-white text-sm shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 hover:translate-y-[-1px] transition`}
                 >
                   Browse
                 </Link>

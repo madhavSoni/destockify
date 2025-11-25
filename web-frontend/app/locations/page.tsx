@@ -21,7 +21,7 @@ export default async function LocationsPage() {
         <div className="mt-4 flex justify-center">
           <Link
             href="/suppliers"
-            className={`${hand.className} inline-flex items-center justify-center rounded-[12px] bg-[#2f6feb] px-4 py-2 text-white text-sm shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 transition hover:-translate-y-[1px]`}
+            className={`${hand.className} inline-flex items-center justify-center rounded-[12px] bg-[#3388FF] px-4 py-2 text-white text-sm shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80 transition hover:-translate-y-[1px]`}
           >
             Marketplace
           </Link>
@@ -69,7 +69,7 @@ export default async function LocationsPage() {
               </p>
               <Link
                 href="/suppliers?region=florida"
-                className={`${hand.className} mt-5 inline-flex items-center justify-center rounded-[10px] bg-[#2f6feb] px-4 py-2 text-white text-base shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80`}
+                className={`${hand.className} mt-5 inline-flex items-center justify-center rounded-[10px] bg-[#3388FF] px-4 py-2 text-white text-base shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80`}
               >
                 Browse
               </Link>
@@ -88,7 +88,7 @@ export default async function LocationsPage() {
               </p>
               <Link
                 href="/suppliers"
-                className={`${hand.className} mt-5 inline-flex items-center justify-center rounded-[10px] bg-[#2f6feb] px-4 py-2 text-white text-base shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80`}
+                className={`${hand.className} mt-5 inline-flex items-center justify-center rounded-[10px] bg-[#3388FF] px-4 py-2 text-white text-base shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] ring-2 ring-slate-900/80`}
               >
                 Browse
               </Link>
