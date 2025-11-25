@@ -1,15 +1,15 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Inter } from 'next/font/google';
+import { Sora } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import { SiteHeader } from '@/components/site-header';
 import './globals.css';
 
-const inter = Inter({
-  variable: '--font-inter',
+const sora = Sora({
+  variable: '--font-sora',
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
+  weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
 });
 
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} bg-white text-black antialiased`}>
+      <body className={`${sora.variable} bg-white text-black antialiased`}>
         <Providers>
           <div className="flex min-h-screen flex-col">
             <SiteHeader />
@@ -51,7 +51,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 function SiteFooter() {
   return (
-    <footer className="border-t border-black/10 bg-white">
+    <footer className="border-t border-black/10 bg-white relative">
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-600/20 to-transparent" />
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-12 sm:px-6 lg:flex-row lg:items-start lg:justify-between lg:px-8">
         <div className="max-w-md space-y-3">
           <Link href="/" className="text-lg font-semibold text-black">
@@ -66,20 +67,20 @@ function SiteFooter() {
         <div className="grid grid-cols-2 gap-10 text-sm text-black/70 sm:grid-cols-3">
           <div className="space-y-2">
             <p className="font-semibold text-black">Marketplace</p>
-            <Link href="/suppliers" className="block hover:text-blue-600">Supplier directory</Link>
-            <Link href="/categories" className="block hover:text-blue-600">Categories</Link>
-            <Link href="/locations" className="block hover:text-blue-600">Locations</Link>
+            <Link href="/suppliers" className="block hover:text-blue-600 transition-colors duration-200">Supplier directory</Link>
+            <Link href="/categories" className="block hover:text-blue-600 transition-colors duration-200">Categories</Link>
+            <Link href="/locations" className="block hover:text-blue-600 transition-colors duration-200">Locations</Link>
           </div>
           <div className="space-y-2">
             <p className="font-semibold text-black">Resources</p>
-            <Link href="/suppliers?search=export" className="block hover:text-blue-600">Export programs</Link>
-            <Link href="/suppliers?search=contract" className="block hover:text-blue-600">Contract loads</Link>
+            <Link href="/suppliers?search=export" className="block hover:text-blue-600 transition-colors duration-200">Export programs</Link>
+            <Link href="/suppliers?search=contract" className="block hover:text-blue-600 transition-colors duration-200">Contract loads</Link>
           </div>
           <div className="space-y-2">
             <p className="font-semibold text-black">Company</p>
-            <Link href="/list-your-business" className="block hover:text-blue-600">Become a partner</Link>
-            <Link href="/contact" className="block hover:text-blue-600">Contact</Link>
-            <Link href="/privacy" className="block hover:text-blue-600">Privacy</Link>
+            <Link href="/list-your-business" className="block hover:text-blue-600 transition-colors duration-200">Become a partner</Link>
+            <Link href="/contact" className="block hover:text-blue-600 transition-colors duration-200">Contact</Link>
+            <Link href="/privacy" className="block hover:text-blue-600 transition-colors duration-200">Privacy</Link>
           </div>
         </div>
       </div>

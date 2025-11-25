@@ -51,7 +51,7 @@ export function StateSelector({ regions }: { regions: Region[] }) {
           <select
             value={selectedState}
             onChange={(e) => setSelectedState(e.target.value)}
-            className="h-14 w-full appearance-none rounded-md border-2 border-black/10 bg-white px-5 pr-12 text-base text-black shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+            className="h-14 w-full appearance-none rounded-md border-2 border-black/10 bg-white px-5 pr-12 text-base text-black shadow-sm hover:border-blue-600/50 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
           >
             <option value="">Shop by State</option>
             {ALL_US_STATES.map((state) => (
@@ -68,7 +68,7 @@ export function StateSelector({ regions }: { regions: Region[] }) {
         </div>
         <button
           onClick={handleGo}
-          className="group h-14 rounded-md bg-blue-600 px-8 text-base font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all flex items-center gap-2"
+          className="group h-14 rounded-md bg-blue-600 px-8 text-base font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg flex items-center gap-2"
         >
           Go
           <svg 

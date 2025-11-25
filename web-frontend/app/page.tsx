@@ -1,16 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Inter } from 'next/font/google';
 import { api } from '@/lib/api';
 import { TrendingSuppliersRail } from '@/components/trending-suppliers-rail';
 import { generateWebsiteSchema, generateOrganizationSchema, schemaToJsonLd } from '@/lib/schema';
 import { StateSelector } from '@/components/state-selector';
-
-const inter = Inter({ 
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
-  display: 'swap',
-});
+import { SearchAutocomplete } from '@/components/search-autocomplete';
 
 export type HomepageData = Awaited<ReturnType<typeof api.home.get>>;
 type SupplierSummaryList = Awaited<ReturnType<typeof api.suppliers.featured>>;
@@ -56,7 +50,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: schemaToJsonLd(organizationSchema) }}
       />
 
-      <div className={`${inter.className} bg-white scroll-smooth`}>
+      <div className="bg-white scroll-smooth">
         <HeroSection />
 
         {/* Trending rail with half-peek card */}
@@ -77,9 +71,9 @@ export default async function HomePage() {
 /* --------------------------- HERO --------------------------- */
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden border-b border-black/10 min-h-[450px] sm:min-h-[500px]">
+    <section className="relative border-b border-black/10 min-h-[400px] sm:min-h-[500px]">
       {/* Background image */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 z-0">
         <Image
           src="/mainbg2.avif"
           alt=""
@@ -88,42 +82,28 @@ function HeroSection() {
           priority
           quality={90}
         />
-        {/* Dark overlay for text readability - lighter for more vibrant image */}
-        <div className="absolute inset-0 bg-black/30" />
+        {/* Dark overlay with subtle gradient for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40" />
       </div>
 
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
         {/* Left-anchored content block like Zillow */}
         <div className="max-w-xl space-y-4 sm:space-y-5">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight text-center sm:text-left antialiased m-0">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-tight text-center sm:text-left antialiased m-0">
         Suppliers. Pallets. Truckloads. Deals.
           </h1>
 
-          <p className="text-sm sm:text-base lg:text-lg leading-6 sm:leading-7 text-white/90">
+          <p className="text-base sm:text-lg lg:text-xl leading-relaxed text-white/90 font-normal">
             Discover vetted suppliers offering truckloads and pallets of returns, overstock and liquidations in your area.
           </p>
 
-          {/* Search bar – clean & simple */}
-          <form action="/suppliers" method="get" className="mt-6 sm:mt-8">
-            <div className="relative flex items-center rounded-md bg-white shadow-lg border border-black/10">
-              <input
-                type="search"
-                name="search"
-                placeholder="Search supplier or keywords"
-                className="h-14 sm:h-16 w-full bg-transparent border-0 text-sm sm:text-base text-black placeholder:text-black/50 focus:outline-none px-4 sm:px-6 pr-12 sm:pr-14"
-              />
-              <button
-                type="submit"
-                className="absolute right-2 sm:right-3 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-md text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-colors"
-                aria-label="Search"
-              >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
+          {/* Search bar with autocomplete */}
+          <div className="mt-6 sm:mt-8 relative z-30">
+            <div className="rounded-md bg-white shadow-lg border-2 border-black/10 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600 transition-all relative">
+              <SearchAutocomplete />
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </section>
@@ -166,24 +146,28 @@ function QuickActionsBar() {
   ];
 
   return (
-    <section className="border-y border-black/10 bg-white py-12 sm:py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="border-y border-black/10 bg-slate-50 py-12 sm:py-16 relative">
+      <div className="absolute inset-0 opacity-3 pointer-events-none" style={{
+        backgroundImage: 'linear-gradient(45deg, transparent 30%, rgba(0,85,255,0.05) 50%, transparent 70%)',
+        backgroundSize: '40px 40px'
+      }} />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item, index) => (
             <Link
               key={`${item.href}-${index}`}
               href={item.href}
-              className="group relative flex flex-col items-center rounded-md border-2 border-black/10 bg-white p-6 sm:p-8 text-center transition-all hover:shadow-lg hover:border-blue-600"
+              className="group relative flex flex-col items-center rounded-xl border-2 border-black/10 bg-white p-6 sm:p-8 text-center transition-all duration-300 hover:shadow-xl hover:border-blue-600 hover:-translate-y-1"
             >
-              <div className="relative mb-4 sm:mb-5 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-md bg-blue-600 text-white transition-all group-hover:bg-blue-700">
+              <div className="relative mb-4 sm:mb-5 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-md bg-blue-600 text-white transition-all duration-300 group-hover:bg-blue-700 group-hover:scale-105">
                 {item.icon}
               </div>
               
-              <h3 className="relative text-lg sm:text-xl font-bold text-black transition-colors group-hover:text-blue-600">
+              <h3 className="relative text-lg sm:text-xl font-bold text-slate-900 transition-colors group-hover:text-blue-600">
                 {item.label}
               </h3>
               
-              <p className="relative mt-2 sm:mt-3 text-sm leading-relaxed text-black/70">
+              <p className="relative mt-2 sm:mt-3 text-sm leading-relaxed text-slate-600">
                 {item.description}
               </p>
               
@@ -204,12 +188,18 @@ function QuickActionsBar() {
 /* -------------------- CONNECT BY STATE -------------------- */
 function ConnectByState({ regions }: { regions: any[] }) {
   return (
-    <section className="mx-auto w-full max-w-3xl px-4 py-12 sm:py-16 text-center sm:px-6 lg:px-8">
-      <h3 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-black">Connect with Verified Suppliers</h3>
-      <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-sm sm:text-base text-black/70">
-        Search for overstock, returns and liquidations by the pallet or truckload.
-      </p>
-      <StateSelector regions={regions} />
+    <section className="mx-auto w-full max-w-3xl px-4 py-12 sm:py-16 text-center sm:px-6 lg:px-8 relative">
+      <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
+        backgroundImage: 'radial-gradient(circle, #0055FF 1px, transparent 1px)',
+        backgroundSize: '24px 24px'
+      }} />
+      <div className="relative">
+        <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">Connect with Verified Suppliers</h3>
+        <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-base sm:text-lg text-slate-600 leading-relaxed">
+          Search for overstock, returns and liquidations by the pallet or truckload.
+        </p>
+        <StateSelector regions={regions} />
+      </div>
     </section>
   );
 }
@@ -217,10 +207,11 @@ function ConnectByState({ regions }: { regions: any[] }) {
 /* --------------------------- TWO IMAGE FEATURES ------------------------------ */
 function TwoUpFeatures() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-12 sm:py-16 lg:py-20 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 py-12 sm:py-16 lg:py-20 sm:px-6 lg:px-8 relative">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
       <div className="space-y-6 sm:space-y-8">
         {/* Feature 1: Split Layout - Image Left, Content Right */}
-        <article className="grid gap-0 overflow-hidden rounded-md border border-black/10 bg-white shadow-md md:grid-cols-2 md:h-[450px] lg:h-[500px]">
+        <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl md:grid-cols-2 md:h-[450px] lg:h-[500px]">
           <div className="relative h-64 sm:h-80 w-full md:h-full">
             <Image
               src="/feature-desk.png"
@@ -231,19 +222,19 @@ function TwoUpFeatures() {
             />
           </div>
           <div className="flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12">
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">
+            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
               Buy Truckload Liquidation Direct from Vetted Liquidators Near You
             </h3>
-            <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-6 sm:leading-7 text-black/70">
+            <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
               Source by the pallet or truckload for your bin stores, discount store, auction house and more! Buy
               truckloads of returns, overstock and liquidations directly from Amazon, Target, Walmart, Home Depot and more.
             </p>
             <Link
               href="/suppliers"
-              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-black px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all hover:bg-black/90 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-black px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-black/90 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
             >
               Browse Suppliers
-              <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </Link>
@@ -251,17 +242,17 @@ function TwoUpFeatures() {
         </article>
 
         {/* Feature 2: Split Layout - Content Left, Image Right */}
-        <article className="grid gap-0 overflow-hidden rounded-md border border-black/10 bg-white shadow-md md:grid-cols-2 md:h-[450px] lg:h-[500px]">
+        <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl md:grid-cols-2 md:h-[450px] lg:h-[500px]">
           <div className="order-2 flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12 md:order-1">
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">
+            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
               Read Real Reviews from Buyers
             </h3>
-            <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-6 sm:leading-7 text-black/70">
+            <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
               Find liquidation pallets, wholesale inventory, and merchandise for live auctions from trusted suppliers.
             </p>
             <Link
               href="/suppliers"
-              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-black px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all hover:bg-black/90 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-black px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-black/90 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
               Browse Reviews
               <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -286,16 +277,17 @@ function TwoUpFeatures() {
 /* ----------------------------- SUPPLIER CTA ---------------------------------- */
 function ListBusinessCta() {
   return (
-    <section className="my-12 sm:my-16 lg:my-20">
-      <div className="relative mx-auto max-w-6xl rounded-md border border-black/10 bg-black p-6 sm:p-8 lg:p-10 text-white shadow-md transition hover:shadow-lg">
+    <section className="my-12 sm:my-16 lg:my-20 relative">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
+      <div className="relative mx-auto max-w-6xl rounded-xl border border-black/10 bg-black p-6 sm:p-8 lg:p-10 text-white shadow-md transition-all duration-300 hover:shadow-lg hover:scale-[1.01]">
         <div className="relative">
-          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold">List your Business</h3>
-          <p className="mt-3 sm:mt-4 text-lg sm:text-xl lg:text-2xl leading-7 sm:leading-8">
+          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">List your Business</h3>
+          <p className="mt-3 sm:mt-4 text-lg sm:text-xl lg:text-2xl leading-relaxed">
             Get seen by 1M people looking for merchandise from top suppliers.
           </p>
           <Link
             href="/list-your-business"
-            className="mt-6 sm:mt-8 inline-flex items-center justify-center rounded-md bg-blue-600 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-colors"
+            className="mt-6 sm:mt-8 inline-flex items-center justify-center rounded-md bg-blue-600 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
           >
             Get Started
           </Link>

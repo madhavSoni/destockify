@@ -49,7 +49,7 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b-2 border-black/10 bg-white shadow-sm">
+    <header className="sticky top-0 z-50 border-b-2 border-black/10 bg-white/95 backdrop-blur-md shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link
@@ -92,13 +92,13 @@ export function SiteHeader() {
         >
           <Link 
             href="/about" 
-            className="text-black hover:text-blue-600 transition-colors duration-200"
+            className="text-black hover:text-blue-600 transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all hover:after:w-full"
           >
             About Us
           </Link>
           <Link 
             href="/suppliers" 
-            className="text-black hover:text-blue-600 transition-colors duration-200"
+            className="text-black hover:text-blue-600 transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all hover:after:w-full"
           >
             Directory
           </Link>
@@ -106,7 +106,7 @@ export function SiteHeader() {
           {!isAuthenticated && (
             <Link 
               href="/login" 
-              className="text-black hover:text-blue-600 transition-colors duration-200"
+              className="text-black hover:text-blue-600 transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all hover:after:w-full"
             >
               Login
             </Link>
@@ -114,7 +114,7 @@ export function SiteHeader() {
 
           <Link
             href="/list-your-business"
-            className="group relative inline-flex items-center gap-2 rounded-md bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-700 transition-all duration-200"
+            className="group relative inline-flex items-center gap-2 rounded-md bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-700 transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />

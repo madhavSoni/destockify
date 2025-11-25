@@ -76,7 +76,7 @@ function SupplierHeader({
   const count = reviewSummary.count ?? 0;
 
   return (
-    <section className="rounded-md border border-black/10 bg-white overflow-hidden shadow-md">
+    <section className="rounded-md border-2 border-black/10 bg-white overflow-hidden shadow-md">
       {/* Hero Image */}
       {supplier.heroImage && (
         <div className="relative h-56 w-full border-b-2 border-black/10">
@@ -94,7 +94,7 @@ function SupplierHeader({
           )}
           <div className="flex-1 min-w-0 w-full">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 flex-wrap mb-2">
-              <h1 className="font-bold text-2xl sm:text-3xl lg:text-4xl text-black break-words">
+              <h1 className="font-black text-2xl sm:text-3xl lg:text-4xl text-slate-900 break-words leading-tight">
                 {supplier.name}
               </h1>
               {/* Prominent Flags next to name */}
@@ -103,9 +103,9 @@ function SupplierHeader({
                   {supplier.flags.map((flag, i) => (
                     <div key={`flag-${i}`} className="group relative">
                       <span 
-                        className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-semibold shadow-sm cursor-help transition-all hover:scale-105 ${
+                        className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-semibold shadow-sm cursor-help transition-all duration-200 hover:scale-105 ${
                           flag.variant === 'verified' 
-                            ? 'bg-blue-600 border-blue-700 text-white' 
+                            ? 'bg-gradient-to-r from-blue-600 to-blue-700 border-blue-700 text-white' 
                             : 'bg-black border-black text-white'
                         }`}
                       >
@@ -139,7 +139,7 @@ function SupplierHeader({
               )}
             </div>
             {supplier.shortDescription && (
-              <p className="font-normal text-sm sm:text-base text-black/70">{supplier.shortDescription}</p>
+              <p className="font-normal text-sm sm:text-base text-slate-600 leading-relaxed">{supplier.shortDescription}</p>
             )}
             
             {/* Region & Badges */}
@@ -176,7 +176,7 @@ function SupplierHeader({
                 href={supplier.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-md border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 transition-colors duration-200"
+                className="inline-flex items-center gap-2 rounded-md border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
@@ -188,7 +188,7 @@ function SupplierHeader({
             {supplier.phone && (
               <a
                 href={`tel:${supplier.phone}`}
-                className="inline-flex items-center gap-2 rounded-md border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 hover:border-blue-700 transition-colors duration-200"
+                className="inline-flex items-center gap-2 rounded-md border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 hover:border-blue-700 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -208,15 +208,15 @@ function SupplierHeader({
 
 function ReadyToOrderCard({ supplier }: { supplier: SupplierDetail['supplier'] }) {
   return (
-    <section className="rounded-md border-2 border-black/10 p-8 sm:p-10 shadow-md relative overflow-hidden bg-white">
+    <section className="rounded-md border-2 border-black/10 p-8 sm:p-10 shadow-md relative overflow-hidden bg-white transition-all duration-300 hover:shadow-lg">
       <div className="max-w-3xl mx-auto text-center relative">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-md bg-blue-600 mb-4">
           <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
         </div>
-        <h2 className="font-bold text-3xl text-black mb-3">Ready to Work with {supplier.name}?</h2>
-        <p className="text-base text-black/70 mb-8 max-w-xl mx-auto">
+        <h2 className="font-black text-3xl text-slate-900 mb-3 leading-tight">Ready to Work with {supplier.name}?</h2>
+        <p className="text-base text-slate-600 mb-8 max-w-xl mx-auto leading-relaxed">
           Get in touch to discuss your wholesale needs and start your order today
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -225,7 +225,7 @@ function ReadyToOrderCard({ supplier }: { supplier: SupplierDetail['supplier'] }
               href={supplier.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-md bg-blue-600 px-8 py-4 text-base font-semibold text-white hover:bg-blue-700 transition-all duration-200"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-md bg-blue-600 px-8 py-4 text-base font-semibold text-white hover:bg-blue-700 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
@@ -236,7 +236,7 @@ function ReadyToOrderCard({ supplier }: { supplier: SupplierDetail['supplier'] }
           {supplier.email && (
             <a
               href={`mailto:${supplier.email}`}
-              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-md border-2 border-blue-600 bg-white px-8 py-4 text-base font-semibold text-blue-600 hover:bg-blue-600/10 transition-all duration-200"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-md border-2 border-blue-600 bg-white px-8 py-4 text-base font-semibold text-blue-600 hover:bg-blue-600/10 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -247,7 +247,7 @@ function ReadyToOrderCard({ supplier }: { supplier: SupplierDetail['supplier'] }
           {supplier.phone && (
             <a
               href={`tel:${supplier.phone}`}
-              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-md border-2 border-black/10 bg-white px-8 py-4 text-base font-semibold text-black hover:bg-black/5 transition-all duration-200"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-md border-2 border-black/10 bg-white px-8 py-4 text-base font-semibold text-black hover:bg-black/5 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -265,19 +265,19 @@ function ReadyToOrderCard({ supplier }: { supplier: SupplierDetail['supplier'] }
 
 function SupplierOverview({ supplier }: { supplier: SupplierDetail['supplier'] }) {
   return (
-    <section className="rounded-md border border-black/10 bg-white p-8 sm:p-10 shadow-md">
+    <section className="rounded-md border-2 border-black/10 bg-white p-8 sm:p-10 shadow-md">
       <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-black/5">
         <div className="flex h-10 w-10 items-center justify-center rounded-md bg-black/5">
           <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h2 className="font-bold text-2xl text-black">About</h2>
+        <h2 className="font-bold text-2xl text-slate-900">About</h2>
       </div>
       
       <div className="space-y-6">
         {supplier.description && (
-          <p className="font-normal text-base text-black/70 leading-relaxed">{supplier.description}</p>
+          <p className="font-normal text-base text-slate-600 leading-relaxed">{supplier.description}</p>
         )}
 
         {/* Key Details Grid */}

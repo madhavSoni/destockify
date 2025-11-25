@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-sora: 'Sora', system-ui, sans-serif;
 }
 
 body {
-  font-family: var(--font-inter);
+  font-family: var(--font-sora);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

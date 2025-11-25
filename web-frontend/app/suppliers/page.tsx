@@ -94,11 +94,11 @@ export default async function SuppliersPage(props: any) {
     <div className="min-h-screen bg-white">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <div className="mb-8 rounded-md border border-black/10 bg-blue-600 p-8 sm:p-12">
-          <h1 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-white mb-4">
+        <div className="mb-8 rounded-md border-2 border-black/10 bg-gradient-to-br from-blue-600 to-blue-700 p-8 sm:p-12 shadow-md">
+          <h1 className="font-black text-3xl sm:text-4xl lg:text-5xl text-white mb-4 leading-tight">
             {headerTitle}
           </h1>
-          <p className="font-normal text-lg text-white/90 max-w-3xl">
+          <p className="font-normal text-lg text-white/90 max-w-3xl leading-relaxed">
             Browse hundreds of verified liquidators and wholesalers across the United States. Connect with suppliers offering returned, overstock, and brand new merchandise.
           </p>
         </div>
@@ -111,7 +111,7 @@ export default async function SuppliersPage(props: any) {
               <input type="hidden" name="search" defaultValue={filters.search} />
               
               {/* State Filter with Expandable Region Groups */}
-              <div className="rounded-md border border-black/10 bg-white p-6">
+              <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
                 <h3 className="font-semibold text-lg text-black mb-4">Filter by State</h3>
                 <div className="space-y-2 max-h-[500px] overflow-y-auto">
                   {Object.entries(regionsByGroup).map(([groupName, groupRegions]) => {
@@ -125,7 +125,7 @@ export default async function SuppliersPage(props: any) {
                     };
                     return (
                       <details key={groupName} className="group">
-                        <summary className="flex items-center justify-between p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors list-none">
+                        <summary className="flex items-center justify-between p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors duration-200 list-none">
                           <span className="font-semibold text-sm text-black group-hover:text-blue-600">
                             {groupLabels[groupName]}
                           </span>
@@ -142,7 +142,7 @@ export default async function SuppliersPage(props: any) {
                           {groupRegions.map((r) => (
                             <label
                               key={r.slug}
-                              className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors group"
+                              className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors duration-200 group"
                             >
                               <input
                                 type="radio"
@@ -164,7 +164,7 @@ export default async function SuppliersPage(props: any) {
               </div>
 
               {/* Verified Filter */}
-              <div className="rounded-md border border-black/10 bg-white p-6">
+              <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
                 <h3 className="font-semibold text-lg text-black mb-4">Verification Status</h3>
                 <div className="space-y-2">
                   {[
@@ -173,7 +173,7 @@ export default async function SuppliersPage(props: any) {
                   ].map((option) => (
                     <label
                       key={option.value}
-                      className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors group"
+                      className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors duration-200 group"
                     >
                       <input
                         type="radio"
@@ -193,7 +193,7 @@ export default async function SuppliersPage(props: any) {
               <div className="pt-4 border-t border-black/5 flex flex-col gap-2">
                 <button
                   type="submit"
-                  className="w-full font-semibold rounded-md bg-blue-600 px-4 py-2.5 text-white hover:bg-blue-700 transition-colors duration-200"
+                  className="w-full font-semibold rounded-md bg-blue-600 px-4 py-2.5 text-white hover:bg-blue-700 transition-all duration-200 hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
                 >
                   Apply Filters
                 </button>
@@ -211,16 +211,16 @@ export default async function SuppliersPage(props: any) {
           <section>
             {/* Results Count */}
             <div className="mb-6">
-              <p className="font-bold text-lg text-black">
+              <p className="font-bold text-lg text-slate-900">
                 {total} Suppliers Found
                 {filters.region && regions.find(r => r.slug === filters.region) && (
-                  <span className="font-medium text-black/50"> in {regions.find(r => r.slug === filters.region)?.name}</span>
+                  <span className="font-medium text-slate-500"> in {regions.find(r => r.slug === filters.region)?.name}</span>
                 )}
               </p>
             </div>
 
             {/* Cards Grid */}
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
+            <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
               {result.items.map((s) => (
                 <SupplierCard key={s.slug} supplier={s} />
               ))}
@@ -234,7 +234,7 @@ export default async function SuppliersPage(props: any) {
                   {hasPrevPage ? (
                     <Link
                       href={buildPageUrl(filters.page - 1)}
-                      className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-colors"
+                      className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600"
                       aria-label="Previous page"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -270,7 +270,7 @@ export default async function SuppliersPage(props: any) {
                         <Link
                           key={1}
                           href={buildPageUrl(1)}
-                          className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-colors font-medium"
+                          className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
                         >
                           1
                         </Link>
@@ -298,11 +298,11 @@ export default async function SuppliersPage(props: any) {
                         );
                       } else {
                         pageNumbers.push(
-                          <Link
-                            key={i}
-                            href={buildPageUrl(i)}
-                            className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-colors font-medium"
-                          >
+                        <Link
+                          key={i}
+                          href={buildPageUrl(i)}
+                          className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
+                        >
                             {i}
                           </Link>
                         );
@@ -322,7 +322,7 @@ export default async function SuppliersPage(props: any) {
                         <Link
                           key={totalPages}
                           href={buildPageUrl(totalPages)}
-                          className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-colors font-medium"
+                          className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
                         >
                           {totalPages}
                         </Link>
@@ -336,7 +336,7 @@ export default async function SuppliersPage(props: any) {
                   {hasNextPage ? (
                     <Link
                       href={buildPageUrl(filters.page + 1)}
-                      className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-colors"
+                      className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600"
                       aria-label="Next page"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -358,7 +358,7 @@ export default async function SuppliersPage(props: any) {
 
         {/* Bottom CTA */}
         <section className="mt-16">
-          <div className="mx-auto max-w-4xl rounded-md border-2 border-black/10 bg-black p-8 sm:p-12 text-white shadow-md">
+          <div className="mx-auto max-w-4xl rounded-md border-2 border-black/10 bg-black p-8 sm:p-12 text-white shadow-md transition-all duration-300 hover:shadow-lg">
             <div className="text-center">
               <h3 className="font-black text-3xl sm:text-4xl mb-4">
                 List Your Business
@@ -368,7 +368,7 @@ export default async function SuppliersPage(props: any) {
               </p>
               <Link
                 href="/list-your-business"
-                className="inline-flex items-center justify-center font-bold rounded-md bg-blue-600 px-8 py-4 text-lg text-white hover:bg-blue-700 transition-all duration-200"
+                className="inline-flex items-center justify-center font-bold rounded-md bg-blue-600 px-8 py-4 text-lg text-white hover:bg-blue-700 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
               >
                 Get Started Today
                 <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

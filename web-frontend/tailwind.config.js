@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sora)', 'system-ui', 'sans-serif'],
       },
       colors: {
         blue: {
@@ -16,11 +16,29 @@ module.exports = {
           200: '#B3D3FF',
           300: '#80B8FF',
           400: '#4D9DFF',
-          500: '#3388FF',
-          600: '#3388FF',
-          700: '#2670E6',
-          800: '#1A58CC',
-          900: '#0D40B3',
+          500: '#0055FF',
+          600: '#0055FF',
+          700: '#0044CC',
+          800: '#003399',
+          900: '#002266',
+        },
+        accent: {
+          blue: '#3388FF',
+        },
+        success: {
+          DEFAULT: '#059669',
+        },
+        slate: {
+          50: '#FAFBFC',
+          100: '#F1F5F9',
+          200: '#E2E8F0',
+          300: '#CBD5E1',
+          400: '#94A3B8',
+          500: '#64748B',
+          600: '#475569',
+          700: '#334155',
+          800: '#1E293B',
+          900: '#0F172A',
         },
       },
     },
