@@ -33,9 +33,18 @@ interface SupplierSummary {
   id: number;
   name: string;
   slug: string;
+  email?: string | null;
   isVerified: boolean;
   isScam: boolean;
   createdAt: string;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  region?: {
+    id: number;
+    name: string;
+    slug: string;
+  } | null;
 }
 
 interface ReviewSummary {
@@ -400,40 +409,53 @@ export default function AdminPage() {
               value={supplierSearch}
               onChange={(e) => setSupplierSearch(e.target.value)}
               placeholder="Search suppliers..."
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             />
           </div>
 
           {suppliersLoading ? (
-            <div className="text-center py-12 text-slate-500">Loading...</div>
+            <div className="text-center py-12 text-sm text-gray-500">Loading...</div>
           ) : (
-            <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-              <table className="min-w-full divide-y divide-slate-200">
-                <thead className="bg-slate-50">
+            <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Name</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Created</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Region</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Location</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Created</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 bg-white">
+                <tbody className="divide-y divide-gray-200 bg-white">
                   {suppliers.map((supplier) => (
-                    <tr key={supplier.id} className="hover:bg-slate-50">
-                      <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-slate-900">{supplier.name}</td>
-                      <td className="whitespace-nowrap px-4 py-3 text-sm">
-                        {supplier.isVerified && (
-                          <span className="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800">
-                            Verified
-                          </span>
-                        )}
-                        {supplier.isScam && (
-                          <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800 ml-2">
-                            Scam
-                          </span>
-                        )}
+                    <tr key={supplier.id} className="hover:bg-gray-50">
+                      <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{supplier.name}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
+                        {supplier.region?.name || '—'}
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-500">
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
+                        {[supplier.city, supplier.state, supplier.country].filter(Boolean).join(', ') || '—'}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm">
+                        <div className="flex gap-2">
+                          {supplier.isVerified && (
+                            <span className="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800">
+                              Verified
+                            </span>
+                          )}
+                          {supplier.isScam && (
+                            <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800">
+                              Scam
+                            </span>
+                          )}
+                          {!supplier.isVerified && !supplier.isScam && (
+                            <span className="text-xs text-gray-400">—</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
                         {new Date(supplier.createdAt).toLocaleDateString()}
                       </td>
                       <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium">

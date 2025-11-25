@@ -605,6 +605,8 @@ export async function getAllSuppliersAdmin(params: {
       name: supplier.name,
       slug: supplier.slug,
       email: supplier.email,
+      isVerified: supplier.isVerified,
+      isScam: supplier.isScam,
       // expose homeRank so admin UI can show/set "featured" state
       homeRank: supplier.homeRank ?? 0,
       createdAt: supplier.createdAt.toISOString(),
