@@ -133,6 +133,7 @@ This script will:
 ```bash
 cd api
 
+# Deploy backend with wildcard CORS initially (will be updated after frontend deployment)
 gcloud run deploy destockify-api \
   --source . \
   --region us-central1 \
@@ -143,7 +144,7 @@ gcloud run deploy destockify-api \
   --cpu 1 \
   --max-instances 10 \
   --min-instances 0 \
-  --set-env-vars NODE_ENV=production,GCP_PROJECT_ID=destockify \
+  --set-env-vars NODE_ENV=production,GCP_PROJECT_ID=destockify,CORS_ORIGINS="*" \
   --set-secrets DATABASE_URL=DATABASE_URL:latest,JWT_SECRET=JWT_SECRET:latest,JWT_REFRESH_SECRET=JWT_REFRESH_SECRET:latest,GCS_PROJECT_ID=GCS_PROJECT_ID:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest \
   --add-cloudsql-instances destockify:us-central1:destockify-db
 
@@ -172,6 +173,21 @@ gcloud run deploy destockify-frontend \
 # Get frontend URL
 FRONTEND_URL=$(gcloud run services describe destockify-frontend --region us-central1 --format 'value(status.url)')
 echo "Frontend URL: $FRONTEND_URL"
+```
+
+#### Update Backend CORS
+
+After deploying the frontend, update the backend CORS configuration to allow requests from the frontend:
+
+```bash
+cd ../api
+
+# Update CORS_ORIGINS to include frontend URL and localhost for development
+gcloud run services update destockify-api \
+  --region us-central1 \
+  --update-env-vars "CORS_ORIGINS=${FRONTEND_URL},http://localhost:3000"
+
+echo "✅ CORS updated successfully"
 ```
 
 ## Post-Deployment: Run Migrations
@@ -253,6 +269,46 @@ If deployment fails during build:
 2. **Check Cloud Build logs:**
    ```bash
    gcloud builds list --limit=5
+   ```
+
+### CORS Issues
+
+If you're experiencing CORS errors (e.g., "No 'Access-Control-Allow-Origin' header is present"):
+
+1. **Verify CORS_ORIGINS is set:**
+   ```bash
+   gcloud run services describe destockify-api --region us-central1 \
+     --format="value(spec.template.spec.containers[0].env)" | grep CORS_ORIGINS
+   ```
+
+2. **Check current CORS configuration:**
+   ```bash
+   gcloud run services describe destockify-api --region us-central1 \
+     --format="get(spec.template.spec.containers[0].env)"
+   ```
+
+3. **Update CORS_ORIGINS manually:**
+   ```bash
+   # Get frontend URL
+   FRONTEND_URL=$(gcloud run services describe destockify-frontend --region us-central1 --format 'value(status.url)')
+   
+   # Update CORS to include frontend URL
+   gcloud run services update destockify-api \
+     --region us-central1 \
+     --update-env-vars "CORS_ORIGINS=${FRONTEND_URL},http://localhost:3000"
+   ```
+
+4. **For development, you can temporarily use wildcard:**
+   ```bash
+   gcloud run services update destockify-api \
+     --region us-central1 \
+     --update-env-vars "CORS_ORIGINS=*"
+   ```
+   ⚠️ **Warning:** Only use wildcard (`*`) for development. In production, always specify exact origins.
+
+5. **Check API logs for CORS errors:**
+   ```bash
+   gcloud run logs read destockify-api --region us-central1 --limit 50 | grep -i cors
    ```
 
 ## Next Steps

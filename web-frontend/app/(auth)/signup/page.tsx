@@ -69,7 +69,7 @@ export default function SignupPage() {
         const result = await api.auth.signup({
           firstName,
           lastName,
-          email,
+          email: email.toLowerCase().trim(),
           password,
         });
 

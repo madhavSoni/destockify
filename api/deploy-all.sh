@@ -19,6 +19,8 @@ gcloud config set project $PROJECT_ID
 echo "📦 Deploying backend API..."
 cd "$(dirname "$0")"
 
+# Deploy backend initially with wildcard CORS (will be updated after frontend deployment)
+# This allows the backend to accept requests from any origin initially
 gcloud run deploy destockify-api \
   --source . \
   --region $REGION \
@@ -29,7 +31,7 @@ gcloud run deploy destockify-api \
   --cpu 1 \
   --max-instances 10 \
   --min-instances 0 \
-  --set-env-vars NODE_ENV=production,GCP_PROJECT_ID=${PROJECT_ID} \
+  --set-env-vars NODE_ENV=production,GCP_PROJECT_ID=${PROJECT_ID},CORS_ORIGINS="*" \
   --set-secrets DATABASE_URL=DATABASE_URL:latest,JWT_SECRET=JWT_SECRET:latest,JWT_REFRESH_SECRET=JWT_REFRESH_SECRET:latest,GCS_PROJECT_ID=GCS_PROJECT_ID:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest \
   --add-cloudsql-instances "${CONNECTION_NAME}"
 
@@ -61,19 +63,22 @@ echo ""
 echo "🔧 Updating backend CORS..."
 cd ../api
 
-# Get frontend URL
+# Get frontend URL (already retrieved above, but get it again to be safe)
 FRONTEND_CUSTOM=$(gcloud run services describe destockify-frontend --region $REGION --format 'value(status.url)')
 
 # Build CORS origins list - include frontend URL and localhost for development
 CORS_ORIGINS="${FRONTEND_CUSTOM},http://localhost:3000"
 
-# Update CORS_ORIGINS - use alternate delimiter (^|^) to escape commas in the value
-# This tells gcloud to use | as the delimiter instead of comma
+# Update CORS_ORIGINS using ^|^ delimiter with --set-env-vars
+# The ^|^ tells gcloud to use | as delimiter for KEY=VALUE pairs instead of comma
+# This allows commas within values (like CORS_ORIGINS) to be preserved
+# Format: --set-env-vars "^|^KEY1=VALUE1|KEY2=VALUE2|KEY3=VALUE3"
 gcloud run services update destockify-api \
   --region $REGION \
-  --update-env-vars "^|^CORS_ORIGINS=${CORS_ORIGINS}"
+  --set-env-vars "^|^NODE_ENV=production|GCP_PROJECT_ID=${PROJECT_ID}|CORS_ORIGINS=${CORS_ORIGINS}"
 
 echo "✅ CORS updated successfully"
+echo "   Allowed origins: ${CORS_ORIGINS}"
 
 echo ""
 echo "✅ Deployment complete!"

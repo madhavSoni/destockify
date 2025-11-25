@@ -31,9 +31,12 @@ export async function signUp(payload: {
   password: string;
 }) {
   const { firstName, lastName, email, password } = payload;
+  
+  // Normalize email to lowercase for case-insensitive handling
+  const normalizedEmail = email.toLowerCase().trim();
 
   const existingCustomer = await prisma.customer.findUnique({
-    where: { email },
+    where: { email: normalizedEmail },
   });
 
   if (existingCustomer) {
@@ -48,7 +51,7 @@ export async function signUp(payload: {
     data: {
       firstName,
       lastName,
-      email,
+      email: normalizedEmail,
       passwordHash,
       isVerified: false,
       verificationToken,
@@ -57,7 +60,7 @@ export async function signUp(payload: {
   });
 
   try {
-    await emailService.sendVerificationEmail(email, verificationToken);
+    await emailService.sendVerificationEmail(normalizedEmail, verificationToken);
   } catch (error) {
     console.error('Failed to send verification email:', error);
   }
@@ -73,9 +76,12 @@ export async function signUp(payload: {
 
 export async function login(payload: { email: string; password: string }) {
   const { email, password } = payload;
+  
+  // Normalize email to lowercase for case-insensitive handling
+  const normalizedEmail = email.toLowerCase().trim();
 
   const customer = await prisma.customer.findUnique({
-    where: { email },
+    where: { email: normalizedEmail },
   });
 
   if (!customer) {
@@ -139,9 +145,12 @@ export async function verifyEmail(payload: { token: string }) {
 
 export async function forgotPassword(payload: { email: string }) {
   const { email } = payload;
+  
+  // Normalize email to lowercase for case-insensitive handling
+  const normalizedEmail = email.toLowerCase().trim();
 
   const customer = await prisma.customer.findUnique({
-    where: { email },
+    where: { email: normalizedEmail },
   });
 
   if (!customer) {
@@ -162,7 +171,7 @@ export async function forgotPassword(payload: { email: string }) {
   });
 
   try {
-    await emailService.sendPasswordResetEmail(email, resetToken);
+    await emailService.sendPasswordResetEmail(normalizedEmail, resetToken);
   } catch (error) {
     console.error('Failed to send password reset email:', error);
     throw new Error('Failed to send password reset email. Please try again.');

@@ -27,7 +27,7 @@ export default function ForgotPasswordPage() {
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
       try {
-        await api.auth.forgotPassword(email);
+        await api.auth.forgotPassword(email.toLowerCase().trim());
         setIsSuccess(true);
       } catch (error: any) {
         console.error('Forgot password failed:', error);

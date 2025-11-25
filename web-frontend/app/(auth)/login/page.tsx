@@ -37,7 +37,7 @@ export default function LoginPage() {
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
       try {
-        await login(email, password);
+        await login(email.toLowerCase().trim(), password);
         // Redirect to home page after successful login
         router.push('/');
       } catch (error: any) {
