@@ -1,10 +1,16 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { Metadata } from 'next';
 import { api } from '@/lib/api';
 import { TrendingSuppliersRail } from '@/components/trending-suppliers-rail';
 import { generateWebsiteSchema, generateOrganizationSchema, schemaToJsonLd } from '@/lib/schema';
 import { StateSelector } from '@/components/state-selector';
 import { SearchAutocomplete } from '@/components/search-autocomplete';
+
+export const metadata: Metadata = {
+  title: 'TrustPallet – Buy Liquidation Truckloads | Reviews & Supplier Directory',
+  description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the TrustPallet directory to source returns, overstock, and wholesale inventory with confidence.',
+};
 
 export type HomepageData = Awaited<ReturnType<typeof api.home.get>>;
 type SupplierSummaryList = Awaited<ReturnType<typeof api.suppliers.featured>>;
@@ -57,6 +63,7 @@ export default async function HomePage() {
         <TrendingSuppliersRail suppliers={data.featuredSuppliers} />
 
         <ConnectByState regions={regions} />
+        <SearchDirectorySection />
         <QuickActionsBar />
         <TwoUpFeatures />
 
@@ -91,11 +98,11 @@ function HeroSection() {
         {/* Left-anchored content block like Zillow */}
         <div className="max-w-xl space-y-4 sm:space-y-5">
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-tight text-center sm:text-left antialiased m-0">
-        Suppliers. Pallets. Truckloads. Deals.
+        Buy Liquidation Truckloads – Find Verified Suppliers
           </h1>
 
           <p className="text-base sm:text-lg lg:text-xl leading-relaxed text-white/90 font-normal">
-            Discover vetted suppliers offering truckloads and pallets of returns, overstock and liquidations in your area.
+            Read real reviews from liquidation companies selling truckloads and pallets of returns, overstock, and wholesale merchandise.
           </p>
 
           {/* Search bar with autocomplete */}
@@ -194,11 +201,25 @@ function ConnectByState({ regions }: { regions: any[] }) {
         backgroundSize: '24px 24px'
       }} />
       <div className="relative">
-        <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">Connect with Verified Suppliers</h3>
+        <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">Top-Rated Liquidation & Wholesale Suppliers Near You</h3>
         <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-base sm:text-lg text-slate-600 leading-relaxed">
-          Search for overstock, returns and liquidations by the pallet or truckload.
+          Discover wholesale lots of returns, overstock, and liquidation inventory sold by the pallet or by the truckload.
         </p>
         <StateSelector regions={regions} />
+      </div>
+    </section>
+  );
+}
+
+/* -------------------- SEARCH DIRECTORY SECTION -------------------- */
+function SearchDirectorySection() {
+  return (
+    <section className="mx-auto w-full max-w-3xl px-4 py-12 sm:py-16 text-center sm:px-6 lg:px-8 relative">
+      <div className="relative">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">Search the Liquidation Directory</h2>
+        <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-base sm:text-lg text-slate-600 leading-relaxed">
+          Use our directory to find liquidation truckload and pallet sellers in your region. Filter by product category, retailer source, condition, and supplier reputation.
+        </p>
       </div>
     </section>
   );
@@ -223,11 +244,10 @@ function TwoUpFeatures() {
           </div>
           <div className="flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12">
             <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
-              Buy Truckload Liquidation Direct from Vetted Liquidators Near You
+              Buy Truckload Liquidation Direct From Verified Liquidators
             </h3>
             <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
-              Source by the pallet or truckload for your bin stores, discount store, auction house and more! Buy
-              truckloads of returns, overstock and liquidations directly from Amazon, Target, Walmart, Home Depot and more.
+              Source pallets and truckloads for your bin store, discount store, flea market business, or auction house. Buy direct from liquidators handling inventory from Amazon, Walmart, Target, Home Depot, and other major retailers.
             </p>
             <Link
               href="/suppliers"
@@ -245,10 +265,10 @@ function TwoUpFeatures() {
         <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl md:grid-cols-2 md:h-[450px] lg:h-[500px]">
           <div className="order-2 flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12 md:order-1">
             <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
-              Read Real Reviews from Buyers
+              Read Supplier Reviews from Buyers
             </h3>
             <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
-              Find liquidation pallets, wholesale inventory, and merchandise for live auctions from trusted suppliers.
+              Get honest insights before you buy. Read reviews from real resellers about liquidation pallets, truckloads, wholesale merchandise, and liquidation inventory from suppliers near you.
             </p>
             <Link
               href="/suppliers"

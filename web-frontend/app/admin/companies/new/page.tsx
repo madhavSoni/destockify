@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
+import { US_STATES } from '@/lib/constants/states';
+import { COUNTRIES } from '@/lib/constants/countries';
+import type { SupplierAddress } from '@/lib/api';
 
 export default function NewCompanyPage() {
   const router = useRouter();
@@ -22,6 +25,20 @@ export default function NewCompanyPage() {
     isVerified: false,
     isScam: false,
     homeRank: 0,
+    addresses: [] as Array<{
+      streetAddress?: string;
+      city?: string;
+      state?: string;
+      country?: string;
+      zipCode?: string;
+    }>,
+  });
+  const [newAddress, setNewAddress] = useState({
+    streetAddress: '',
+    city: '',
+    state: '',
+    country: '',
+    zipCode: '',
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -80,7 +97,17 @@ export default function NewCompanyPage() {
 
     setLoading(true);
     try {
-      await api.suppliers.create(formData, authToken);
+      const payload: any = {
+        ...formData,
+        addresses: formData.addresses.map(addr => ({
+          streetAddress: addr.streetAddress || undefined,
+          city: addr.city || undefined,
+          state: addr.state || undefined,
+          country: addr.country || undefined,
+          zipCode: addr.zipCode || undefined,
+        })),
+      };
+      await api.suppliers.create(payload, authToken);
       router.push('/admin/companies');
     } catch (error: any) {
       alert(error.message || 'Failed to create company');
@@ -88,6 +115,34 @@ export default function NewCompanyPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddAddress = () => {
+    if (!newAddress.city && !newAddress.state && !newAddress.country) {
+      alert('Please fill in at least city, state, or country');
+      return;
+    }
+    setFormData({
+      ...formData,
+      addresses: [
+        ...formData.addresses,
+        {
+          streetAddress: newAddress.streetAddress || undefined,
+          city: newAddress.city || undefined,
+          state: newAddress.state || undefined,
+          country: newAddress.country || undefined,
+          zipCode: newAddress.zipCode || undefined,
+        },
+      ],
+    });
+    setNewAddress({ streetAddress: '', city: '', state: '', country: '', zipCode: '' });
+  };
+
+  const handleDeleteAddress = (index: number) => {
+    setFormData({
+      ...formData,
+      addresses: formData.addresses.filter((_, i) => i !== index),
+    });
   };
 
   return (
@@ -253,6 +308,121 @@ export default function NewCompanyPage() {
                   placeholder="https://example.com/banner.jpg"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Addresses */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-slate-900 border-b pb-2">Addresses</h3>
+          
+          {/* Existing Addresses */}
+          {formData.addresses.length > 0 && (
+            <div className="space-y-4">
+              {formData.addresses.map((address, index) => (
+                <div key={index} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="text-sm text-slate-700">
+                        {[
+                          address.streetAddress,
+                          address.city,
+                          address.state,
+                          address.country,
+                          address.zipCode,
+                        ]
+                          .filter(Boolean)
+                          .join(', ')}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteAddress(index)}
+                      className="rounded-lg border border-red-300 bg-white px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50 ml-4"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add New Address Form */}
+          <div className="rounded-lg border border-slate-200 bg-white p-4">
+            <h4 className="text-sm font-semibold text-slate-900 mb-4">Add New Address</h4>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Street Address</label>
+                <input
+                  type="text"
+                  value={newAddress.streetAddress}
+                  onChange={(e) => setNewAddress({ ...newAddress, streetAddress: e.target.value })}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  placeholder="123 Main St"
+                />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">City</label>
+                  <input
+                    type="text"
+                    value={newAddress.city}
+                    onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                    placeholder="New York"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">State</label>
+                  <select
+                    value={newAddress.state}
+                    onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  >
+                    <option value="">Select State</option>
+                    {US_STATES.map((state) => (
+                      <option key={state.code} value={state.code}>
+                        {state.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Country</label>
+                  <select
+                    value={newAddress.country}
+                    onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  >
+                    <option value="">Select Country</option>
+                    {COUNTRIES.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Zip Code</label>
+                  <input
+                    type="text"
+                    value={newAddress.zipCode}
+                    onChange={(e) => setNewAddress({ ...newAddress, zipCode: e.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                    placeholder="10001"
+                  />
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleAddAddress}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              >
+                Add Address
+              </button>
             </div>
           </div>
         </div>

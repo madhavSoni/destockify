@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
+import { US_STATES } from '@/lib/constants/states';
+import { COUNTRIES } from '@/lib/constants/countries';
+import type { SupplierAddress } from '@/lib/api';
 
 type Review = {
   id: number;
@@ -45,15 +48,22 @@ export default function EditCompanyPage() {
     heroImage: '',
     logoImage: '',
     socialLink: '',
+    regionId: null as number | null,
+    categoryIds: [] as number[],
+    addresses: [] as SupplierAddress[],
+    isVerified: false,
+    isScam: false,
+    isContractHolder: false,
+    isBroker: false,
+    homeRank: 0,
+  });
+  const [editingAddressId, setEditingAddressId] = useState<number | null>(null);
+  const [newAddress, setNewAddress] = useState({
     streetAddress: '',
     city: '',
     state: '',
     country: '',
-    regionId: null as number | null,
-    categoryIds: [] as number[],
-    isVerified: false,
-    isScam: false,
-    homeRank: 0,
+    zipCode: '',
   });
   const [categories, setCategories] = useState<Array<{ id: number; name: string; slug: string }>>([]);
   const [regions, setRegions] = useState<Array<{ id: number; name: string; slug: string }>>([]);
@@ -84,14 +94,13 @@ export default function EditCompanyPage() {
           heroImage: supplier.heroImage || '',
           logoImage: supplier.logoImage || '',
           socialLink: supplier.socialLink || '',
-          streetAddress: supplier.streetAddress || '',
-          city: supplier.city || '',
-          state: supplier.state || '',
-          country: supplier.country || '',
           regionId: supplier.regionId || null,
           categoryIds: supplier.categoryIds || [],
+          addresses: supplier.addresses || [],
           isVerified: supplier.isVerified || false,
           isScam: supplier.isScam || false,
+          isContractHolder: supplier.isContractHolder || false,
+          isBroker: supplier.isBroker || false,
           homeRank: supplier.homeRank || 0,
         });
         setLogoPreview(supplier.logoImage || null);
@@ -192,7 +201,17 @@ export default function EditCompanyPage() {
 
     setLoading(true);
     try {
-      const payload: any = { ...formData };
+      const payload: any = { 
+        ...formData,
+        addresses: formData.addresses.map(addr => ({
+          id: addr.id,
+          streetAddress: addr.streetAddress || undefined,
+          city: addr.city || undefined,
+          state: addr.state || undefined,
+          country: addr.country || undefined,
+          zipCode: addr.zipCode || undefined,
+        })),
+      };
       await api.suppliers.update(id, payload, authToken);
       router.push('/admin/companies');
     } catch (error: any) {
@@ -201,6 +220,72 @@ export default function EditCompanyPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddAddress = () => {
+    if (!newAddress.city && !newAddress.state && !newAddress.country) {
+      alert('Please fill in at least city, state, or country');
+      return;
+    }
+    setFormData({
+      ...formData,
+      addresses: [
+        ...formData.addresses,
+        {
+          id: Date.now(), // Temporary ID for new addresses
+          streetAddress: newAddress.streetAddress || null,
+          city: newAddress.city || null,
+          state: newAddress.state || null,
+          country: newAddress.country || null,
+          zipCode: newAddress.zipCode || null,
+        },
+      ],
+    });
+    setNewAddress({ streetAddress: '', city: '', state: '', country: '', zipCode: '' });
+  };
+
+  const handleDeleteAddress = (addressId: number) => {
+    setFormData({
+      ...formData,
+      addresses: formData.addresses.filter(addr => addr.id !== addressId),
+    });
+  };
+
+  const handleEditAddress = (address: SupplierAddress) => {
+    setEditingAddressId(address.id);
+    setNewAddress({
+      streetAddress: address.streetAddress || '',
+      city: address.city || '',
+      state: address.state || '',
+      country: address.country || '',
+      zipCode: address.zipCode || '',
+    });
+  };
+
+  const handleSaveEditAddress = () => {
+    if (!editingAddressId) return;
+    setFormData({
+      ...formData,
+      addresses: formData.addresses.map(addr =>
+        addr.id === editingAddressId
+          ? {
+              ...addr,
+              streetAddress: newAddress.streetAddress || null,
+              city: newAddress.city || null,
+              state: newAddress.state || null,
+              country: newAddress.country || null,
+              zipCode: newAddress.zipCode || null,
+            }
+          : addr
+      ),
+    });
+    setEditingAddressId(null);
+    setNewAddress({ streetAddress: '', city: '', state: '', country: '', zipCode: '' });
+  };
+
+  const handleCancelEditAddress = () => {
+    setEditingAddressId(null);
+    setNewAddress({ streetAddress: '', city: '', state: '', country: '', zipCode: '' });
   };
 
   if (fetching) {
@@ -387,70 +472,231 @@ export default function EditCompanyPage() {
           </div>
         </div>
 
-        {/* Location Information */}
+        {/* Addresses */}
         <div className="space-y-6">
-          <h3 className="text-lg font-semibold text-slate-900 border-b pb-2">Location Information</h3>
+          <h3 className="text-lg font-semibold text-slate-900 border-b pb-2">Addresses</h3>
           
+          {/* Existing Addresses */}
+          {formData.addresses.length > 0 && (
+            <div className="space-y-4">
+              {formData.addresses.map((address) => (
+                <div key={address.id} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                  {editingAddressId === address.id ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Street Address</label>
+                        <input
+                          type="text"
+                          value={newAddress.streetAddress}
+                          onChange={(e) => setNewAddress({ ...newAddress, streetAddress: e.target.value })}
+                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          placeholder="123 Main St"
+                        />
+                      </div>
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">City</label>
+                          <input
+                            type="text"
+                            value={newAddress.city}
+                            onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                            placeholder="New York"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">State</label>
+                          <select
+                            value={newAddress.state}
+                            onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          >
+                            <option value="">Select State</option>
+                            {US_STATES.map((state) => (
+                              <option key={state.code} value={state.code}>
+                                {state.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Country</label>
+                          <select
+                            value={newAddress.country}
+                            onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          >
+                            <option value="">Select Country</option>
+                            {COUNTRIES.map((country) => (
+                              <option key={country.code} value={country.code}>
+                                {country.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Zip Code</label>
+                          <input
+                            type="text"
+                            value={newAddress.zipCode}
+                            onChange={(e) => setNewAddress({ ...newAddress, zipCode: e.target.value })}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                            placeholder="10001"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={handleSaveEditAddress}
+                          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleCancelEditAddress}
+                          className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="text-sm text-slate-700">
+                          {[
+                            address.streetAddress,
+                            address.city,
+                            address.state,
+                            address.country,
+                            address.zipCode,
+                          ]
+                            .filter(Boolean)
+                            .join(', ')}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 ml-4">
+                        <button
+                          type="button"
+                          onClick={() => handleEditAddress(address)}
+                          className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteAddress(address.id)}
+                          className="rounded-lg border border-red-300 bg-white px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add New Address Form */}
+          {editingAddressId === null && (
+            <div className="rounded-lg border border-slate-200 bg-white p-4">
+              <h4 className="text-sm font-semibold text-slate-900 mb-4">Add New Address</h4>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Street Address</label>
+                  <input
+                    type="text"
+                    value={newAddress.streetAddress}
+                    onChange={(e) => setNewAddress({ ...newAddress, streetAddress: e.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                    placeholder="123 Main St"
+                  />
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">City</label>
+                    <input
+                      type="text"
+                      value={newAddress.city}
+                      onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                      placeholder="New York"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">State</label>
+                    <select
+                      value={newAddress.state}
+                      onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                    >
+                      <option value="">Select State</option>
+                      {US_STATES.map((state) => (
+                        <option key={state.code} value={state.code}>
+                          {state.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Country</label>
+                    <select
+                      value={newAddress.country}
+                      onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })}
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                    >
+                      <option value="">Select Country</option>
+                      {COUNTRIES.map((country) => (
+                        <option key={country.code} value={country.code}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Zip Code</label>
+                    <input
+                      type="text"
+                      value={newAddress.zipCode}
+                      onChange={(e) => setNewAddress({ ...newAddress, zipCode: e.target.value })}
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                      placeholder="10001"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddAddress}
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                >
+                  Add Address
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Region */}
           <div>
-            <label className="block text-sm font-medium text-slate-700">Street Address</label>
-            <input
-              type="text"
-              value={formData.streetAddress}
-              onChange={(e) => setFormData({ ...formData, streetAddress: e.target.value })}
+            <label className="block text-sm font-medium text-slate-700 mb-1">Region</label>
+            <select
+              value={formData.regionId || ''}
+              onChange={(e) => setFormData({ ...formData, regionId: e.target.value ? Number(e.target.value) : null })}
               className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-              placeholder="123 Main St"
-            />
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-slate-700">City</label>
-              <input
-                type="text"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-                placeholder="New York"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700">State</label>
-              <input
-                type="text"
-                value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-                placeholder="NY"
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-slate-700">Country</label>
-              <input
-                type="text"
-                value={formData.country}
-                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-                placeholder="USA"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700">Region</label>
-              <select
-                value={formData.regionId || ''}
-                onChange={(e) => setFormData({ ...formData, regionId: e.target.value ? Number(e.target.value) : null })}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-              >
-                <option value="">No Region</option>
-                {regions.map((region) => (
-                  <option key={region.id} value={region.id}>
-                    {region.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            >
+              <option value="">No Region</option>
+              {regions.map((region) => (
+                <option key={region.id} value={region.id}>
+                  {region.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -498,7 +744,7 @@ export default function EditCompanyPage() {
             <p className="mt-1 text-xs text-slate-500">Higher = more prominent</p>
           </div>
 
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-6">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -516,6 +762,24 @@ export default function EditCompanyPage() {
                 className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
               />
               <span className="text-sm font-medium text-red-700">⚠️ Mark as Scam</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.isContractHolder}
+                onChange={(e) => setFormData({ ...formData, isContractHolder: e.target.checked })}
+                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm font-medium text-slate-700">Contract Holder</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.isBroker}
+                onChange={(e) => setFormData({ ...formData, isBroker: e.target.checked })}
+                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm font-medium text-slate-700">Broker</span>
             </label>
           </div>
         </div>

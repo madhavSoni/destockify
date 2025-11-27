@@ -3,27 +3,50 @@ import { listCategories, listRegions } from '../catalog/catalog.service';
 import { mapSupplierSummary, type SupplierSummaryPayload } from '../suppliers/suppliers.service';
 
 export async function getHomepageContent() {
-  // First try to get suppliers with homeRank > 0, if none found, get any suppliers
-  let featuredSuppliersRaw = await prisma.supplier.findMany({
+  const TARGET_SUPPLIER_COUNT = 8;
+  
+  // First get suppliers with homeRank > 0 (prioritized)
+  const suppliersWithHomeRank = await prisma.supplier.findMany({
     where: { homeRank: { gt: 0 } },
     include: {
       region: true,
       categories: { include: { category: true } },
     },
     orderBy: [{ homeRank: 'asc' }, { name: 'asc' }],
-    take: 6,
+    take: TARGET_SUPPLIER_COUNT,
   }) as SupplierSummaryPayload[];
 
-  // If no suppliers with homeRank, get any suppliers as fallback
-  if (featuredSuppliersRaw.length === 0) {
-    featuredSuppliersRaw = await prisma.supplier.findMany({
+  let featuredSuppliersRaw = suppliersWithHomeRank;
+
+  // If we have fewer than 8 suppliers, fill remaining slots with suppliers without homeRank
+  if (featuredSuppliersRaw.length < TARGET_SUPPLIER_COUNT) {
+    const remainingCount = TARGET_SUPPLIER_COUNT - featuredSuppliersRaw.length;
+    const existingIds = featuredSuppliersRaw.map((s) => s.id);
+
+    const whereClause: any = {
+      OR: [
+        { homeRank: 0 },
+        { homeRank: null },
+      ],
+    };
+
+    // Exclude already selected suppliers if any exist
+    if (existingIds.length > 0) {
+      whereClause.NOT = { id: { in: existingIds } };
+    }
+
+    const suppliersWithoutHomeRank = await prisma.supplier.findMany({
+      where: whereClause,
       include: {
         region: true,
         categories: { include: { category: true } },
       },
       orderBy: [{ isVerified: 'desc' }, { createdAt: 'desc' }, { name: 'asc' }],
-      take: 6,
+      take: remainingCount,
     }) as SupplierSummaryPayload[];
+
+    // Combine both results
+    featuredSuppliersRaw = [...featuredSuppliersRaw, ...suppliersWithoutHomeRank].slice(0, TARGET_SUPPLIER_COUNT);
   }
 
   const [latestReviews, categories, regions, stats] =
@@ -60,7 +83,37 @@ export async function getHomepageContent() {
 
   const [supplierCount, reviewCount, categoryCount] = stats;
 
-  const featuredSuppliers = featuredSuppliersRaw.map((supplier: SupplierSummaryPayload) => mapSupplierSummary(supplier));
+  // Get ratings for featured suppliers
+  const supplierIds = featuredSuppliersRaw.map((s: SupplierSummaryPayload) => s.id);
+  const reviews = await prisma.review.findMany({
+    where: {
+      supplierId: { in: supplierIds },
+      isApproved: true,
+    },
+    select: {
+      supplierId: true,
+      ratingOverall: true,
+    },
+  });
+
+  // Calculate average rating per supplier
+  const ratingsBySupplier = new Map<number, { average: number; count: number }>();
+  for (const review of reviews) {
+    const existing = ratingsBySupplier.get(review.supplierId) || { average: 0, count: 0 };
+    existing.average = (existing.average * existing.count + review.ratingOverall) / (existing.count + 1);
+    existing.count += 1;
+    ratingsBySupplier.set(review.supplierId, existing);
+  }
+
+  const featuredSuppliers = featuredSuppliersRaw.map((supplier: SupplierSummaryPayload) => {
+    const summary = mapSupplierSummary(supplier);
+    const rating = ratingsBySupplier.get(supplier.id);
+    return {
+      ...summary,
+      ratingAverage: rating ? Number(rating.average.toFixed(1)) : null,
+      ratingCount: rating?.count || 0,
+    };
+  });
 
   const spotlightReviews = latestReviews.map((review: (typeof latestReviews)[number]) => ({
     author: review.author,

@@ -26,10 +26,12 @@ type RecentReview = {
 
 export function ReviewsSection({
   supplierId,
+  supplierName,
   recentReviews,
   reviewSummary,
 }: {
   supplierId: string;
+  supplierName: string;
   recentReviews: RecentReview[];
   reviewSummary: ReviewSummary;
 }) {
@@ -132,7 +134,7 @@ export function ReviewsSection({
           </svg>
         </div>
         <h2 className="font-bold text-2xl text-black">
-          Reviews ({reviewSummary.count})
+          {supplierName}: Read Reviews
         </h2>
       </div>
 

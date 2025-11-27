@@ -1,28 +1,47 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { api } from '@/lib/api';
 
 type Region = {
   slug: string;
   name: string;
 };
 
-// All US states for the dropdown
-const ALL_US_STATES = [
-  'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 
-  'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 
-  'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 
-  'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 
-  'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 
-  'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 
-  'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 
-  'Wisconsin', 'Wyoming'
-];
+type StateOption = {
+  code: string;
+  name: string;
+  count: number;
+};
 
 export function StateSelector({ regions }: { regions: Region[] }) {
   const [selectedState, setSelectedState] = useState('');
+  const [availableStates, setAvailableStates] = useState<StateOption[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    // Fetch available states from the API
+    const fetchStates = async () => {
+      try {
+        const response = await api.suppliers.list({ limit: 1 });
+        if (response.availableFilters?.states) {
+          // Sort states by name for better UX
+          const sortedStates = [...response.availableFilters.states].sort((a, b) => 
+            a.name.trim().localeCompare(b.name.trim())
+          );
+          setAvailableStates(sortedStates);
+        }
+      } catch (error) {
+        console.error('Failed to fetch states:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStates();
+  }, []);
 
   const handleGo = () => {
     if (!selectedState) {
@@ -30,18 +49,9 @@ export function StateSelector({ regions }: { regions: Region[] }) {
       return;
     }
 
-    // Check if we have this state in our regions (case-insensitive match)
-    const matchedRegion = regions.find(
-      r => r.name.toLowerCase() === selectedState.toLowerCase()
-    );
-
-    if (matchedRegion) {
-      // We have suppliers in this state - filter by it
-      router.push(`/suppliers?region=${matchedRegion.slug}`);
-    } else {
-      // We don't have suppliers in this state - go to general suppliers page
-      router.push('/suppliers');
-    }
+    // Navigate to suppliers page filtered by the selected state
+    // The state value matches what's in the database
+    router.push(`/suppliers?state=${encodeURIComponent(selectedState)}`);
   };
 
   return (
@@ -51,12 +61,15 @@ export function StateSelector({ regions }: { regions: Region[] }) {
           <select
             value={selectedState}
             onChange={(e) => setSelectedState(e.target.value)}
-            className="h-14 w-full appearance-none rounded-md border-2 border-black/10 bg-white px-5 pr-12 text-base text-black shadow-sm hover:border-blue-600/50 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+            disabled={loading}
+            className="h-14 w-full appearance-none rounded-md border-2 border-black/10 bg-white px-5 pr-12 text-base text-black shadow-sm hover:border-blue-600/50 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <option value="">Shop by State</option>
-            {ALL_US_STATES.map((state) => (
-              <option key={state} value={state}>
-                {state}
+            <option value="">
+              {loading ? 'Loading states...' : 'Shop by State'}
+            </option>
+            {availableStates.map((state) => (
+              <option key={state.code} value={state.code}>
+                {state.name.trim()} ({state.count})
               </option>
             ))}
           </select>
@@ -68,7 +81,8 @@ export function StateSelector({ regions }: { regions: Region[] }) {
         </div>
         <button
           onClick={handleGo}
-          className="group h-14 rounded-md bg-blue-600 px-8 text-base font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg flex items-center gap-2"
+          disabled={loading || !selectedState}
+          className="group h-14 rounded-md bg-blue-600 px-8 text-base font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
           Go
           <svg 

@@ -21,7 +21,7 @@ export function TrendingSuppliersRail({
   };
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
+    <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8 bg-slate-50">
       <div className="mb-4 sm:mb-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
         <div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">Trending Wholesale Suppliers Near You</h2>

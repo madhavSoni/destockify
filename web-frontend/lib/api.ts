@@ -88,6 +88,15 @@ export type RegionSummary = {
   supplierCount: number;
 };
 
+export type SupplierAddress = {
+  id: number;
+  streetAddress?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  zipCode?: string | null;
+};
+
 export type SupplierSummary = {
   slug: string;
   name: string;
@@ -101,7 +110,7 @@ export type SupplierSummary = {
     variant: 'verified' | 'scam';
   }>;
   homeRank?: number;
-  streetAddress?: string | null;
+  addresses?: SupplierAddress[];
   city?: string | null;
   state?: string | null;
   country?: string | null;
@@ -113,6 +122,8 @@ export type SupplierSummary = {
     slug: string;
     name: string;
   }>;
+  ratingAverage?: number | null;
+  ratingCount?: number;
 };
 
 export type ReviewHighlight = {
@@ -143,15 +154,14 @@ export type SupplierDetailResponse = {
     email?: string | null;
     isVerified?: boolean;
     isScam?: boolean;
+    isContractHolder?: boolean;
+    isBroker?: boolean;
     flags?: Array<{
       text: string;
       variant: 'verified' | 'scam';
     }>;
     socialLink?: string | null;
-    streetAddress?: string | null;
-    city?: string | null;
-    state?: string | null;
-    country?: string | null;
+    addresses?: SupplierAddress[];
     region?: {
       slug: string;
       name: string;
@@ -188,6 +198,11 @@ export type SupplierListResponse = {
   items: SupplierSummary[];
   nextCursor: number | null;
   total: number;
+  availableFilters?: {
+    states: Array<{ code: string; name: string; count: number }>;
+    countries: Array<{ code: string; name: string; count: number }>;
+    categories: Array<{ id: number; name: string; slug: string; count: number }>;
+  };
 };
 
 export type HomepagePayload = {
@@ -297,12 +312,9 @@ export type SupplierAdminResponse = {
   isScam: boolean;
   homeRank: number;
   socialLink?: string | null;
-  streetAddress?: string | null;
-  city?: string | null;
-  state?: string | null;
-  country?: string | null;
   regionId?: number | null;
   categoryIds: number[];
+  addresses?: SupplierAddress[];
   images: SupplierImage[];
 };
 
@@ -395,8 +407,8 @@ export const api = {
     get: () => fetchFromApi<HomepagePayload>('/home', { revalidate: 30 }),
   },
   suppliers: {
-    list: (params?: { category?: string; region?: string; search?: string; cursor?: number; limit?: number; verified?: boolean }) =>
-      fetchFromApi<SupplierListResponse>(`/suppliers${buildQueryString(params)}`, { revalidate: 30 }),
+    list: (params?: { category?: string; region?: string; state?: string; country?: string; search?: string; cursor?: number; limit?: number; verified?: boolean; sort?: string }) =>
+      fetchFromApi<SupplierListResponse>(`/suppliers${buildQueryString(params)}`, { cache: 'no-store' }),
     get: (slug: string) => fetchFromApi<SupplierDetailResponse>(`/suppliers/${slug}`, { revalidate: 30 }),
     featured: () => fetchFromApi<SupplierSummary[]>('/suppliers/featured', { revalidate: 30 }),
     // Admin: Get supplier by ID
@@ -922,6 +934,33 @@ export const api = {
         }),
       delete: (id: number, token: string) =>
         fetchFromApi<{ message: string }>(`/suppliers/${id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      // Address management
+      createAddress: (supplierId: number, payload: { streetAddress?: string; city?: string; state?: string; country?: string; zipCode?: string }, token: string) =>
+        fetchFromApi<SupplierAddress>(`/suppliers/${supplierId}/addresses`, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      updateAddress: (addressId: number, payload: { streetAddress?: string; city?: string; state?: string; country?: string; zipCode?: string }, token: string) =>
+        fetchFromApi<SupplierAddress>(`/suppliers/addresses/${addressId}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      deleteAddress: (addressId: number, token: string) =>
+        fetchFromApi<{ message: string }>(`/suppliers/addresses/${addressId}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${token}`,

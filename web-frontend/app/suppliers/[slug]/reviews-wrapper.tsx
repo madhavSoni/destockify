@@ -53,6 +53,7 @@ export function ReviewsWrapper({
       <ReviewsSection
         key={refreshTrigger}
         supplierId={supplierId}
+        supplierName={supplier.name}
         recentReviews={recentReviews}
         reviewSummary={reviewSummary}
       />

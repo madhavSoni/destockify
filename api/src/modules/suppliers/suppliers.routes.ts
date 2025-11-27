@@ -8,6 +8,9 @@ import {
   deleteSupplier,
   getAllSuppliersAdmin,
   getSupplierByIdAdmin,
+  createSupplierAddress,
+  updateSupplierAddress,
+  deleteSupplierAddress,
 } from './suppliers.service';
 import { authenticateToken, AuthRequest } from '../../middleware/authMiddleware';
 import { isAdmin } from '../../middleware/adminMiddleware';
@@ -16,15 +19,18 @@ const router = Router();
 
 router.get('/', async (req, res) => {
   try {
-    const { category, region, search, cursor, limit, verified } = req.query;
+    const { category, region, state, country, search, cursor, limit, verified, sort } = req.query;
 
     const result = await listSuppliers({
       category: typeof category === 'string' ? category : undefined,
       region: typeof region === 'string' ? region : undefined,
+      state: typeof state === 'string' ? state : undefined,
+      country: typeof country === 'string' ? country : undefined,
       search: typeof search === 'string' ? search : undefined,
       cursor: cursor ? Number(cursor) : undefined,
       limit: limit ? Number(limit) : undefined,
       verified: verified === 'true' ? true : verified === 'false' ? false : undefined,
+      sort: typeof sort === 'string' ? sort : undefined,
     });
 
     res.json(result);
@@ -112,6 +118,49 @@ router.delete('/:id', authenticateToken, isAdmin, async (req: AuthRequest, res) 
     res.json(result);
   } catch (error: any) {
     res.status(400).json({ message: error.message ?? 'Unable to delete supplier' });
+  }
+});
+
+// Address management routes (admin only)
+router.post('/:id/addresses', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
+  try {
+    const supplierId = parseInt(req.params.id);
+    if (isNaN(supplierId)) {
+      return res.status(400).json({ message: 'Invalid supplier ID' });
+    }
+
+    const address = await createSupplierAddress(supplierId, req.body);
+    res.status(201).json(address);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message ?? 'Unable to create address' });
+  }
+});
+
+router.put('/addresses/:addressId', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
+  try {
+    const addressId = parseInt(req.params.addressId);
+    if (isNaN(addressId)) {
+      return res.status(400).json({ message: 'Invalid address ID' });
+    }
+
+    const address = await updateSupplierAddress(addressId, req.body);
+    res.json(address);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message ?? 'Unable to update address' });
+  }
+});
+
+router.delete('/addresses/:addressId', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
+  try {
+    const addressId = parseInt(req.params.addressId);
+    if (isNaN(addressId)) {
+      return res.status(400).json({ message: 'Invalid address ID' });
+    }
+
+    const result = await deleteSupplierAddress(addressId);
+    res.json(result);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message ?? 'Unable to delete address' });
   }
 });
 

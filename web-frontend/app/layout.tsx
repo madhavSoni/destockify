@@ -59,8 +59,7 @@ function SiteFooter() {
             Trust Pallet
           </Link>
           <p className="text-sm leading-6 text-black/70">
-            Your guide to trusted liquidation and wholesale pallet suppliers. We verify sourcing, highlight buyer wins,
-            and help you scale without surprises.
+            Buy Truckload Liquidation from trusted sellers across the United States. Your go to directory for Liquidation and Wholesale Suppliers.
           </p>
         </div>
 
@@ -74,7 +73,6 @@ function SiteFooter() {
           <div className="space-y-2">
             <p className="font-semibold text-black">Resources</p>
             <Link href="/suppliers?search=export" className="block hover:text-blue-600 transition-colors duration-200">Export programs</Link>
-            <Link href="/suppliers?search=contract" className="block hover:text-blue-600 transition-colors duration-200">Contract loads</Link>
           </div>
           <div className="space-y-2">
             <p className="font-semibold text-black">Company</p>

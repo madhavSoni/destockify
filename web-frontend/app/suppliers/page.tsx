@@ -1,94 +1,181 @@
+'use client';
+
+import { Suspense, useEffect, useState, useCallback, useMemo } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { SupplierCard } from '@/components/supplier-card';
+// Icons as inline SVGs
+const SlidersHorizontalIcon = ({ size = 20 }: { size?: number }) => (
+  <svg width={size} height={size} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h18M3 9h18m-9 4.5h9M3 19.5h18" />
+  </svg>
+);
 
-// Helper function to categorize states into regions
-function getRegionGroup(stateCode: string | null | undefined): string {
-  if (!stateCode) return 'other';
-  
-  const state = stateCode.toUpperCase();
-  
-  const southStates = ['FL', 'GA', 'TX', 'AL', 'MS', 'LA', 'AR', 'TN', 'NC', 'SC', 'KY', 'VA', 'WV'];
-  const westStates = ['CA', 'OR', 'WA', 'NV', 'AZ', 'UT', 'CO', 'NM', 'ID', 'MT', 'WY', 'AK', 'HI'];
-  const northeastStates = ['NY', 'NJ', 'PA', 'MA', 'CT', 'RI', 'VT', 'NH', 'ME', 'DE', 'MD', 'DC'];
-  const midwestStates = ['IL', 'IN', 'OH', 'MI', 'WI', 'MN', 'IA', 'MO', 'ND', 'SD', 'NE', 'KS', 'OK'];
-  
-  if (southStates.includes(state)) return 'south';
-  if (westStates.includes(state)) return 'west';
-  if (northeastStates.includes(state)) return 'northeast';
-  if (midwestStates.includes(state)) return 'midwest';
-  return 'other';
-}
+const XIcon = ({ size = 20 }: { size?: number }) => (
+  <svg width={size} height={size} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
 
-export default async function SuppliersPage(props: any) {
-  const searchParams = await props.searchParams;
-  // existing filters (kept so your API keeps working)
-  const filters = {
-    search: typeof searchParams.search === 'string' ? searchParams.search : '',
-    category: typeof searchParams.category === 'string' ? searchParams.category : '',
-    region: typeof searchParams.region === 'string' ? searchParams.region : '',
-    verified: typeof searchParams.verified === 'string' ? searchParams.verified : '',
-    regionGroup: typeof searchParams['region-group'] === 'string' ? searchParams['region-group'] : '',
-    page: typeof searchParams.page === 'string' ? Math.max(1, Number(searchParams.page)) : 1,
-  };
+type FilterState = {
+  search: string;
+  category: string;
+  state: string;
+  country: string;
+  verified: string;
+  sort: string;
+  page: number;
+};
+
+function SuppliersPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [loading, setLoading] = useState(true);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
+  const [total, setTotal] = useState(0);
+  const [availableFilters, setAvailableFilters] = useState<{
+    states?: Array<{ code: string; name: string; count: number }>;
+    countries?: Array<{ code: string; name: string; count: number }>;
+    categories?: Array<{ id: number; name: string; slug: string; count: number }>;
+  } | null>(null);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [showFiltersModal, setShowFiltersModal] = useState(false);
+  const [nextCursor, setNextCursor] = useState<number | null>(null);
+
+  const filters = useMemo(() => {
+    return {
+      search: searchParams?.get('search') || '',
+      category: searchParams?.get('category') || '',
+      state: searchParams?.get('state') || '',
+      country: searchParams?.get('country') || '',
+      verified: searchParams?.get('verified') || '',
+      sort: searchParams?.get('sort') || '',
+      page: Math.max(1, Number(searchParams?.get('page')) || 1),
+    };
+  }, [searchParams]);
 
   const itemsPerPage = 18;
   const cursor = filters.page > 1 ? (filters.page - 1) * itemsPerPage : undefined;
 
-  const [result, categories, regions] = await Promise.all([
-    api.suppliers.list({
-      search: filters.search,
-      category: filters.category || undefined,
-      region: filters.region || undefined,
-      verified: filters.verified === 'true' ? true : filters.verified === 'false' ? false : undefined,
-      cursor: cursor,
-      limit: itemsPerPage,
-    }),
-    api.catalog.categories(),
-    api.catalog.regions(),
-  ]);
-
-  // Group regions by region group
-  const regionsByGroup: Record<string, typeof regions> = {
-    south: [],
-    west: [],
-    northeast: [],
-    midwest: [],
-    other: [],
-  };
-
-  regions.forEach(region => {
-    const group = getRegionGroup(region.stateCode);
-    if (regionsByGroup[group]) {
-      regionsByGroup[group].push(region);
+  const loadSuppliers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await api.suppliers.list({
+        search: filters.search || undefined,
+        category: filters.category || undefined,
+        state: filters.state || undefined,
+        country: filters.country || undefined,
+        verified: filters.verified === 'true' ? true : filters.verified === 'false' ? false : undefined,
+        sort: filters.sort || undefined,
+        cursor: cursor,
+        limit: itemsPerPage,
+      });
+      setSuppliers(result.items);
+      setTotal(result.total);
+      setNextCursor(result.nextCursor);
+      if (result.availableFilters) {
+        setAvailableFilters(result.availableFilters);
+      }
+    } catch (error) {
+      console.error('Failed to load suppliers:', error);
+      setSuppliers([]);
+      setTotal(0);
+    } finally {
+      setLoading(false);
     }
-  });
+  }, [filters.search, filters.category, filters.state, filters.country, filters.verified, filters.sort, filters.page, cursor]);
 
-  // Calculate pagination info
-  const total = result.total ?? result.items.length;
+  useEffect(() => {
+    loadSuppliers();
+  }, [loadSuppliers]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const cats = await api.catalog.categories();
+        setCategories(cats);
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  const updateFilters = useCallback((updates: Partial<FilterState>) => {
+    const params = new URLSearchParams();
+    const newFilters = { ...filters, ...updates, page: 1 };
+    
+    Object.entries(newFilters).forEach(([key, value]) => {
+      if (value && value !== '' && key !== 'page') {
+        params.set(key, String(value));
+      }
+    });
+    
+    router.push(`/suppliers${params.toString() ? '?' + params.toString() : ''}`);
+  }, [filters, router]);
+
+  const clearFilters = useCallback(() => {
+    router.push('/suppliers');
+  }, [router]);
+
+  const buildPageUrl = useCallback((page: number) => {
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value && value !== '' && key !== 'page') {
+        params.set(key, String(value));
+      }
+    });
+    if (page > 1) params.set('page', String(page));
+    return `/suppliers${params.toString() ? '?' + params.toString() : ''}`;
+  }, [filters]);
+
   const totalPages = Math.ceil(total / itemsPerPage);
   const hasNextPage = filters.page < totalPages;
   const hasPrevPage = filters.page > 1;
-  
-  // Helper function to build URL with page number
-  const buildPageUrl = (page: number) => {
-    const params = new URLSearchParams();
-    if (filters.search) params.set('search', filters.search);
-    if (filters.category) params.set('category', filters.category);
-    if (filters.region) params.set('region', filters.region);
-    if (filters.verified) params.set('verified', filters.verified);
-    if (filters.regionGroup) params.set('region-group', filters.regionGroup);
-    if (page > 1) params.set('page', String(page));
-    return `/suppliers${params.toString() ? '?' + params.toString() : ''}`;
-  };
 
-  // Get the selected region name for the header
-  const selectedRegion = filters.region 
-    ? regions.find(r => r.slug === filters.region) 
-    : null;
-  const headerTitle = selectedRegion 
-    ? `Find Trusted Suppliers in ${selectedRegion.name}`
-    : 'Find Trusted Suppliers Near You';
+  const activeFilterCount = [
+    filters.category ? 1 : 0,
+    filters.state ? 1 : 0,
+    filters.country ? 1 : 0,
+    filters.verified ? 1 : 0,
+    filters.sort ? 1 : 0,
+  ].reduce((a, b) => a + b, 0);
+
+  // Get available states and countries from API, fallback to all if not loaded yet
+  const stateOptions = useMemo(() => {
+    if (availableFilters?.states && availableFilters.states.length > 0) {
+      return availableFilters.states;
+    }
+    return [];
+  }, [availableFilters]);
+
+  const countryOptions = useMemo(() => {
+    if (availableFilters?.countries && availableFilters.countries.length > 0) {
+      return availableFilters.countries;
+    }
+    return [];
+  }, [availableFilters]);
+
+  const categoryOptions = useMemo(() => {
+    if (availableFilters?.categories && availableFilters.categories.length > 0) {
+      return availableFilters.categories.map(c => ({
+        slug: c.slug,
+        name: c.name,
+      }));
+    }
+    return categories.map(c => ({
+      slug: c.slug,
+      name: c.name,
+    }));
+  }, [availableFilters, categories]);
+
+  const sortOptions = [
+    { value: '', label: 'Default (Verified First)' },
+    { value: 'name_asc', label: 'Name A-Z' },
+    { value: 'name_desc', label: 'Name Z-A' },
+    { value: 'newest', label: 'Newest First' },
+  ];
 
   return (
     <div className="min-h-screen bg-white">
@@ -96,141 +183,285 @@ export default async function SuppliersPage(props: any) {
         {/* Hero Section */}
         <div className="mb-8 rounded-md border-2 border-black/10 bg-gradient-to-br from-blue-600 to-blue-700 p-8 sm:p-12 shadow-md">
           <h1 className="font-black text-3xl sm:text-4xl lg:text-5xl text-white mb-4 leading-tight">
-            {headerTitle}
+            Find Trusted Suppliers Near You
           </h1>
           <p className="font-normal text-lg text-white/90 max-w-3xl leading-relaxed">
             Browse hundreds of verified liquidators and wholesalers across the United States. Connect with suppliers offering returned, overstock, and brand new merchandise.
           </p>
         </div>
 
+        {/* Mobile Filter Button */}
+        <div className="lg:hidden mb-6 flex items-center justify-between">
+          <button
+            onClick={() => setShowFiltersModal(true)}
+            className="flex items-center gap-2 rounded-lg border-2 border-black/10 bg-white px-4 py-2 font-semibold text-black hover:bg-blue-50 hover:border-blue-600 transition-colors"
+          >
+            <SlidersHorizontalIcon size={20} />
+            <span>Filters</span>
+            {activeFilterCount > 0 && (
+              <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-bold text-white">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+        </div>
+
         {/* Main Grid: Filters + Cards */}
         <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
-          {/* Sidebar Filters */}
-          <aside className="space-y-6">
-            <form method="get" className="space-y-6">
-              <input type="hidden" name="search" defaultValue={filters.search} />
-              
-              {/* State Filter with Expandable Region Groups */}
+          {/* Desktop Sidebar Filters */}
+          <aside className="hidden lg:block space-y-6">
+            <div className="space-y-6">
+              {/* Search */}
               <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
-                <h3 className="font-semibold text-lg text-black mb-4">Filter by State</h3>
-                <div className="space-y-2 max-h-[500px] overflow-y-auto">
-                  {Object.entries(regionsByGroup).map(([groupName, groupRegions]) => {
-                    if (groupRegions.length === 0) return null;
-                    const groupLabels: Record<string, string> = {
-                      south: 'South',
-                      west: 'West',
-                      northeast: 'Northeast',
-                      midwest: 'Midwest',
-                      other: 'Other',
-                    };
-                    return (
-                      <details key={groupName} className="group">
-                        <summary className="flex items-center justify-between p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors duration-200 list-none">
-                          <span className="font-semibold text-sm text-black group-hover:text-blue-600">
-                            {groupLabels[groupName]}
-                          </span>
-                          <svg
-                            className="w-4 h-4 text-black/50 group-open:rotate-180 transition-transform"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </summary>
-                        <div className="mt-1 ml-2 space-y-1 border-l-2 border-black/5 pl-3">
-                          {groupRegions.map((r) => (
-                            <label
-                              key={r.slug}
-                              className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors duration-200 group"
-                            >
-                              <input
-                                type="radio"
-                                name="region"
-                                value={r.slug}
-                                defaultChecked={filters.region === r.slug}
-                                className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600 cursor-pointer"
-                              />
-                              <span className="font-normal text-sm text-black/70 group-hover:text-blue-600">
-                                {r.name}
-                              </span>
-                            </label>
-                          ))}
-                        </div>
-                      </details>
-                    );
-                  })}
-                </div>
+                <h3 className="font-semibold text-lg text-black mb-4">Search</h3>
+                <input
+                  type="text"
+                  value={filters.search}
+                  onChange={(e) => updateFilters({ search: e.target.value })}
+                  placeholder="Search suppliers..."
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                />
               </div>
+
+              {/* Category Filter */}
+              {categoryOptions.length > 0 && (
+                <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
+                  <h3 className="font-semibold text-lg text-black mb-4">Category</h3>
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                    <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
+                      <input
+                        type="radio"
+                        name="category"
+                        value=""
+                        checked={filters.category === ''}
+                        onChange={(e) => updateFilters({ category: e.target.value })}
+                        className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                      />
+                      <span className="font-normal text-sm text-black/70">All Categories</span>
+                    </label>
+                    {categoryOptions.map((cat) => (
+                      <label
+                        key={cat.slug}
+                        className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors"
+                      >
+                        <input
+                          type="radio"
+                          name="category"
+                          value={cat.slug}
+                          checked={filters.category === cat.slug}
+                          onChange={(e) => updateFilters({ category: e.target.value })}
+                          className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                        />
+                        <span className="font-normal text-sm text-black/70">{cat.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* State Filter */}
+              {stateOptions.length > 0 && (
+                <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
+                  <h3 className="font-semibold text-lg text-black mb-4">State</h3>
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                    <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
+                      <input
+                        type="radio"
+                        name="state"
+                        value=""
+                        checked={filters.state === ''}
+                        onChange={(e) => updateFilters({ state: e.target.value })}
+                        className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                      />
+                      <span className="font-normal text-sm text-black/70">All States</span>
+                    </label>
+                    {stateOptions.map((state) => (
+                      <label
+                        key={state.code}
+                        className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors"
+                      >
+                        <input
+                          type="radio"
+                          name="state"
+                          value={state.code}
+                          checked={filters.state === state.code}
+                          onChange={(e) => updateFilters({ state: e.target.value })}
+                          className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                        />
+                        <span className="font-normal text-sm text-black/70">
+                          {state.name} ({state.count})
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Country Filter */}
+              {countryOptions.length > 0 && (
+                <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
+                  <h3 className="font-semibold text-lg text-black mb-4">Country</h3>
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                    <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
+                      <input
+                        type="radio"
+                        name="country"
+                        value=""
+                        checked={filters.country === ''}
+                        onChange={(e) => updateFilters({ country: e.target.value })}
+                        className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                      />
+                      <span className="font-normal text-sm text-black/70">All Countries</span>
+                    </label>
+                    {countryOptions.map((country) => (
+                      <label
+                        key={country.code}
+                        className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors"
+                      >
+                        <input
+                          type="radio"
+                          name="country"
+                          value={country.code}
+                          checked={filters.country === country.code}
+                          onChange={(e) => updateFilters({ country: e.target.value })}
+                          className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                        />
+                        <span className="font-normal text-sm text-black/70">
+                          {country.name} ({country.count})
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Verified Filter */}
               <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
                 <h3 className="font-semibold text-lg text-black mb-4">Verification Status</h3>
                 <div className="space-y-2">
-                  {[
-                    { value: 'true', label: 'Verified' },
-                    { value: 'false', label: 'Not Verified' },
-                  ].map((option) => (
+                  <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
+                    <input
+                      type="radio"
+                      name="verified"
+                      value=""
+                      checked={filters.verified === ''}
+                      onChange={(e) => updateFilters({ verified: e.target.value })}
+                      className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                    />
+                    <span className="font-normal text-sm text-black/70">All</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
+                    <input
+                      type="radio"
+                      name="verified"
+                      value="true"
+                      checked={filters.verified === 'true'}
+                      onChange={(e) => updateFilters({ verified: e.target.value })}
+                      className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                    />
+                    <span className="font-normal text-sm text-black/70">Verified</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
+                    <input
+                      type="radio"
+                      name="verified"
+                      value="false"
+                      checked={filters.verified === 'false'}
+                      onChange={(e) => updateFilters({ verified: e.target.value })}
+                      className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                    />
+                    <span className="font-normal text-sm text-black/70">Not Verified</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Sort */}
+              <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
+                <h3 className="font-semibold text-lg text-black mb-4">Sort By</h3>
+                <div className="space-y-2">
+                  {sortOptions.map((option) => (
                     <label
                       key={option.value}
-                      className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors duration-200 group"
+                      className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors"
                     >
                       <input
                         type="radio"
-                        name="verified"
+                        name="sort"
                         value={option.value}
-                        defaultChecked={filters.verified === option.value}
-                        className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600 cursor-pointer"
+                        checked={filters.sort === option.value}
+                        onChange={(e) => updateFilters({ sort: e.target.value })}
+                        className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
                       />
-                      <span className="font-normal text-sm text-black/70 group-hover:text-blue-600">
-                        {option.label}
-                      </span>
+                      <span className="font-normal text-sm text-black/70">{option.label}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-black/5 flex flex-col gap-2">
+              {activeFilterCount > 0 && (
                 <button
-                  type="submit"
-                  className="w-full font-semibold rounded-md bg-blue-600 px-4 py-2.5 text-white hover:bg-blue-700 transition-all duration-200 hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
-                >
-                  Apply Filters
-                </button>
-                <Link
-                  href="/suppliers"
-                  className="w-full text-center font-normal text-sm text-black/50 hover:text-black py-2 hover:underline underline-offset-2"
+                  onClick={clearFilters}
+                  className="w-full font-semibold rounded-md bg-slate-100 px-4 py-2.5 text-slate-700 hover:bg-slate-200 transition-all duration-200"
                 >
                   Clear All Filters
-                </Link>
-              </div>
-            </form>
+                </button>
+              )}
+            </div>
           </aside>
 
           {/* Cards Section */}
           <section>
-            {/* Results Count */}
-            <div className="mb-6">
+            {/* Results Count and Sort (Mobile) */}
+            <div className="mb-6 flex items-center justify-between">
               <p className="font-bold text-lg text-slate-900">
-                {total} Suppliers Found
-                {filters.region && regions.find(r => r.slug === filters.region) && (
-                  <span className="font-medium text-slate-500"> in {regions.find(r => r.slug === filters.region)?.name}</span>
-                )}
+                {loading ? 'Loading...' : `${total} Suppliers Found`}
               </p>
+              <div className="lg:hidden">
+                <select
+                  value={filters.sort}
+                  onChange={(e) => updateFilters({ sort: e.target.value })}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                >
+                  {sortOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            {/* Cards Grid */}
-            <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
-              {result.items.map((s) => (
-                <SupplierCard key={s.slug} supplier={s} />
-              ))}
-            </div>
+            {/* Cards Grid - 2 columns on mobile, 3 on desktop */}
+            {loading ? (
+              <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="h-64 bg-slate-200 animate-pulse rounded-2xl" />
+                ))}
+              </div>
+            ) : suppliers.length === 0 ? (
+              <div className="rounded-lg border border-slate-200 bg-white p-12 text-center">
+                <p className="text-slate-600">No suppliers found. Try adjusting your filters.</p>
+                {activeFilterCount > 0 && (
+                  <button
+                    onClick={clearFilters}
+                    className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  >
+                    Clear Filters
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
+                {suppliers.map((s) => (
+                  <SupplierCard key={s.slug} supplier={s} />
+                ))}
+              </div>
+            )}
 
-            {/* Page-based Pagination */}
+            {/* Pagination */}
             {(hasNextPage || hasPrevPage) && (
               <div className="mt-10 flex justify-center">
                 <nav className="flex items-center gap-2" aria-label="Pagination">
-                  {/* Previous Button */}
                   {hasPrevPage ? (
                     <Link
                       href={buildPageUrl(filters.page - 1)}
@@ -249,22 +480,17 @@ export default async function SuppliersPage(props: any) {
                     </div>
                   )}
 
-                  {/* Page Numbers */}
                   {(() => {
                     const pageNumbers = [];
                     const maxVisiblePages = 7;
                     const currentPage = filters.page;
-                    
-                    // Calculate range of pages to show
                     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
                     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
                     
-                    // Adjust startPage if we're near the end
                     if (endPage - startPage < maxVisiblePages - 1) {
                       startPage = Math.max(1, endPage - maxVisiblePages + 1);
                     }
                     
-                    // Show first page and ellipsis if needed
                     if (startPage > 1) {
                       pageNumbers.push(
                         <Link
@@ -284,7 +510,6 @@ export default async function SuppliersPage(props: any) {
                       }
                     }
                     
-                    // Show page numbers in range
                     for (let i = startPage; i <= endPage; i++) {
                       if (i === currentPage) {
                         pageNumbers.push(
@@ -298,18 +523,17 @@ export default async function SuppliersPage(props: any) {
                         );
                       } else {
                         pageNumbers.push(
-                        <Link
-                          key={i}
-                          href={buildPageUrl(i)}
-                          className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
-                        >
+                          <Link
+                            key={i}
+                            href={buildPageUrl(i)}
+                            className="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
+                          >
                             {i}
                           </Link>
                         );
                       }
                     }
                     
-                    // Show ellipsis and last page if needed
                     if (endPage < totalPages) {
                       if (endPage < totalPages - 1) {
                         pageNumbers.push(
@@ -332,7 +556,6 @@ export default async function SuppliersPage(props: any) {
                     return pageNumbers;
                   })()}
 
-                  {/* Next Button */}
                   {hasNextPage ? (
                     <Link
                       href={buildPageUrl(filters.page + 1)}
@@ -379,6 +602,249 @@ export default async function SuppliersPage(props: any) {
           </div>
         </section>
       </div>
+
+      {/* Mobile Filter Modal */}
+      {showFiltersModal && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+            onClick={() => setShowFiltersModal(false)}
+          />
+          <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg shadow-2xl z-50 lg:hidden max-h-[90vh] flex flex-col animate-slide-up">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+              <div className="flex items-center gap-3">
+                <SlidersHorizontalIcon size={20} />
+                <h2 className="text-lg font-semibold text-slate-900">Filters</h2>
+                {activeFilterCount > 0 && (
+                  <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-bold text-white">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={() => setShowFiltersModal(false)}
+                className="flex h-8 w-8 items-center justify-center text-slate-600 hover:text-slate-900 transition-colors"
+                aria-label="Close filters"
+              >
+                <XIcon size={20} />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+              {/* Search */}
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900 mb-2">Search</h3>
+                <input
+                  type="text"
+                  value={filters.search}
+                  onChange={(e) => updateFilters({ search: e.target.value })}
+                  placeholder="Search suppliers..."
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                />
+              </div>
+
+              {/* Category Filter */}
+              {categoryOptions.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-2">Category</h3>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="category-modal"
+                        value=""
+                        checked={filters.category === ''}
+                        onChange={(e) => updateFilters({ category: e.target.value })}
+                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-slate-700">All Categories</span>
+                    </label>
+                    {categoryOptions.map((cat) => (
+                      <label
+                        key={cat.slug}
+                        className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"
+                      >
+                        <input
+                          type="radio"
+                          name="category-modal"
+                          value={cat.slug}
+                          checked={filters.category === cat.slug}
+                          onChange={(e) => updateFilters({ category: e.target.value })}
+                          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-slate-700">{cat.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* State Filter */}
+              {stateOptions.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-2">State</h3>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="state-modal"
+                        value=""
+                        checked={filters.state === ''}
+                        onChange={(e) => updateFilters({ state: e.target.value })}
+                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-slate-700">All States</span>
+                    </label>
+                    {stateOptions.map((state) => (
+                      <label
+                        key={state.code}
+                        className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"
+                      >
+                        <input
+                          type="radio"
+                          name="state-modal"
+                          value={state.code}
+                          checked={filters.state === state.code}
+                          onChange={(e) => updateFilters({ state: e.target.value })}
+                          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-slate-700">
+                          {state.name} ({state.count})
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Country Filter */}
+              {countryOptions.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-2">Country</h3>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="country-modal"
+                        value=""
+                        checked={filters.country === ''}
+                        onChange={(e) => updateFilters({ country: e.target.value })}
+                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-slate-700">All Countries</span>
+                    </label>
+                    {countryOptions.map((country) => (
+                      <label
+                        key={country.code}
+                        className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"
+                      >
+                        <input
+                          type="radio"
+                          name="country-modal"
+                          value={country.code}
+                          checked={filters.country === country.code}
+                          onChange={(e) => updateFilters({ country: e.target.value })}
+                          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-slate-700">
+                          {country.name} ({country.count})
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Verified Filter */}
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900 mb-2">Verification Status</h3>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="verified-modal"
+                      value=""
+                      checked={filters.verified === ''}
+                      onChange={(e) => updateFilters({ verified: e.target.value })}
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-slate-700">All</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="verified-modal"
+                      value="true"
+                      checked={filters.verified === 'true'}
+                      onChange={(e) => updateFilters({ verified: e.target.value })}
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-slate-700">Verified</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="verified-modal"
+                      value="false"
+                      checked={filters.verified === 'false'}
+                      onChange={(e) => updateFilters({ verified: e.target.value })}
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-slate-700">Not Verified</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Sort */}
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900 mb-2">Sort By</h3>
+                <div className="space-y-2">
+                  {sortOptions.map((option) => (
+                    <label
+                      key={option.value}
+                      className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="sort-modal"
+                        value={option.value}
+                        checked={filters.sort === option.value}
+                        onChange={(e) => updateFilters({ sort: e.target.value })}
+                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-slate-700">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {activeFilterCount > 0 && (
+                <button
+                  onClick={() => {
+                    clearFilters();
+                    setShowFiltersModal(false);
+                  }}
+                  className="w-full rounded-lg bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-200 transition-colors"
+                >
+                  Clear All Filters
+                </button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
+  );
+}
+
+export default function SuppliersPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-slate-600">Loading...</div>
+      </div>
+    }>
+      <SuppliersPageContent />
+    </Suspense>
   );
 }
