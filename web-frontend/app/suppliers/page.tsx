@@ -22,8 +22,9 @@ type FilterState = {
   search: string;
   category: string;
   state: string;
-  country: string;
   verified: string;
+  contractHolder: boolean;
+  broker: boolean;
   sort: string;
   page: number;
 };
@@ -48,8 +49,9 @@ function SuppliersPageContent() {
       search: searchParams?.get('search') || '',
       category: searchParams?.get('category') || '',
       state: searchParams?.get('state') || '',
-      country: searchParams?.get('country') || '',
       verified: searchParams?.get('verified') || '',
+      contractHolder: searchParams?.get('contractHolder') === 'true',
+      broker: searchParams?.get('broker') === 'true',
       sort: searchParams?.get('sort') || '',
       page: Math.max(1, Number(searchParams?.get('page')) || 1),
     };
@@ -65,8 +67,9 @@ function SuppliersPageContent() {
         search: filters.search || undefined,
         category: filters.category || undefined,
         state: filters.state || undefined,
-        country: filters.country || undefined,
         verified: filters.verified === 'true' ? true : filters.verified === 'false' ? false : undefined,
+        isContractHolder: filters.contractHolder || undefined,
+        isBroker: filters.broker || undefined,
         sort: filters.sort || undefined,
         cursor: cursor,
         limit: itemsPerPage,
@@ -84,7 +87,7 @@ function SuppliersPageContent() {
     } finally {
       setLoading(false);
     }
-  }, [filters.search, filters.category, filters.state, filters.country, filters.verified, filters.sort, filters.page, cursor]);
+  }, [filters.search, filters.category, filters.state, filters.verified, filters.contractHolder, filters.broker, filters.sort, filters.page, cursor]);
 
   useEffect(() => {
     loadSuppliers();
@@ -107,7 +110,12 @@ function SuppliersPageContent() {
     const newFilters = { ...filters, ...updates, page: 1 };
     
     Object.entries(newFilters).forEach(([key, value]) => {
-      if (value && value !== '' && key !== 'page') {
+      if (key === 'page') return;
+      if (key === 'contractHolder' || key === 'broker') {
+        if (value === true) {
+          params.set(key, 'true');
+        }
+      } else if (value && value !== '') {
         params.set(key, String(value));
       }
     });
@@ -122,7 +130,12 @@ function SuppliersPageContent() {
   const buildPageUrl = useCallback((page: number) => {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
-      if (value && value !== '' && key !== 'page') {
+      if (key === 'page') return;
+      if (key === 'contractHolder' || key === 'broker') {
+        if (value === true) {
+          params.set(key, 'true');
+        }
+      } else if (value && value !== '') {
         params.set(key, String(value));
       }
     });
@@ -137,22 +150,16 @@ function SuppliersPageContent() {
   const activeFilterCount = [
     filters.category ? 1 : 0,
     filters.state ? 1 : 0,
-    filters.country ? 1 : 0,
     filters.verified ? 1 : 0,
+    filters.contractHolder ? 1 : 0,
+    filters.broker ? 1 : 0,
     filters.sort ? 1 : 0,
   ].reduce((a, b) => a + b, 0);
 
-  // Get available states and countries from API, fallback to all if not loaded yet
+  // Get available states from API, fallback to all if not loaded yet
   const stateOptions = useMemo(() => {
     if (availableFilters?.states && availableFilters.states.length > 0) {
       return availableFilters.states;
-    }
-    return [];
-  }, [availableFilters]);
-
-  const countryOptions = useMemo(() => {
-    if (availableFilters?.countries && availableFilters.countries.length > 0) {
-      return availableFilters.countries;
     }
     return [];
   }, [availableFilters]);
@@ -259,10 +266,10 @@ function SuppliersPageContent() {
                 </div>
               )}
 
-              {/* State Filter */}
+              {/* Location Filter */}
               {stateOptions.length > 0 && (
                 <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
-                  <h3 className="font-semibold text-lg text-black mb-4">State</h3>
+                  <h3 className="font-semibold text-lg text-black mb-4">Location</h3>
                   <div className="space-y-2 max-h-[300px] overflow-y-auto">
                     <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
                       <input
@@ -290,44 +297,6 @@ function SuppliersPageContent() {
                         />
                         <span className="font-normal text-sm text-black/70">
                           {state.name} ({state.count})
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Country Filter */}
-              {countryOptions.length > 0 && (
-                <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
-                  <h3 className="font-semibold text-lg text-black mb-4">Country</h3>
-                  <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                    <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
-                      <input
-                        type="radio"
-                        name="country"
-                        value=""
-                        checked={filters.country === ''}
-                        onChange={(e) => updateFilters({ country: e.target.value })}
-                        className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
-                      />
-                      <span className="font-normal text-sm text-black/70">All Countries</span>
-                    </label>
-                    {countryOptions.map((country) => (
-                      <label
-                        key={country.code}
-                        className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors"
-                      >
-                        <input
-                          type="radio"
-                          name="country"
-                          value={country.code}
-                          checked={filters.country === country.code}
-                          onChange={(e) => updateFilters({ country: e.target.value })}
-                          className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
-                        />
-                        <span className="font-normal text-sm text-black/70">
-                          {country.name} ({country.count})
                         </span>
                       </label>
                     ))}
@@ -370,7 +339,32 @@ function SuppliersPageContent() {
                       onChange={(e) => updateFilters({ verified: e.target.value })}
                       className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
                     />
-                    <span className="font-normal text-sm text-black/70">Not Verified</span>
+                    <span className="font-normal text-sm text-black/70">Unverified</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Supplier Type Filter */}
+              <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
+                <h3 className="font-semibold text-lg text-black mb-4">Supplier Type</h3>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={filters.contractHolder}
+                      onChange={(e) => updateFilters({ contractHolder: e.target.checked })}
+                      className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                    />
+                    <span className="font-normal text-sm text-black/70">Contract holder</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={filters.broker}
+                      onChange={(e) => updateFilters({ broker: e.target.checked })}
+                      className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                    />
+                    <span className="font-normal text-sm text-black/70">Broker</span>
                   </label>
                 </div>
               </div>
@@ -679,10 +673,10 @@ function SuppliersPageContent() {
                 </div>
               )}
 
-              {/* State Filter */}
+              {/* Location Filter */}
               {stateOptions.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-900 mb-2">State</h3>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-2">Location</h3>
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
                       <input
@@ -710,44 +704,6 @@ function SuppliersPageContent() {
                         />
                         <span className="text-sm text-slate-700">
                           {state.name} ({state.count})
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Country Filter */}
-              {countryOptions.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900 mb-2">Country</h3>
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="country-modal"
-                        value=""
-                        checked={filters.country === ''}
-                        onChange={(e) => updateFilters({ country: e.target.value })}
-                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-slate-700">All Countries</span>
-                    </label>
-                    {countryOptions.map((country) => (
-                      <label
-                        key={country.code}
-                        className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"
-                      >
-                        <input
-                          type="radio"
-                          name="country-modal"
-                          value={country.code}
-                          checked={filters.country === country.code}
-                          onChange={(e) => updateFilters({ country: e.target.value })}
-                          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-slate-700">
-                          {country.name} ({country.count})
                         </span>
                       </label>
                     ))}
@@ -790,7 +746,32 @@ function SuppliersPageContent() {
                       onChange={(e) => updateFilters({ verified: e.target.value })}
                       className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-slate-700">Not Verified</span>
+                    <span className="text-sm text-slate-700">Unverified</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Supplier Type Filter */}
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900 mb-2">Supplier Type</h3>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filters.contractHolder}
+                      onChange={(e) => updateFilters({ contractHolder: e.target.checked })}
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-slate-700">Contract holder</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filters.broker}
+                      onChange={(e) => updateFilters({ broker: e.target.checked })}
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-slate-700">Broker</span>
                   </label>
                 </div>
               </div>

@@ -63,16 +63,12 @@ function SiteFooter() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-10 text-sm text-black/70 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-10 text-sm text-black/70 sm:grid-cols-2">
           <div className="space-y-2">
             <p className="font-semibold text-black">Marketplace</p>
             <Link href="/suppliers" className="block hover:text-blue-600 transition-colors duration-200">Supplier directory</Link>
             <Link href="/categories" className="block hover:text-blue-600 transition-colors duration-200">Categories</Link>
             <Link href="/locations" className="block hover:text-blue-600 transition-colors duration-200">Locations</Link>
-          </div>
-          <div className="space-y-2">
-            <p className="font-semibold text-black">Resources</p>
-            <Link href="/suppliers?search=export" className="block hover:text-blue-600 transition-colors duration-200">Export programs</Link>
           </div>
           <div className="space-y-2">
             <p className="font-semibold text-black">Company</p>

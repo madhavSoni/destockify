@@ -2,15 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Patrick_Hand } from 'next/font/google';
-
-const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
-
-const STATES = [
-  'AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','IA','ID','IL','IN','KS','KY','LA','MA',
-  'MD','ME','MI','MN','MO','MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','OR','PA','RI',
-  'SC','SD','TN','TX','UT','VA','VT','WA','WI','WV','WY',
-];
+import { api } from '@/lib/api';
 
 type RegionSummary = {
   slug: string;
@@ -42,6 +34,8 @@ export function StateSelector() {
   const router = useRouter();
   const [stateToRegionMap, setStateToRegionMap] = useState<Record<string, string>>({});
   const [regionsList, setRegionsList] = useState<RegionSummary[]>([]);
+  const [availableStates, setAvailableStates] = useState<Array<{ code: string; name: string; count: number }>>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch regions and create a map of stateCode -> region slug
@@ -69,36 +63,38 @@ export function StateSelector() {
       .catch((err) => {
         console.error('Failed to fetch regions:', err);
       });
+
+    // Fetch states that have suppliers
+    api.suppliers.list({ limit: 1 })
+      .then((result) => {
+        if (result.availableFilters?.states) {
+          const states = result.availableFilters.states
+            .map(s => ({
+              code: s.code,
+              name: s.name || STATE_NAMES[s.code] || s.code,
+              count: s.count
+            }))
+            .sort((a, b) => {
+              // Sort by name alphabetically
+              return a.name.localeCompare(b.name);
+            });
+          setAvailableStates(states);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch state data:', err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const stateCode = e.target.value;
     if (!stateCode) return;
     
-    // Check if we have a region mapping for this state
-    if (stateToRegionMap[stateCode]) {
-      // Navigate to suppliers filtered by the region
-      router.push(`/suppliers?region=${stateToRegionMap[stateCode]}`);
-    } else {
-      // If no direct mapping, try to find a region by name match
-      const stateName = getStateName(stateCode);
-      if (stateName) {
-        // Try to find a region whose name contains the state name
-        const matchingRegion = regionsList.find((region) => 
-          region.name.toLowerCase().includes(stateName.toLowerCase())
-        );
-        
-        if (matchingRegion) {
-          router.push(`/suppliers?region=${matchingRegion.slug}`);
-        } else {
-          // Fallback: search by state name
-          router.push(`/suppliers?search=${stateName}`);
-        }
-      } else {
-        // Final fallback: search by state code
-        router.push(`/suppliers?search=${stateCode}`);
-      }
-    }
+    // First try direct state filtering (most reliable)
+    router.push(`/suppliers?state=${stateCode}`);
   };
 
   return (
@@ -108,15 +104,27 @@ export function StateSelector() {
           name="state"
           defaultValue=""
           onChange={handleChange}
-          className={`${hand.className} h-11 w-full appearance-none rounded-[14px] border-2 border-slate-900/80 bg-white px-4 pr-10 text-base text-slate-900 shadow-[3px_4px_0_0_rgba(2,6,23,0.85)] focus:outline-none cursor-pointer`}
+          disabled={loading}
+          className="h-11 w-full appearance-none rounded-md border-2 border-black/10 bg-white px-4 pr-10 text-base font-medium text-slate-900 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <option value="" disabled>Shop by State</option>
-          {STATES.map((s) => (
-            <option key={s} value={s}>{s}</option>
+          <option value="" disabled>
+            {loading ? 'Loading states...' : 'Shop by State'}
+          </option>
+          {availableStates.map((state) => (
+            <option key={state.code} value={state.code}>
+              {state.code} - {state.name} ({state.count})
+            </option>
           ))}
         </select>
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-700">▾</span>
+        <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
       </div>
+      {!loading && availableStates.length > 0 && (
+        <p className="mt-2 text-xs text-slate-500 text-center">
+          {availableStates.length} state{availableStates.length !== 1 ? 's' : ''} with suppliers
+        </p>
+      )}
     </form>
   );
 }

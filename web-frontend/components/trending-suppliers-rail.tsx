@@ -21,99 +21,101 @@ export function TrendingSuppliersRail({
   };
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8 bg-slate-50">
-      <div className="mb-4 sm:mb-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
-        <div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">Trending Wholesale Suppliers Near You</h2>
-          <p className="mt-1 text-sm sm:text-base text-slate-600 leading-relaxed">
-            Find wholesale lots of returns, overstock and mixed merchandise by the pallet or truckload.
-          </p>
+    <section className="w-full bg-slate-50 py-12 sm:py-16">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-4 sm:mb-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
+          <div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">Trending Wholesale Suppliers Near You</h2>
+            <p className="mt-1 text-sm sm:text-base text-slate-600 leading-relaxed">
+              Find wholesale lots of returns, overstock and mixed merchandise by the pallet or truckload.
+            </p>
+          </div>
+          <div className="hidden lg:flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Previous"
+              onClick={() => scrollByCards(-1)}
+              className="rounded-md border border-black/10 bg-white p-2 text-black hover:bg-black/5 hover:border-blue-600 transition-all duration-200"
+            >
+              <Chevron dir="left" />
+            </button>
+            <button
+              type="button"
+              aria-label="Next"
+              onClick={() => scrollByCards(1)}
+              className="rounded-md border border-black/10 bg-white p-2 text-black hover:bg-black/5 hover:border-blue-600 transition-all duration-200"
+            >
+              <Chevron dir="right" />
+            </button>
+          </div>
         </div>
-        <div className="hidden lg:flex items-center gap-2">
+
+        <div className="relative">
+          {/* Mobile navigation arrows */}
           <button
             type="button"
-            aria-label="Previous"
             onClick={() => scrollByCards(-1)}
-            className="rounded-md border border-black/10 bg-white p-2 text-black hover:bg-black/5 hover:border-blue-600 transition-all duration-200"
+            className="lg:hidden absolute left-1 top-1/2 -translate-y-1/2 z-20 rounded-md bg-white/95 p-2 shadow-lg ring-1 ring-black/10 text-black hover:bg-white transition-all duration-200"
+            aria-label="Previous"
           >
             <Chevron dir="left" />
           </button>
           <button
             type="button"
-            aria-label="Next"
             onClick={() => scrollByCards(1)}
-            className="rounded-md border border-black/10 bg-white p-2 text-black hover:bg-black/5 hover:border-blue-600 transition-all duration-200"
+            className="lg:hidden absolute right-1 top-1/2 -translate-y-1/2 z-20 rounded-md bg-white/95 p-2 shadow-lg ring-1 ring-black/10 text-black hover:bg-white transition-all duration-200"
+            aria-label="Next"
           >
             <Chevron dir="right" />
           </button>
-        </div>
-      </div>
 
-      <div className="relative">
-        {/* Mobile navigation arrows */}
-        <button
-          type="button"
-          onClick={() => scrollByCards(-1)}
-          className="lg:hidden absolute left-1 top-1/2 -translate-y-1/2 z-20 rounded-md bg-white/95 p-2 shadow-lg ring-1 ring-black/10 text-black hover:bg-white transition-all duration-200"
-          aria-label="Previous"
-        >
-          <Chevron dir="left" />
-        </button>
-        <button
-          type="button"
-          onClick={() => scrollByCards(1)}
-          className="lg:hidden absolute right-1 top-1/2 -translate-y-1/2 z-20 rounded-md bg-white/95 p-2 shadow-lg ring-1 ring-black/10 text-black hover:bg-white transition-all duration-200"
-          aria-label="Next"
-        >
-          <Chevron dir="right" />
-        </button>
-
-        <div
-          ref={railRef}
-          className="flex snap-x snap-mandatory gap-3 sm:gap-4 overflow-x-auto pb-3 scrollbar-hide items-stretch"
-          style={{ 
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            WebkitOverflowScrolling: 'touch'
-          }}
-        >
-          {suppliers.slice(0, 8).map((s) => (
-            <div
-              key={s.slug}
-              data-card
-              className="w-[280px] sm:w-[320px] shrink-0 snap-start flex flex-col"
+          <div
+            ref={railRef}
+            className="flex snap-x snap-mandatory gap-3 sm:gap-4 overflow-x-auto pb-3 scrollbar-hide items-stretch"
+            style={{ 
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch'
+            }}
+          >
+            {suppliers.slice(0, 8).map((s) => (
+              <div
+                key={s.slug}
+                data-card
+                className="w-[280px] sm:w-[320px] shrink-0 snap-start flex flex-col"
+              >
+                <SupplierCard supplier={s} />
+              </div>
+            ))}
+            
+            {/* "See more" button card - half peek */}
+            <Link
+              href="/suppliers"
+              className="group relative shrink-0 snap-start overflow-hidden rounded-md border-2 border-dashed border-black/20 bg-white/70 backdrop-blur-sm hover:bg-white hover:border-blue-600 transition-all duration-300 hover:shadow-md"
+              style={{ width: '160px' }}
+              aria-label="See more suppliers"
             >
-              <SupplierCard supplier={s} />
-            </div>
-          ))}
-          
-          {/* "See more" button card - half peek */}
+              <div className="flex h-full min-h-[200px] w-full flex-col items-center justify-center gap-2 p-4 text-center">
+                <svg className="w-8 h-8 text-black/30 group-hover:text-blue-600 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+                <span className="text-sm font-semibold text-black/50 group-hover:text-blue-600 transition-colors duration-200">See more</span>
+              </div>
+            </Link>
+
+            {/* Right spacer for last card breathing room */}
+            <div className="shrink-0 w-4 sm:w-8" aria-hidden />
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-center">
           <Link
             href="/suppliers"
-            className="group relative shrink-0 snap-start overflow-hidden rounded-md border-2 border-dashed border-black/20 bg-white/70 backdrop-blur-sm hover:bg-white hover:border-blue-600 transition-all duration-300 hover:shadow-md"
-            style={{ width: '160px' }}
-            aria-label="See more suppliers"
+            className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white hover:bg-blue-700 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
           >
-            <div className="flex h-full min-h-[200px] w-full flex-col items-center justify-center gap-2 p-4 text-center">
-              <svg className="w-8 h-8 text-black/30 group-hover:text-blue-600 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-              <span className="text-sm font-semibold text-black/50 group-hover:text-blue-600 transition-colors duration-200">See more</span>
-            </div>
+            See all suppliers
           </Link>
-
-          {/* Right spacer for last card breathing room */}
-          <div className="shrink-0 w-4 sm:w-8" aria-hidden />
         </div>
-      </div>
-
-      <div className="mt-6 flex justify-center">
-        <Link
-          href="/suppliers"
-          className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white hover:bg-blue-700 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
-        >
-          See all suppliers
-        </Link>
       </div>
     </section>
   );

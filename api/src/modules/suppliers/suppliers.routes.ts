@@ -19,7 +19,7 @@ const router = Router();
 
 router.get('/', async (req, res) => {
   try {
-    const { category, region, state, country, search, cursor, limit, verified, sort } = req.query;
+    const { category, region, state, country, search, cursor, limit, verified, sort, isContractHolder, isBroker } = req.query;
 
     const result = await listSuppliers({
       category: typeof category === 'string' ? category : undefined,
@@ -31,6 +31,8 @@ router.get('/', async (req, res) => {
       limit: limit ? Number(limit) : undefined,
       verified: verified === 'true' ? true : verified === 'false' ? false : undefined,
       sort: typeof sort === 'string' ? sort : undefined,
+      isContractHolder: isContractHolder === 'true' ? true : undefined,
+      isBroker: isBroker === 'true' ? true : undefined,
     });
 
     res.json(result);

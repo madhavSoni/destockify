@@ -407,7 +407,7 @@ export const api = {
     get: () => fetchFromApi<HomepagePayload>('/home', { revalidate: 30 }),
   },
   suppliers: {
-    list: (params?: { category?: string; region?: string; state?: string; country?: string; search?: string; cursor?: number; limit?: number; verified?: boolean; sort?: string }) =>
+    list: (params?: { category?: string; region?: string; state?: string; country?: string; search?: string; cursor?: number; limit?: number; verified?: boolean; sort?: string; isContractHolder?: boolean; isBroker?: boolean }) =>
       fetchFromApi<SupplierListResponse>(`/suppliers${buildQueryString(params)}`, { cache: 'no-store' }),
     get: (slug: string) => fetchFromApi<SupplierDetailResponse>(`/suppliers/${slug}`, { revalidate: 30 }),
     featured: () => fetchFromApi<SupplierSummary[]>('/suppliers/featured', { revalidate: 30 }),

@@ -37,6 +37,8 @@ export interface SupplierListParams {
   homeOnly?: boolean;
   verified?: boolean;
   sort?: string;
+  isContractHolder?: boolean;
+  isBroker?: boolean;
 }
 
 export interface SupplierListResponse {
@@ -185,6 +187,20 @@ export async function listSuppliers(params: SupplierListParams): Promise<Supplie
     where.isVerified = params.verified;
   }
 
+  // Supplier type filtering: if both are true, use OR logic (either contract holder OR broker)
+  if (params.isContractHolder === true || params.isBroker === true) {
+    if (params.isContractHolder === true && params.isBroker === true) {
+      where.OR = [
+        { isContractHolder: true },
+        { isBroker: true },
+      ];
+    } else if (params.isContractHolder === true) {
+      where.isContractHolder = true;
+    } else if (params.isBroker === true) {
+      where.isBroker = true;
+    }
+  }
+
   if (params.homeOnly) {
     where.homeRank = { gt: 0 };
   }
@@ -307,8 +323,38 @@ export async function listSuppliers(params: SupplierListParams): Promise<Supplie
 
   const categoryMap = new Map(categories.map(c => [c.id, c]));
 
+  // Get ratings for all suppliers
+  const supplierIds = suppliers.map(s => s.id);
+  const reviews = supplierIds.length > 0 ? await prisma.review.findMany({
+    where: {
+      supplierId: { in: supplierIds },
+      isApproved: true,
+    },
+    select: {
+      supplierId: true,
+      ratingOverall: true,
+    },
+  }) : [];
+
+  // Calculate average rating per supplier
+  const ratingsBySupplier = new Map<number, { average: number; count: number }>();
+  for (const review of reviews) {
+    const existing = ratingsBySupplier.get(review.supplierId) || { average: 0, count: 0 };
+    existing.average = (existing.average * existing.count + review.ratingOverall) / (existing.count + 1);
+    existing.count += 1;
+    ratingsBySupplier.set(review.supplierId, existing);
+  }
+
   return {
-    items: suppliers.map((supplier) => mapSupplierSummary(supplier)),
+    items: suppliers.map((supplier) => {
+      const summary = mapSupplierSummary(supplier);
+      const rating = ratingsBySupplier.get(supplier.id);
+      return {
+        ...summary,
+        ratingAverage: rating ? Number(rating.average.toFixed(1)) : null,
+        ratingCount: rating?.count || 0,
+      };
+    }),
     nextCursor,
     total,
     availableFilters: {
@@ -778,6 +824,8 @@ export async function getAllSuppliersAdmin(params: {
         // expose homeRank so admin UI can show/set "featured" state
         homeRank: supplier.homeRank ?? 0,
         createdAt: supplier.createdAt.toISOString(),
+        logoImage: supplier.logoImage,
+        heroImage: supplier.heroImage,
         city: primaryAddress?.city || null,
         state: primaryAddress?.state || null,
         country: primaryAddress?.country || null,
