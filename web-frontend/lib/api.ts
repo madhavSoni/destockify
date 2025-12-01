@@ -256,6 +256,7 @@ export type CreateReviewPayload = {
   ratingOverall: number; // Single 1-5 integer rating
   body: string;
   images?: string[];
+  isAnonymous?: boolean;
 };
 
 export type UpdateReviewPayload = {

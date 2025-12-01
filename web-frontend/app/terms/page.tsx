@@ -1,6 +1,14 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
+  alternates: {
+    canonical: 'https://trustpallet.com/terms',
+  },
+  openGraph: {
+    url: 'https://trustpallet.com/terms',
+    siteName: 'TrustPallet',
+    type: 'website',
+  },
   title: 'Terms of Service | Trust Pallet',
   description: 'Terms and conditions for using Trust Pallet platform.',
 };

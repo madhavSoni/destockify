@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { SupplierCard } from '@/components/supplier-card';
+import { REGIONS, getStatesForRegion, type RegionName } from '@/lib/constants/regions';
+import { getStateName } from '@/lib/constants/states';
 // Icons as inline SVGs
 const SlidersHorizontalIcon = ({ size = 20 }: { size?: number }) => (
   <svg width={size} height={size} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -43,6 +45,8 @@ function SuppliersPageContent() {
   const [categories, setCategories] = useState<any[]>([]);
   const [showFiltersModal, setShowFiltersModal] = useState(false);
   const [nextCursor, setNextCursor] = useState<number | null>(null);
+  const [expandedRegion, setExpandedRegion] = useState<RegionName | null>(null);
+  const [expandedRegionMobile, setExpandedRegionMobile] = useState<RegionName | null>(null);
 
   const filters = useMemo(() => {
     return {
@@ -164,6 +168,28 @@ function SuppliersPageContent() {
     return [];
   }, [availableFilters]);
 
+  // Group states by region
+  const statesByRegion = useMemo(() => {
+    const grouped: Record<RegionName, Array<{ code: string; name: string; count: number }>> = {
+      'Northeast': [],
+      'Southeast': [],
+      'Midwest': [],
+      'Westcoast': [],
+    };
+
+    stateOptions.forEach(state => {
+      for (const region of Object.keys(REGIONS) as RegionName[]) {
+        const regionStates = getStatesForRegion(region);
+        if (regionStates.includes(state.code)) {
+          grouped[region].push(state);
+          break;
+        }
+      }
+    });
+
+    return grouped;
+  }, [stateOptions]);
+
   const categoryOptions = useMemo(() => {
     if (availableFilters?.categories && availableFilters.categories.length > 0) {
       return availableFilters.categories.map(c => ({
@@ -190,10 +216,10 @@ function SuppliersPageContent() {
         {/* Hero Section */}
         <div className="mb-8 rounded-md border-2 border-black/10 bg-gradient-to-br from-blue-600 to-blue-700 p-8 sm:p-12 shadow-md">
           <h1 className="font-black text-3xl sm:text-4xl lg:text-5xl text-white mb-4 leading-tight">
-            Find Trusted Suppliers Near You
+            Buy Liquidation Truckloads & Pallets Near You.
           </h1>
           <p className="font-normal text-lg text-white/90 max-w-3xl leading-relaxed">
-            Browse hundreds of verified liquidators and wholesalers across the United States. Connect with suppliers offering returned, overstock, and brand new merchandise.
+            Browse hundreds of verified liquidators and wholesalers across the United States. Connect with suppliers offering returned, overstock, and brand-new merchandise.
           </p>
         </div>
 
@@ -266,11 +292,11 @@ function SuppliersPageContent() {
                 </div>
               )}
 
-              {/* Location Filter */}
+              {/* Location Filter - Region Based */}
               {stateOptions.length > 0 && (
                 <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
                   <h3 className="font-semibold text-lg text-black mb-4">Location</h3>
-                  <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                  <div className="space-y-2 max-h-[400px] overflow-y-auto">
                     <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
                       <input
                         type="radio"
@@ -282,23 +308,46 @@ function SuppliersPageContent() {
                       />
                       <span className="font-normal text-sm text-black/70">All States</span>
                     </label>
-                    {stateOptions.map((state) => (
-                      <label
-                        key={state.code}
-                        className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors"
-                      >
-                        <input
-                          type="radio"
-                          name="state"
-                          value={state.code}
-                          checked={filters.state === state.code}
-                          onChange={(e) => updateFilters({ state: e.target.value })}
-                          className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
-                        />
-                        <span className="font-normal text-sm text-black/70">
-                          {state.name} ({state.count})
-                        </span>
-                      </label>
+                    {(Object.keys(REGIONS) as RegionName[]).map((region) => (
+                      <div key={region}>
+                        <button
+                          type="button"
+                          onClick={() => setExpandedRegion(expandedRegion === region ? null : region)}
+                          className="w-full flex items-center justify-between p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors"
+                        >
+                          <span className="font-semibold text-sm text-black/70">{region}</span>
+                          <svg
+                            className={`w-4 h-4 text-black/50 transition-transform ${expandedRegion === region ? 'rotate-180' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                        {expandedRegion === region && (
+                          <div className="ml-4 mt-1 space-y-1 border-l-2 border-blue-200 pl-3">
+                            {statesByRegion[region].map((state) => (
+                              <label
+                                key={state.code}
+                                className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors"
+                              >
+                                <input
+                                  type="radio"
+                                  name="state"
+                                  value={state.code}
+                                  checked={filters.state === state.code}
+                                  onChange={(e) => updateFilters({ state: e.target.value })}
+                                  className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                                />
+                                <span className="font-normal text-sm text-black/70">
+                                  {state.name} ({state.count})
+                                </span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -595,6 +644,111 @@ function SuppliersPageContent() {
             </div>
           </div>
         </section>
+
+        {/* FAQ Section */}
+        <section className="mt-16 mb-8">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-8 sm:mb-10">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">Frequently Asked Questions</h2>
+            </div>
+            <div className="mx-auto max-w-3xl space-y-4">
+              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
+                  <div className="flex-1">
+                    <div className="text-base sm:text-lg font-semibold text-slate-900">
+                      How do I find suppliers in my area?
+                    </div>
+                    <div className="mt-1 text-xs sm:text-sm uppercase tracking-wide text-slate-400">Finding Suppliers</div>
+                  </div>
+                  <span className="ml-4 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition group-open:rotate-45">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="mt-2 px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-slate-600 leading-relaxed">
+                  Use the Location filter to browse by region or state. Click on a region to see all states within that region, then select a specific state to view suppliers in that area. You can also use the search function to find suppliers by name or location.
+                </div>
+              </details>
+
+              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
+                  <div className="flex-1">
+                    <div className="text-base sm:text-lg font-semibold text-slate-900">
+                      What's the difference between verified and unverified suppliers?
+                    </div>
+                    <div className="mt-1 text-xs sm:text-sm uppercase tracking-wide text-slate-400">Verification</div>
+                  </div>
+                  <span className="ml-4 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition group-open:rotate-45">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="mt-2 px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-slate-600 leading-relaxed">
+                  Verified suppliers have completed our comprehensive verification process, which includes proof of sourcing rights, warehouse inspections, insurance verification, and buyer reference checks. Unverified suppliers are listed but haven't completed this process yet. We recommend reading reviews for both types before making a purchase.
+                </div>
+              </details>
+
+              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
+                  <div className="flex-1">
+                    <div className="text-base sm:text-lg font-semibold text-slate-900">
+                      Can I buy liquidation pallets or truckloads directly through TrustPallet?
+                    </div>
+                    <div className="mt-1 text-xs sm:text-sm uppercase tracking-wide text-slate-400">Purchasing</div>
+                  </div>
+                  <span className="ml-4 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition group-open:rotate-45">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="mt-2 px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-slate-600 leading-relaxed">
+                  TrustPallet is a directory and review platform. We connect you with suppliers, but all purchases are made directly with the suppliers. Visit supplier profiles to find contact information, websites, and details about their inventory and purchasing process.
+                </div>
+              </details>
+
+              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
+                  <div className="flex-1">
+                    <div className="text-base sm:text-lg font-semibold text-slate-900">
+                      How do I know if a supplier is trustworthy?
+                    </div>
+                    <div className="mt-1 text-xs sm:text-sm uppercase tracking-wide text-slate-400">Trust & Safety</div>
+                  </div>
+                  <span className="ml-4 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition group-open:rotate-45">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="mt-2 px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-slate-600 leading-relaxed">
+                  Check the supplier's verification status, read reviews from other buyers, and look at their rating average. Verified suppliers with high ratings and positive reviews are generally more trustworthy. Always do your due diligence and contact suppliers directly with any questions before making a purchase.
+                </div>
+              </details>
+
+              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
+                  <div className="flex-1">
+                    <div className="text-base sm:text-lg font-semibold text-slate-900">
+                      What information should I look for in supplier reviews?
+                    </div>
+                    <div className="mt-1 text-xs sm:text-sm uppercase tracking-wide text-slate-400">Reviews</div>
+                  </div>
+                  <span className="ml-4 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition group-open:rotate-45">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="mt-2 px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-slate-600 leading-relaxed">
+                  Look for reviews that mention product condition accuracy, shipping times, communication quality, and overall satisfaction. Reviews with photos are especially helpful. Pay attention to both positive and negative reviews to get a balanced view of the supplier's performance.
+                </div>
+              </details>
+            </div>
+          </div>
+        </section>
       </div>
 
       {/* Mobile Filter Modal */}
@@ -673,7 +827,7 @@ function SuppliersPageContent() {
                 </div>
               )}
 
-              {/* Location Filter */}
+              {/* Location Filter - Region Based */}
               {stateOptions.length > 0 && (
                 <div>
                   <h3 className="text-sm font-semibold text-slate-900 mb-2">Location</h3>
@@ -689,23 +843,46 @@ function SuppliersPageContent() {
                       />
                       <span className="text-sm text-slate-700">All States</span>
                     </label>
-                    {stateOptions.map((state) => (
-                      <label
-                        key={state.code}
-                        className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"
-                      >
-                        <input
-                          type="radio"
-                          name="state-modal"
-                          value={state.code}
-                          checked={filters.state === state.code}
-                          onChange={(e) => updateFilters({ state: e.target.value })}
-                          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-slate-700">
-                          {state.name} ({state.count})
-                        </span>
-                      </label>
+                    {(Object.keys(REGIONS) as RegionName[]).map((region) => (
+                      <div key={region}>
+                        <button
+                          type="button"
+                          onClick={() => setExpandedRegionMobile(expandedRegionMobile === region ? null : region)}
+                          className="w-full flex items-center justify-between p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"
+                        >
+                          <span className="font-semibold text-sm text-slate-700">{region}</span>
+                          <svg
+                            className={`w-4 h-4 text-slate-500 transition-transform ${expandedRegionMobile === region ? 'rotate-180' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                        {expandedRegionMobile === region && (
+                          <div className="ml-4 mt-1 space-y-1 border-l-2 border-blue-200 pl-3">
+                            {statesByRegion[region].map((state) => (
+                              <label
+                                key={state.code}
+                                className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer"
+                              >
+                                <input
+                                  type="radio"
+                                  name="state-modal"
+                                  value={state.code}
+                                  checked={filters.state === state.code}
+                                  onChange={(e) => updateFilters({ state: e.target.value })}
+                                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                />
+                                <span className="text-sm text-slate-700">
+                                  {state.name} ({state.count})
+                                </span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>

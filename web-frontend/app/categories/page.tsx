@@ -1,9 +1,63 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { Metadata } from 'next';
 import { api } from '@/lib/api';
+import { generateFAQSchema, generateBreadcrumbSchema, schemaToJsonLd } from '@/lib/schema';
+
+export const metadata: Metadata = {
+  title: 'Liquidation Categories – Buy Wholesale by Product Type | TrustPallet',
+  description: 'Browse liquidation pallets and truckloads by category. Find wholesale electronics, apparel, home goods, tools, toys, and more from verified suppliers across the United States.',
+  keywords: 'liquidation categories, wholesale merchandise, liquidation pallets, truckload liquidation, electronics liquidation, apparel liquidation, home goods liquidation',
+  alternates: {
+    canonical: 'https://trustpallet.com/categories',
+  },
+  openGraph: {
+    title: 'Liquidation Categories – Buy Wholesale by Product Type | TrustPallet',
+    description: 'Browse liquidation pallets and truckloads by category. Find wholesale electronics, apparel, home goods, tools, toys, and more from verified suppliers across the United States.',
+    url: 'https://trustpallet.com/categories',
+    siteName: 'TrustPallet',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Liquidation Categories – Buy Wholesale by Product Type | TrustPallet',
+    description: 'Browse liquidation pallets and truckloads by category. Find wholesale electronics, apparel, home goods, tools, toys, and more from verified suppliers across the United States.',
+  },
+};
 
 export default async function CategoriesPage() {
   const categories = await api.catalog.categories();
+
+  // FAQ data for schema
+  const faqs = [
+    {
+      question: "How often is supplier data refreshed?",
+      answer: "Supplier profiles, ratings, and lot availability are refreshed weekly by Trust Pallet analysts. Subscribers receive alerts when new categories or truckload programs become available.",
+    },
+    {
+      question: "How are Trust Pallet suppliers vetted?",
+      answer: "Every supplier completes a multi-step verification including proof of retailer contracts or sourcing rights, warehouse walkthrough, insurance and compliance review, plus buyer reference checks.",
+    },
+    {
+      question: "Do you support international buyers?",
+      answer: "Absolutely. Many suppliers offer bilingual account reps, export documentation, and container consolidation. Filter by \"Export Friendly\" badge to find partners experienced with overseas shipping.",
+    },
+    {
+      question: "Can Trust Pallet help me negotiate freight?",
+      answer: "Yes. Our sourcing advisors maintain a roster of vetted LTL and full truckload carriers familiar with liquidation hubs. Request a freight consult and we will benchmark rates for your lane.",
+    },
+    {
+      question: "What categories of liquidation merchandise are available?",
+      answer: "TrustPallet features suppliers offering liquidation merchandise across many categories including electronics, apparel, home goods, tools, toys, groceries, and more. Browse by category to find suppliers specializing in the types of inventory you're looking for.",
+    }
+  ];
+  const faqSchema = generateFAQSchema(faqs);
+  
+  // Breadcrumb schema
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Categories', url: '/categories' }
+  ]);
 
   // simple emoji placeholders (swap to icons later)
   const iconFor = (slug: string) => {
@@ -17,6 +71,16 @@ export default async function CategoriesPage() {
   };
 
   return (
+    <>
+      {/* Schema.org JSON-LD for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(breadcrumbSchema) }}
+      />
     <div className="bg-white">
       <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
         {/* Heading */}
@@ -61,9 +125,9 @@ export default async function CategoriesPage() {
         {/* Feature Cards Section */}
         <section className="mt-16 sm:mt-20">
           <div className="grid gap-6 sm:gap-8 md:grid-cols-2">
-            {/* Left card */}
-            <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl">
-              <div className="relative h-64 sm:h-80 w-full bg-gray-50">
+            {/* Left card - Image Left, Text Right */}
+            <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl md:grid-cols-2 md:h-[450px] lg:h-[500px]">
+              <div className="relative h-64 sm:h-80 w-full md:h-full bg-gray-50">
                 <Image
                   src="/feature-desk.png"
                   alt="Wholesale electronics workspace"
@@ -93,8 +157,8 @@ export default async function CategoriesPage() {
               </div>
             </article>
 
-            {/* Right card */}
-            <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl">
+            {/* Right card - Text Left, Image Right */}
+            <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl md:grid-cols-2 md:h-[450px] lg:h-[500px]">
               <div className="order-2 flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12 md:order-1">
                 <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
                   Find Wholesale Clothing and Apparel Suppliers Near You
@@ -113,7 +177,7 @@ export default async function CategoriesPage() {
                   </svg>
                 </Link>
               </div>
-              <div className="relative order-1 h-64 sm:h-80 w-full md:order-2 bg-gray-50">
+              <div className="relative order-1 h-64 sm:h-80 w-full md:order-2 md:h-full bg-gray-50">
                 <Image
                   src="/feature-family.png"
                   alt="Family sourcing pallets"
@@ -203,11 +267,31 @@ export default async function CategoriesPage() {
                   Yes. Our sourcing advisors maintain a roster of vetted LTL and full truckload carriers familiar with liquidation hubs. Request a freight consult and we will benchmark rates for your lane.
                 </div>
               </details>
+
+              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
+                  <div className="flex-1">
+                    <div className="text-base sm:text-lg font-semibold text-slate-900">
+                      What categories of liquidation merchandise are available?
+                    </div>
+                    <div className="mt-1 text-xs sm:text-sm uppercase tracking-wide text-slate-400">Categories</div>
+                  </div>
+                  <span className="ml-4 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition group-open:rotate-45">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="mt-2 px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-slate-600 leading-relaxed">
+                  TrustPallet features suppliers offering liquidation merchandise across many categories including electronics, apparel, home goods, tools, toys, groceries, and more. Browse by category to find suppliers specializing in the types of inventory you're looking for.
+                </div>
+              </details>
             </div>
           </div>
 
         </section>
       </div>
     </div>
+    </>
   );
 }

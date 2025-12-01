@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { api } from '@/lib/api';
 import { ReviewsWrapper } from './reviews-wrapper';
-import { generateSupplierSchema, schemaToJsonLd } from '@/lib/schema';
+import { generateSupplierSchema, generateBreadcrumbSchema, schemaToJsonLd } from '@/lib/schema';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -19,10 +19,37 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const { supplier } = detail;
   const companyName = supplier.name;
+  const supplierUrl = `https://trustpallet.com/suppliers/${supplier.slug}`;
 
   return {
     title: `${companyName} Reviews – Are They Legit? | Truckloads & Pallets Buyer Ratings`,
     description: `Is ${companyName} legit? Read real buyer reviews, ratings, and experiences with their liquidation truckloads and pallet sales. See complaints, pricing details, and verified insights before you buy.`,
+    alternates: {
+      canonical: supplierUrl,
+    },
+    openGraph: {
+      title: `${companyName} Reviews – Are They Legit? | TrustPallet`,
+      description: `Is ${companyName} legit? Read real buyer reviews, ratings, and experiences with their liquidation truckloads and pallet sales.`,
+      url: supplierUrl,
+      siteName: 'TrustPallet',
+      type: 'website',
+      ...(supplier.logoImage && {
+        images: [{
+          url: supplier.logoImage,
+          width: 1200,
+          height: 630,
+          alt: `${companyName} logo`,
+        }],
+      }),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${companyName} Reviews – Are They Legit? | TrustPallet`,
+      description: `Is ${companyName} legit? Read real buyer reviews, ratings, and experiences with their liquidation truckloads and pallet sales.`,
+      ...(supplier.logoImage && {
+        images: [supplier.logoImage],
+      }),
+    },
   };
 }
 
@@ -37,6 +64,13 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
   // Generate Schema.org structured data - DYNAMICALLY from database
   // This updates automatically when reviews are added/changed
   const supplierSchema = generateSupplierSchema(supplier, reviewSummary, recentReviews);
+  
+  // Breadcrumb schema
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Suppliers', url: '/suppliers' },
+    { name: supplier.name, url: `/suppliers/${supplier.slug}` }
+  ]);
 
   return (
     <>
@@ -44,6 +78,10 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: schemaToJsonLd(supplierSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(breadcrumbSchema) }}
       />
 
       <div className="min-h-screen bg-white">

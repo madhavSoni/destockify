@@ -28,6 +28,7 @@ export function WriteReviewSection({
   const [formData, setFormData] = useState({
     ratingOverall: 5,
     body: '',
+    isAnonymous: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,6 +52,7 @@ export function WriteReviewSection({
         supplierId: supplier.id,
         ratingOverall: formData.ratingOverall,
         body: formData.body,
+        isAnonymous: formData.isAnonymous,
       };
 
       await api.reviews.create(payload, authToken);
@@ -59,6 +61,7 @@ export function WriteReviewSection({
       setFormData({
         ratingOverall: 5,
         body: '',
+        isAnonymous: false,
       });
 
       // Trigger immediate refresh of reviews section
@@ -224,6 +227,24 @@ export function WriteReviewSection({
               rows={6}
               className="w-full rounded-md border border-black/10 px-4 py-3 font-medium text-black placeholder:text-black/50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none resize-none"
             />
+          </div>
+
+          {/* Anonymous Option */}
+          <div>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.isAnonymous}
+                onChange={(e) => setFormData(prev => ({ ...prev, isAnonymous: e.target.checked }))}
+                className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+              />
+              <span className="text-sm font-medium text-black">
+                Post as anonymous
+              </span>
+            </label>
+            <p className="mt-1 ml-7 text-xs text-black/60">
+              Your name will not be displayed with this review
+            </p>
           </div>
 
           {/* Submit Button */}

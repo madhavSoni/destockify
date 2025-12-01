@@ -86,3 +86,5 @@ If something goes wrong:
 - It skips suppliers that already have addresses in the new table
 - The old columns will remain in the database until Step 4
 
+
+

@@ -3,13 +3,28 @@ import Image from 'next/image';
 import { Metadata } from 'next';
 import { api } from '@/lib/api';
 import { TrendingSuppliersRail } from '@/components/trending-suppliers-rail';
-import { generateWebsiteSchema, generateOrganizationSchema, schemaToJsonLd } from '@/lib/schema';
+import { generateWebsiteSchema, generateOrganizationSchema, generateFAQSchema, schemaToJsonLd } from '@/lib/schema';
 import { StateSelector } from '@/components/state-selector';
 import { SearchAutocomplete } from '@/components/search-autocomplete';
 
 export const metadata: Metadata = {
   title: 'TrustPallet – Buy Liquidation Truckloads | Reviews & Supplier Directory',
   description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the TrustPallet directory to source returns, overstock, and wholesale inventory with confidence.',
+  alternates: {
+    canonical: 'https://trustpallet.com',
+  },
+  openGraph: {
+    title: 'TrustPallet – Buy Liquidation Truckloads | Reviews & Supplier Directory',
+    description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the TrustPallet directory to source returns, overstock, and wholesale inventory with confidence.',
+    url: 'https://trustpallet.com',
+    siteName: 'TrustPallet',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'TrustPallet – Buy Liquidation Truckloads | Reviews & Supplier Directory',
+    description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the TrustPallet directory to source returns, overstock, and wholesale inventory with confidence.',
+  },
 };
 
 export type HomepageData = Awaited<ReturnType<typeof api.home.get>>;
@@ -43,6 +58,31 @@ export default async function HomePage() {
   // Generate Schema.org structured data for homepage
   const websiteSchema = generateWebsiteSchema();
   const organizationSchema = generateOrganizationSchema();
+  
+  // FAQ data for schema
+  const faqs = [
+    {
+      question: "How do I find the best liquidation suppliers near me?",
+      answer: "Use our directory to search by location, category, and supplier reputation. Filter by state or region to find liquidators in your area. Read verified reviews from other buyers to compare suppliers before making a purchase.",
+    },
+    {
+      question: "What types of liquidation inventory can I buy?",
+      answer: "You can find a wide variety of liquidation merchandise including returns, overstock, closeout items, and brand-new products. Categories range from electronics and apparel to home goods, tools, toys, and more. Most suppliers offer pallets or full truckloads.",
+    },
+    {
+      question: "How are suppliers verified on TrustPallet?",
+      answer: "Every supplier goes through a verification process that includes proof of sourcing rights, warehouse inspections, insurance verification, and buyer reference checks. Verified suppliers display a verification badge on their profile.",
+    },
+    {
+      question: "Can I read reviews before buying from a supplier?",
+      answer: "Yes, all suppliers have a reviews section where you can read detailed feedback from verified buyers. Reviews include ratings, written feedback, and sometimes photos of the merchandise received. This helps you make informed purchasing decisions.",
+    },
+    {
+      question: "What should I expect when buying liquidation truckloads?",
+      answer: "Liquidation truckloads typically contain mixed merchandise that may include customer returns, overstock, or closeout items. Condition varies, so it's important to read supplier descriptions and reviews carefully. Many suppliers offer inspection options before purchase.",
+    }
+  ];
+  const faqSchema = generateFAQSchema(faqs);
 
   return (
     <>
@@ -55,6 +95,10 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: schemaToJsonLd(organizationSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(faqSchema) }}
+      />
 
       <div className="bg-white scroll-smooth">
         <HeroSection />
@@ -63,13 +107,16 @@ export default async function HomePage() {
         <TrendingSuppliersRail suppliers={data.featuredSuppliers} />
 
         <ConnectByState regions={regions} />
-        <SearchDirectorySection />
         <QuickActionsBar />
+        <SearchDirectorySection />
         <TwoUpFeatures />
 
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
           <ListBusinessCta />
         </div>
+
+        {/* FAQ Section */}
+        <FaqSection />
       </div>
     </>
   );
@@ -216,9 +263,9 @@ function SearchDirectorySection() {
   return (
     <section className="mx-auto w-full max-w-3xl px-4 py-12 sm:py-16 text-center sm:px-6 lg:px-8 relative">
       <div className="relative">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">Search the Liquidation Directory</h2>
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">The Largest Liquidation Directory</h2>
         <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-base sm:text-lg text-slate-600 leading-relaxed">
-          Use our directory to find liquidation truckload and pallet sellers in your region. Filter by product category, retailer source, condition, and supplier reputation.
+          Use TrustPallet to find the best liquidation truckload and pallet sellers. Read reviews from bin stores, discount stores, auction houses, and more.
         </p>
       </div>
     </section>
@@ -312,6 +359,67 @@ function ListBusinessCta() {
             Get Started
           </Link>
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* ----------------------------- FAQ SECTION ---------------------------------- */
+function FaqSection() {
+  const faqs = [
+    {
+      question: "How do I find the best liquidation suppliers near me?",
+      answer: "Use our directory to search by location, category, and supplier reputation. Filter by state or region to find liquidators in your area. Read verified reviews from other buyers to compare suppliers before making a purchase.",
+      category: "Getting Started"
+    },
+    {
+      question: "What types of liquidation inventory can I buy?",
+      answer: "You can find a wide variety of liquidation merchandise including returns, overstock, closeout items, and brand-new products. Categories range from electronics and apparel to home goods, tools, toys, and more. Most suppliers offer pallets or full truckloads.",
+      category: "Inventory Types"
+    },
+    {
+      question: "How are suppliers verified on TrustPallet?",
+      answer: "Every supplier goes through a verification process that includes proof of sourcing rights, warehouse inspections, insurance verification, and buyer reference checks. Verified suppliers display a verification badge on their profile.",
+      category: "Verification"
+    },
+    {
+      question: "Can I read reviews before buying from a supplier?",
+      answer: "Yes, all suppliers have a reviews section where you can read detailed feedback from verified buyers. Reviews include ratings, written feedback, and sometimes photos of the merchandise received. This helps you make informed purchasing decisions.",
+      category: "Reviews"
+    },
+    {
+      question: "What should I expect when buying liquidation truckloads?",
+      answer: "Liquidation truckloads typically contain mixed merchandise that may include customer returns, overstock, or closeout items. Condition varies, so it's important to read supplier descriptions and reviews carefully. Many suppliers offer inspection options before purchase.",
+      category: "Buying Process"
+    }
+  ];
+
+  return (
+    <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 lg:py-20 sm:px-6 lg:px-8">
+      <div className="text-center mb-8 sm:mb-10">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">Frequently Asked Questions</h2>
+      </div>
+      <div className="mx-auto max-w-3xl space-y-4">
+        {faqs.map((faq, index) => (
+          <details key={index} className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
+              <div className="flex-1">
+                <div className="text-base sm:text-lg font-semibold text-slate-900">
+                  {faq.question}
+                </div>
+                <div className="mt-1 text-xs sm:text-sm uppercase tracking-wide text-slate-400">{faq.category}</div>
+              </div>
+              <span className="ml-4 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition group-open:rotate-45">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </span>
+            </summary>
+            <div className="mt-2 px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-slate-600 leading-relaxed">
+              {faq.answer}
+            </div>
+          </details>
+        ))}
       </div>
     </section>
   );

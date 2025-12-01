@@ -4,6 +4,21 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'About Us | Trust Pallet',
   description: 'Learn about Trust Pallet - your trusted platform for connecting with verified liquidation and wholesale suppliers across the United States.',
+  alternates: {
+    canonical: 'https://trustpallet.com/about',
+  },
+  openGraph: {
+    title: 'About Us | Trust Pallet',
+    description: 'Learn about Trust Pallet - your trusted platform for connecting with verified liquidation and wholesale suppliers across the United States.',
+    url: 'https://trustpallet.com/about',
+    siteName: 'TrustPallet',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'About Us | Trust Pallet',
+    description: 'Learn about Trust Pallet - your trusted platform for connecting with verified liquidation and wholesale suppliers across the United States.',
+  },
 };
 
 export default function AboutPage() {

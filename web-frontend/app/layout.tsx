@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: 'Trust Pallet | Wholesale Liquidation Supplier Directory',
     description:
       'Find vetted liquidation suppliers, read verified buyer reviews, and learn how to scale your wholesale sourcing with confidence.',
-    url: 'https://destockify.com',
+    url: 'https://trustpallet.com',
     siteName: 'Trust Pallet',
     type: 'website',
   },
