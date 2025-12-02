@@ -3,12 +3,19 @@
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 export function SiteHeader() {
   const { user, isAuthenticated, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Ensure we're mounted before using portal
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -204,17 +211,17 @@ export function SiteHeader() {
         </nav>
       </div>
 
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
+      {/* Mobile Menu Overlay - Rendered via Portal to escape header stacking context */}
+      {mounted && isMobileMenuOpen && typeof document !== 'undefined' && createPortal(
         <>
           {/* Backdrop */}
           <div 
-            className="md:hidden fixed inset-0 bg-black/30 z-40 animate-in fade-in duration-200"
+            className="md:hidden fixed inset-0 bg-black/30 z-[60] animate-in fade-in duration-200"
             onClick={closeMobileMenu}
           />
           
           {/* Side Menu */}
-          <div className="md:hidden fixed right-0 top-0 h-full w-72 bg-white border-l-2 border-black/10 shadow-lg z-50 animate-in slide-in-from-right duration-300">
+          <div className="md:hidden fixed right-0 top-0 h-full w-72 bg-white border-l-2 border-black/10 shadow-lg z-[60] animate-in slide-in-from-right duration-300">
             <div className="flex flex-col h-full">
               {/* Menu Header */}
               <div className="flex items-center justify-between px-4 py-4 border-b-2 border-black/10">
@@ -335,7 +342,8 @@ export function SiteHeader() {
               )}
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
     </header>
   );

@@ -63,7 +63,7 @@ export function SupplierCard({
     <Link
       href={`/suppliers/${supplier.slug}`}
       className={clsx(
-        'group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-[0_10px_30px_rgba(0,0,0,0.15)] transition-all duration-300 hover:shadow-[0_15px_40px_rgba(0,0,0,0.2)] hover:-translate-y-1 h-full',
+        'group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition-all duration-300 hover:shadow-[0_6px_20px_rgba(0,0,0,0.12)] hover:-translate-y-1 h-full',
         variant === 'compact' ? 'lg:flex-row lg:h-48' : '',
         className
       )}

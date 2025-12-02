@@ -282,8 +282,8 @@ function TwoUpFeatures() {
         <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl md:grid-cols-2 md:h-[450px] lg:h-[500px]">
           <div className="relative h-64 sm:h-80 w-full md:h-full">
             <Image
-              src="/feature-desk.png"
-              alt="Liquidation warehouse desk"
+              src="/PHOTO-2025-11-30-11-00-27.jpg"
+              alt="Liquidation warehouse with product pallets"
               fill
               className="object-cover"
               priority
@@ -329,8 +329,8 @@ function TwoUpFeatures() {
           </div>
           <div className="relative order-1 h-64 sm:h-80 w-full md:order-2 md:h-full">
             <Image
-              src="/feature-family.png"
-              alt="Family business liquidation"
+              src="/PHOTO-2025-11-30-10-58-35.jpg"
+              alt="Team reviewing supplier reviews on laptop"
               fill
               className="object-cover"
             />

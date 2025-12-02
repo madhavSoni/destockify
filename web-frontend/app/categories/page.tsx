@@ -123,16 +123,17 @@ export default async function CategoriesPage() {
         </div>
 
         {/* Feature Cards Section */}
-        <section className="mt-16 sm:mt-20">
-          <div className="grid gap-6 sm:gap-8 md:grid-cols-2">
-            {/* Left card - Image Left, Text Right */}
+        <section className="mx-auto max-w-7xl px-4 py-12 sm:py-16 lg:py-20 sm:px-6 lg:px-8 relative">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
+          <div className="space-y-6 sm:space-y-8">
+            {/* Feature 1: Split Layout - Image Left, Content Right */}
             <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl md:grid-cols-2 md:h-[450px] lg:h-[500px]">
-              <div className="relative h-64 sm:h-80 w-full md:h-full bg-gray-50">
+              <div className="relative h-64 sm:h-80 w-full md:h-full">
                 <Image
                   src="/feature-desk.png"
                   alt="Wholesale electronics workspace"
                   fill
-                  className="object-contain"
+                  className="object-cover"
                   priority
                 />
               </div>
@@ -157,7 +158,7 @@ export default async function CategoriesPage() {
               </div>
             </article>
 
-            {/* Right card - Text Left, Image Right */}
+            {/* Feature 2: Split Layout - Content Left, Image Right */}
             <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl md:grid-cols-2 md:h-[450px] lg:h-[500px]">
               <div className="order-2 flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12 md:order-1">
                 <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
@@ -177,12 +178,12 @@ export default async function CategoriesPage() {
                   </svg>
                 </Link>
               </div>
-              <div className="relative order-1 h-64 sm:h-80 w-full md:order-2 md:h-full bg-gray-50">
+              <div className="relative order-1 h-64 sm:h-80 w-full md:order-2 md:h-full">
                 <Image
                   src="/feature-family.png"
                   alt="Family sourcing pallets"
                   fill
-                  className="object-contain"
+                  className="object-cover"
                 />
               </div>
             </article>

@@ -476,7 +476,7 @@ function SuppliersPageContent() {
 
             {/* Cards Grid - 2 columns on mobile, 3 on desktop */}
             {loading ? (
-              <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
+              <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 items-stretch">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="h-64 bg-slate-200 animate-pulse rounded-2xl" />
                 ))}
@@ -494,7 +494,7 @@ function SuppliersPageContent() {
                 )}
               </div>
             ) : (
-              <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
+              <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 items-stretch">
                 {suppliers.map((s) => (
                   <SupplierCard key={s.slug} supplier={s} />
                 ))}
