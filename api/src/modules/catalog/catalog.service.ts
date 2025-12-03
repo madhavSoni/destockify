@@ -376,4 +376,25 @@ export async function deleteRegion(id: number) {
   return { message: 'Region deleted successfully' };
 }
 
+// CategoryPage public functions
+export async function getCategoryPages() {
+  const pages = await prisma.categoryPage.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return pages;
+}
+
+export async function getCategoryPageBySlug(slug: string) {
+  const page = await prisma.categoryPage.findUnique({
+    where: { slug },
+  });
+
+  if (!page) {
+    throw new Error('Category page not found');
+  }
+
+  return page;
+}
+
 

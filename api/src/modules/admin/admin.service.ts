@@ -134,3 +134,248 @@ export async function uploadImage(base64Data: string, filename?: string, mimeTyp
 
   return publicUrl;
 }
+
+// Helper function to generate slug from title
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+// CategoryPage CRUD operations
+export async function listCategoryPages(params?: { limit?: number; offset?: number }) {
+  const limit = params?.limit || 100;
+  const offset = params?.offset || 0;
+
+  const [pages, total] = await Promise.all([
+    prisma.categoryPage.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      skip: offset,
+    }),
+    prisma.categoryPage.count(),
+  ]);
+
+  return {
+    items: pages,
+    total,
+    limit,
+    offset,
+  };
+}
+
+export async function getCategoryPage(id: number) {
+  const page = await prisma.categoryPage.findUnique({
+    where: { id },
+  });
+
+  if (!page) {
+    throw new Error('Category page not found');
+  }
+
+  return page;
+}
+
+export async function createCategoryPage(data: {
+  pageTitle: string;
+  metaTitle: string;
+  metaDescription: string;
+  slug?: string;
+  canonicalUrl?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  nofollow?: boolean;
+  enableFaqSchema?: boolean;
+  enableBreadcrumbSchema?: boolean;
+  customSchema?: any;
+  heroImage?: string;
+  heroImageAlt?: string;
+  heroH1?: string;
+  heroText?: string;
+  featuredSuppliersH2?: string;
+  featuredSuppliersText?: string;
+  supplierSourceType?: string;
+  supplierIds?: number[];
+  centeredValueH2?: string;
+  centeredValueText?: string;
+  contentBlocks?: any;
+  faqSectionH2?: string;
+  faqs?: any;
+  internalLinks?: any;
+  customHtml?: string;
+  lastUpdated?: Date;
+  authorOverride?: string;
+  topicCategory?: string;
+  enableDivider?: boolean;
+}) {
+  const slug = data.slug || generateSlug(data.pageTitle);
+
+  // Check if slug already exists
+  const existing = await prisma.categoryPage.findUnique({ where: { slug } });
+  if (existing) {
+    throw new Error('A category page with this slug already exists');
+  }
+
+  // Validate slug format
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    throw new Error('Slug must contain only lowercase letters, numbers, and hyphens');
+  }
+
+  const page = await prisma.categoryPage.create({
+    data: {
+      pageTitle: data.pageTitle.trim(),
+      metaTitle: data.metaTitle.trim(),
+      metaDescription: data.metaDescription.trim(),
+      slug,
+      canonicalUrl: data.canonicalUrl?.trim() || null,
+      ogTitle: data.ogTitle?.trim() || null,
+      ogDescription: data.ogDescription?.trim() || null,
+      ogImage: data.ogImage?.trim() || null,
+      noindex: data.noindex ?? false,
+      nofollow: data.nofollow ?? false,
+      enableFaqSchema: data.enableFaqSchema ?? true,
+      enableBreadcrumbSchema: data.enableBreadcrumbSchema ?? true,
+      customSchema: data.customSchema || null,
+      heroImage: data.heroImage?.trim() || null,
+      heroImageAlt: data.heroImageAlt?.trim() || null,
+      heroH1: data.heroH1?.trim() || null,
+      heroText: data.heroText?.trim() || null,
+      featuredSuppliersH2: data.featuredSuppliersH2?.trim() || null,
+      featuredSuppliersText: data.featuredSuppliersText?.trim() || null,
+      supplierSourceType: data.supplierSourceType || 'manual',
+      supplierIds: data.supplierIds || [],
+      centeredValueH2: data.centeredValueH2?.trim() || null,
+      centeredValueText: data.centeredValueText?.trim() || null,
+      contentBlocks: data.contentBlocks || [],
+      faqSectionH2: data.faqSectionH2?.trim() || null,
+      faqs: data.faqs || [],
+      internalLinks: data.internalLinks || null,
+      customHtml: data.customHtml?.trim() || null,
+      lastUpdated: data.lastUpdated || null,
+      authorOverride: data.authorOverride?.trim() || null,
+      topicCategory: data.topicCategory?.trim() || null,
+      enableDivider: data.enableDivider ?? false,
+    },
+  });
+
+  return page;
+}
+
+export async function updateCategoryPage(
+  id: number,
+  data: {
+    pageTitle?: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    slug?: string;
+    canonicalUrl?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+    noindex?: boolean;
+    nofollow?: boolean;
+    enableFaqSchema?: boolean;
+    enableBreadcrumbSchema?: boolean;
+    customSchema?: any;
+    heroImage?: string;
+    heroImageAlt?: string;
+    heroH1?: string;
+    heroText?: string;
+    featuredSuppliersH2?: string;
+    featuredSuppliersText?: string;
+    supplierSourceType?: string;
+    supplierIds?: number[];
+    centeredValueH2?: string;
+    centeredValueText?: string;
+    contentBlocks?: any;
+    faqSectionH2?: string;
+    faqs?: any;
+    internalLinks?: any;
+    customHtml?: string;
+    lastUpdated?: Date;
+    authorOverride?: string;
+    topicCategory?: string;
+    enableDivider?: boolean;
+  }
+) {
+  const existing = await prisma.categoryPage.findUnique({ where: { id } });
+  if (!existing) {
+    throw new Error('Category page not found');
+  }
+
+  // Determine slug: use provided slug, or generate from pageTitle, or keep existing
+  let slug = existing.slug;
+  if (data.slug) {
+    slug = data.slug;
+  } else if (data.pageTitle) {
+    slug = generateSlug(data.pageTitle);
+  }
+
+  // Validate slug format
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    throw new Error('Slug must contain only lowercase letters, numbers, and hyphens');
+  }
+
+  // Check if new slug conflicts with another page
+  if (slug !== existing.slug) {
+    const slugConflict = await prisma.categoryPage.findUnique({ where: { slug } });
+    if (slugConflict) {
+      throw new Error('A category page with this slug already exists');
+    }
+  }
+
+  const page = await prisma.categoryPage.update({
+    where: { id },
+    data: {
+      ...(data.pageTitle !== undefined && { pageTitle: data.pageTitle.trim() }),
+      ...(data.metaTitle !== undefined && { metaTitle: data.metaTitle.trim() }),
+      ...(data.metaDescription !== undefined && { metaDescription: data.metaDescription.trim() }),
+      ...(slug !== existing.slug && { slug }),
+      ...(data.canonicalUrl !== undefined && { canonicalUrl: data.canonicalUrl?.trim() || null }),
+      ...(data.ogTitle !== undefined && { ogTitle: data.ogTitle?.trim() || null }),
+      ...(data.ogDescription !== undefined && { ogDescription: data.ogDescription?.trim() || null }),
+      ...(data.ogImage !== undefined && { ogImage: data.ogImage?.trim() || null }),
+      ...(data.noindex !== undefined && { noindex: data.noindex }),
+      ...(data.nofollow !== undefined && { nofollow: data.nofollow }),
+      ...(data.enableFaqSchema !== undefined && { enableFaqSchema: data.enableFaqSchema }),
+      ...(data.enableBreadcrumbSchema !== undefined && { enableBreadcrumbSchema: data.enableBreadcrumbSchema }),
+      ...(data.customSchema !== undefined && { customSchema: data.customSchema }),
+      ...(data.heroImage !== undefined && { heroImage: data.heroImage?.trim() || null }),
+      ...(data.heroImageAlt !== undefined && { heroImageAlt: data.heroImageAlt?.trim() || null }),
+      ...(data.heroH1 !== undefined && { heroH1: data.heroH1?.trim() || null }),
+      ...(data.heroText !== undefined && { heroText: data.heroText?.trim() || null }),
+      ...(data.featuredSuppliersH2 !== undefined && { featuredSuppliersH2: data.featuredSuppliersH2?.trim() || null }),
+      ...(data.featuredSuppliersText !== undefined && { featuredSuppliersText: data.featuredSuppliersText?.trim() || null }),
+      ...(data.supplierSourceType !== undefined && { supplierSourceType: data.supplierSourceType }),
+      ...(data.supplierIds !== undefined && { supplierIds: data.supplierIds }),
+      ...(data.centeredValueH2 !== undefined && { centeredValueH2: data.centeredValueH2?.trim() || null }),
+      ...(data.centeredValueText !== undefined && { centeredValueText: data.centeredValueText?.trim() || null }),
+      ...(data.contentBlocks !== undefined && { contentBlocks: data.contentBlocks }),
+      ...(data.faqSectionH2 !== undefined && { faqSectionH2: data.faqSectionH2?.trim() || null }),
+      ...(data.faqs !== undefined && { faqs: data.faqs }),
+      ...(data.internalLinks !== undefined && { internalLinks: data.internalLinks }),
+      ...(data.customHtml !== undefined && { customHtml: data.customHtml?.trim() || null }),
+      ...(data.lastUpdated !== undefined && { lastUpdated: data.lastUpdated }),
+      ...(data.authorOverride !== undefined && { authorOverride: data.authorOverride?.trim() || null }),
+      ...(data.topicCategory !== undefined && { topicCategory: data.topicCategory?.trim() || null }),
+      ...(data.enableDivider !== undefined && { enableDivider: data.enableDivider }),
+    },
+  });
+
+  return page;
+}
+
+export async function deleteCategoryPage(id: number) {
+  const existing = await prisma.categoryPage.findUnique({ where: { id } });
+  if (!existing) {
+    throw new Error('Category page not found');
+  }
+
+  await prisma.categoryPage.delete({ where: { id } });
+  return { message: 'Category page deleted successfully' };
+}

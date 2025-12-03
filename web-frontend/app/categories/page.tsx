@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CategoriesPage() {
-  const categories = await api.catalog.categories();
+  const categoryPages = await api.catalog.categoryPages.list();
 
   // FAQ data for schema
   const faqs = [
@@ -106,18 +106,27 @@ export default async function CategoriesPage() {
           </Link>
         </div>
 
-        {/* Grid of category cards */}
+        {/* Grid of category page cards */}
         <div className="mt-10 grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {categories.map((c) => (
+          {categoryPages.map((page) => (
             <Link
-              key={c.slug}
-              href={`/categories/${c.slug}`}
-              className="group relative flex h-32 items-center justify-center rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-              aria-label={c.name}
-              title={c.name}
+              key={page.slug}
+              href={`/categories/${page.slug}`}
+              className="group relative flex flex-col h-48 items-center justify-center rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden"
+              aria-label={page.pageTitle}
+              title={page.pageTitle}
             >
-              <span className="text-4xl select-none">{iconFor(c.slug + c.name)}</span>
-              <span className="sr-only">{c.name}</span>
+              {page.heroImage && (
+                <div className="absolute inset-0">
+                  <img src={page.heroImage} alt={page.heroImageAlt || page.pageTitle} className="w-full h-full object-cover opacity-20" />
+                </div>
+              )}
+              <div className="relative z-10 text-center px-4">
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">{page.pageTitle}</h3>
+                {page.metaDescription && (
+                  <p className="text-xs text-slate-600 line-clamp-2">{page.metaDescription.substring(0, 100)}...</p>
+                )}
+              </div>
             </Link>
           ))}
         </div>

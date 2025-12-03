@@ -180,3 +180,60 @@ model SupplierSubmission {
   @@index([customerId, createdAt])
   @@index([status, createdAt])
 }
+
+model CategoryPage {
+  id                    Int      @id @default(autoincrement())
+  
+  // SEO & Metadata
+  pageTitle             String
+  metaTitle             String
+  metaDescription       String
+  slug                  String   @unique
+  canonicalUrl          String?
+  ogTitle               String?
+  ogDescription         String?
+  ogImage               String?
+  noindex               Boolean  @default(false)
+  nofollow              Boolean  @default(false)
+  enableFaqSchema       Boolean  @default(true)
+  enableBreadcrumbSchema Boolean @default(true)
+  customSchema          Json?
+  
+  // Hero Section
+  heroImage             String?
+  heroImageAlt          String?
+  heroH1                String?
+  heroText              String?
+  
+  // Featured Suppliers
+  featuredSuppliersH2   String?
+  featuredSuppliersText String?
+  supplierSourceType    String   @default("manual")
+  supplierIds           Int[]    @default([])
+  
+  // Centered Value Prop
+  centeredValueH2      String?
+  centeredValueText    String?
+  
+  // Content Blocks (JSON array)
+  contentBlocks         Json     @default("[]")
+  
+  // FAQ Section
+  faqSectionH2          String?
+  faqs                  Json     @default("[]")
+  
+  // Optional Fields
+  internalLinks         Json?
+  customHtml             String?
+  lastUpdated            DateTime?
+  authorOverride         String?
+  topicCategory          String?
+  enableDivider          Boolean  @default(false)
+  
+  // Metadata
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@index([slug])
+  @@index([createdAt])
+}

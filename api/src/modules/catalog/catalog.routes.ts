@@ -10,6 +10,8 @@ import {
   createRegion,
   updateRegion,
   deleteRegion,
+  getCategoryPages,
+  getCategoryPageBySlug,
 } from './catalog.service';
 import { authenticateToken, AuthRequest } from '../../middleware/authMiddleware';
 import { isAdmin } from '../../middleware/adminMiddleware';
@@ -32,6 +34,26 @@ router.get('/regions', async (_req, res) => {
     res.json(regions);
   } catch (error: any) {
     res.status(400).json({ message: error.message ?? 'Unable to load regions' });
+  }
+});
+
+// Public CategoryPage routes
+router.get('/category-pages', async (_req, res) => {
+  try {
+    const pages = await getCategoryPages();
+    res.json(pages);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message ?? 'Unable to load category pages' });
+  }
+});
+
+router.get('/category-pages/:slug', async (req, res) => {
+  try {
+    const page = await getCategoryPageBySlug(req.params.slug);
+    res.json(page);
+  } catch (error: any) {
+    const statusCode = error.message?.includes('not found') ? 404 : 400;
+    res.status(statusCode).json({ message: error.message ?? 'Unable to load category page' });
   }
 });
 

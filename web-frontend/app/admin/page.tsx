@@ -8,7 +8,7 @@ import { US_STATES } from '@/lib/constants/states';
 import { COUNTRIES } from '@/lib/constants/countries';
 import type { SupplierAddress } from '@/lib/api';
 
-type AdminTab = 'dashboard' | 'suppliers' | 'reviews' | 'categories' | 'regions';
+type AdminTab = 'dashboard' | 'suppliers' | 'reviews' | 'categories' | 'regions' | 'category-pages';
 
 interface Category {
   id: number;
@@ -231,6 +231,57 @@ export default function AdminPage() {
   const [isCreatingRegion, setIsCreatingRegion] = useState(false);
   const [regionError, setRegionError] = useState<string | null>(null);
 
+  // Category Pages state
+  const [categoryPages, setCategoryPages] = useState<any[]>([]);
+  const [categoryPagesLoading, setCategoryPagesLoading] = useState(false);
+  const [categoryPageEditingId, setCategoryPageEditingId] = useState<number | null>(null);
+  const [isCreatingCategoryPage, setIsCreatingCategoryPage] = useState(false);
+  const [categoryPageError, setCategoryPageError] = useState<string | null>(null);
+  const [categoryPageFormData, setCategoryPageFormData] = useState({
+    pageTitle: '',
+    metaTitle: '',
+    metaDescription: '',
+    slug: '',
+    canonicalUrl: '',
+    ogTitle: '',
+    ogDescription: '',
+    ogImage: '',
+    noindex: false,
+    nofollow: false,
+    enableFaqSchema: true,
+    enableBreadcrumbSchema: true,
+    customSchema: '',
+    heroImage: '',
+    heroImageAlt: '',
+    heroH1: '',
+    heroText: '',
+    featuredSuppliersH2: '',
+    featuredSuppliersText: '',
+    supplierSourceType: 'manual',
+    supplierIds: [] as number[],
+    centeredValueH2: '',
+    centeredValueText: '',
+    contentBlocks: [] as any[],
+    faqSectionH2: '',
+    faqs: [] as any[],
+    internalLinks: null as any,
+    customHtml: '',
+    lastUpdated: null as Date | null,
+    authorOverride: '',
+    topicCategory: '',
+    enableDivider: false,
+  });
+  const [availableSuppliers, setAvailableSuppliers] = useState<Array<{ id: number; name: string; slug: string }>>([]);
+  
+  // Category Page image upload state
+  const [heroImageFile, setHeroImageFile] = useState<File | null>(null);
+  const [heroImagePreview, setHeroImagePreview] = useState<string | null>(null);
+  const [uploadingHeroImage, setUploadingHeroImage] = useState(false);
+  const [ogImageFile, setOgImageFile] = useState<File | null>(null);
+  const [ogImagePreview, setOgImagePreview] = useState<string | null>(null);
+  const [uploadingOgImage, setUploadingOgImage] = useState(false);
+  const [uploadingContentBlockImages, setUploadingContentBlockImages] = useState<Record<number, boolean>>({});
+
   // Supplier edit form state
   const [supplierFormData, setSupplierFormData] = useState({
     name: '',
@@ -376,6 +427,27 @@ export default function AdminPage() {
     }
   }, [authToken, activeTab]);
 
+  // Load category pages
+  useEffect(() => {
+    if (authToken && activeTab === 'category-pages') {
+      setCategoryPagesLoading(true);
+      api.admin.categoryPages
+        .list(authToken)
+        .then((result) => setCategoryPages(result.items || []))
+        .catch((err: any) => {
+          setCategoryPageError(err.message);
+          setCategoryPages([]);
+        })
+        .finally(() => setCategoryPagesLoading(false));
+      
+      // Also load suppliers for the supplier selector
+      api.admin.suppliers
+        .list(authToken, { limit: 1000 })
+        .then((result) => setAvailableSuppliers(result.items?.map((s: any) => ({ id: s.id, name: s.name, slug: s.slug })) || []))
+        .catch(console.error);
+    }
+  }, [authToken, activeTab]);
+
   // Category handlers
   const handleCreateCategory = async () => {
     if (!authToken || !categoryFormData.name.trim()) return;
@@ -506,6 +578,247 @@ export default function AdminPage() {
     setRegionEditingId(null);
     setIsCreatingRegion(false);
     setRegionFormData({ name: '', slug: '', headline: '', description: '', stateCode: '', mapImage: '', marketStats: '' });
+  };
+
+  // Category Page handlers
+  const handleCreateCategoryPage = async () => {
+    if (!authToken || !categoryPageFormData.pageTitle.trim() || !categoryPageFormData.metaTitle.trim()) return;
+    try {
+      setCategoryPageError(null);
+      const payload: any = { ...categoryPageFormData };
+      // Parse JSON fields
+      if (payload.customSchema) {
+        try {
+          payload.customSchema = JSON.parse(payload.customSchema);
+        } catch {
+          payload.customSchema = null;
+        }
+      } else {
+        payload.customSchema = null;
+      }
+      if (payload.internalLinks) {
+        try {
+          payload.internalLinks = JSON.parse(payload.internalLinks);
+        } catch {
+          payload.internalLinks = null;
+        }
+      } else {
+        payload.internalLinks = null;
+      }
+      // Ensure arrays are arrays
+      if (!Array.isArray(payload.contentBlocks)) payload.contentBlocks = [];
+      if (!Array.isArray(payload.faqs)) payload.faqs = [];
+      if (!Array.isArray(payload.supplierIds)) payload.supplierIds = [];
+      
+      const newPage = await api.admin.categoryPages.create(payload, authToken);
+      setCategoryPages([...categoryPages, newPage]);
+      resetCategoryPageForm();
+      setIsCreatingCategoryPage(false);
+    } catch (err: any) {
+      setCategoryPageError(err.message || 'Failed to create category page');
+    }
+  };
+
+  const handleUpdateCategoryPage = async (id: number) => {
+    if (!authToken) return;
+    try {
+      setCategoryPageError(null);
+      const payload: any = { ...categoryPageFormData };
+      // Parse JSON fields
+      if (payload.customSchema) {
+        try {
+          payload.customSchema = JSON.parse(payload.customSchema);
+        } catch {
+          payload.customSchema = null;
+        }
+      } else {
+        payload.customSchema = null;
+      }
+      if (payload.internalLinks) {
+        try {
+          payload.internalLinks = JSON.parse(payload.internalLinks);
+        } catch {
+          payload.internalLinks = null;
+        }
+      } else {
+        payload.internalLinks = null;
+      }
+      // Ensure arrays are arrays
+      if (!Array.isArray(payload.contentBlocks)) payload.contentBlocks = [];
+      if (!Array.isArray(payload.faqs)) payload.faqs = [];
+      if (!Array.isArray(payload.supplierIds)) payload.supplierIds = [];
+      
+      const updated = await api.admin.categoryPages.update(id, payload, authToken);
+      setCategoryPages(categoryPages.map((p) => (p.id === id ? updated : p)));
+      resetCategoryPageForm();
+      setCategoryPageEditingId(null);
+    } catch (err: any) {
+      setCategoryPageError(err.message || 'Failed to update category page');
+    }
+  };
+
+  const handleDeleteCategoryPage = async (id: number) => {
+    if (!authToken || !confirm('Are you sure you want to delete this category page?')) return;
+    try {
+      setCategoryPageError(null);
+      await api.admin.categoryPages.delete(id, authToken);
+      setCategoryPages(categoryPages.filter((p) => p.id !== id));
+    } catch (err: any) {
+      setCategoryPageError(err.message || 'Failed to delete category page');
+    }
+  };
+
+  const startEditCategoryPage = (page: any) => {
+    setCategoryPageEditingId(page.id);
+    setHeroImagePreview(page.heroImage || null);
+    setOgImagePreview(page.ogImage || null);
+    setCategoryPageFormData({
+      pageTitle: page.pageTitle || '',
+      metaTitle: page.metaTitle || '',
+      metaDescription: page.metaDescription || '',
+      slug: page.slug || '',
+      canonicalUrl: page.canonicalUrl || '',
+      ogTitle: page.ogTitle || '',
+      ogDescription: page.ogDescription || '',
+      ogImage: page.ogImage || '',
+      noindex: page.noindex || false,
+      nofollow: page.nofollow || false,
+      enableFaqSchema: page.enableFaqSchema ?? true,
+      enableBreadcrumbSchema: page.enableBreadcrumbSchema ?? true,
+      customSchema: page.customSchema ? JSON.stringify(page.customSchema, null, 2) : '',
+      heroImage: page.heroImage || '',
+      heroImageAlt: page.heroImageAlt || '',
+      heroH1: page.heroH1 || '',
+      heroText: page.heroText || '',
+      featuredSuppliersH2: page.featuredSuppliersH2 || '',
+      featuredSuppliersText: page.featuredSuppliersText || '',
+      supplierSourceType: page.supplierSourceType || 'manual',
+      supplierIds: Array.isArray(page.supplierIds) ? page.supplierIds : [],
+      centeredValueH2: page.centeredValueH2 || '',
+      centeredValueText: page.centeredValueText || '',
+      contentBlocks: Array.isArray(page.contentBlocks) ? page.contentBlocks : [],
+      faqSectionH2: page.faqSectionH2 || '',
+      faqs: Array.isArray(page.faqs) ? page.faqs : [],
+      internalLinks: page.internalLinks ? JSON.stringify(page.internalLinks, null, 2) : null,
+      customHtml: page.customHtml || '',
+      lastUpdated: page.lastUpdated ? new Date(page.lastUpdated) : null,
+      authorOverride: page.authorOverride || '',
+      topicCategory: page.topicCategory || '',
+      enableDivider: page.enableDivider || false,
+    });
+  };
+
+  const resetCategoryPageForm = () => {
+    setCategoryPageFormData({
+      pageTitle: '',
+      metaTitle: '',
+      metaDescription: '',
+      slug: '',
+      canonicalUrl: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: '',
+      noindex: false,
+      nofollow: false,
+      enableFaqSchema: true,
+      enableBreadcrumbSchema: true,
+      customSchema: '',
+      heroImage: '',
+      heroImageAlt: '',
+      heroH1: '',
+      heroText: '',
+      featuredSuppliersH2: '',
+      featuredSuppliersText: '',
+      supplierSourceType: 'manual',
+      supplierIds: [],
+      centeredValueH2: '',
+      centeredValueText: '',
+      contentBlocks: [],
+      faqSectionH2: '',
+      faqs: [],
+      internalLinks: null,
+      customHtml: '',
+      lastUpdated: null,
+      authorOverride: '',
+      topicCategory: '',
+      enableDivider: false,
+    });
+    setHeroImagePreview(null);
+    setOgImagePreview(null);
+    setHeroImageFile(null);
+    setOgImageFile(null);
+  };
+
+  const cancelEditCategoryPage = () => {
+    setCategoryPageEditingId(null);
+    setIsCreatingCategoryPage(false);
+    resetCategoryPageForm();
+    setHeroImagePreview(null);
+    setOgImagePreview(null);
+    setHeroImageFile(null);
+    setOgImageFile(null);
+  };
+
+  // Category Page image upload handlers
+  const handleHeroImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !authToken) return;
+
+    setHeroImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setHeroImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    setUploadingHeroImage(true);
+    try {
+      const url = await api.admin.uploadImage(file, authToken);
+      setCategoryPageFormData({ ...categoryPageFormData, heroImage: url });
+    } catch (error: any) {
+      alert(error.message || 'Failed to upload hero image');
+    } finally {
+      setUploadingHeroImage(false);
+    }
+  };
+
+  const handleOgImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !authToken) return;
+
+    setOgImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setOgImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    setUploadingOgImage(true);
+    try {
+      const url = await api.admin.uploadImage(file, authToken);
+      setCategoryPageFormData({ ...categoryPageFormData, ogImage: url });
+    } catch (error: any) {
+      alert(error.message || 'Failed to upload OG image');
+    } finally {
+      setUploadingOgImage(false);
+    }
+  };
+
+  const handleContentBlockImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, blockIndex: number) => {
+    const file = e.target.files?.[0];
+    if (!file || !authToken) return;
+
+    setUploadingContentBlockImages({ ...uploadingContentBlockImages, [blockIndex]: true });
+    try {
+      const url = await api.admin.uploadImage(file, authToken);
+      const newBlocks = [...categoryPageFormData.contentBlocks];
+      newBlocks[blockIndex] = { ...newBlocks[blockIndex], image: url };
+      setCategoryPageFormData({ ...categoryPageFormData, contentBlocks: newBlocks });
+    } catch (error: any) {
+      alert(error.message || 'Failed to upload image');
+    } finally {
+      setUploadingContentBlockImages({ ...uploadingContentBlockImages, [blockIndex]: false });
+    }
   };
 
   // Supplier form handlers
@@ -750,6 +1063,18 @@ export default function AdminPage() {
                   + Add Region
                 </button>
               )}
+              {activeTab === 'category-pages' && (
+                <button
+                  onClick={() => {
+                    setIsCreatingCategoryPage(true);
+                    setCategoryPageEditingId(null);
+                    resetCategoryPageForm();
+                  }}
+                  className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                >
+                  + Add Category Page
+                </button>
+              )}
             </div>
           </div>
           <nav className="border-t">
@@ -783,6 +1108,12 @@ export default function AdminPage() {
                 className={activeTab === 'regions' ? 'bg-emerald-100 text-emerald-700 font-medium px-3 py-1.5 rounded-md' : 'text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 px-3 py-1.5 rounded-md transition-colors'}
               >
                 Regions <span className="text-gray-500">({regions.length})</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('category-pages')}
+                className={activeTab === 'category-pages' ? 'bg-purple-100 text-purple-700 font-medium px-3 py-1.5 rounded-md' : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600 px-3 py-1.5 rounded-md transition-colors'}
+              >
+                Category Pages <span className="text-gray-500">({categoryPages.length})</span>
               </button>
             </div>
           </nav>
@@ -1736,6 +2067,637 @@ export default function AdminPage() {
                               Delete
                             </span>
                           )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'category-pages' && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">Category Pages</h2>
+              <p className="mt-1 text-sm text-gray-600">Manage SEO-optimized category pages</p>
+            </div>
+
+            {categoryPageError && (
+              <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                {categoryPageError}
+              </div>
+            )}
+
+            {(isCreatingCategoryPage || categoryPageEditingId !== null) && (
+              <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm space-y-6 max-h-[80vh] overflow-y-auto">
+                <h2 className="text-lg font-semibold mb-4">
+                  {isCreatingCategoryPage ? 'Create New Category Page' : 'Edit Category Page'}
+                </h2>
+
+                {/* SEO Settings */}
+                <div className="border-t pt-4">
+                  <h3 className="text-md font-semibold mb-3 text-gray-900">SEO Settings</h3>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Page Title <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={categoryPageFormData.pageTitle}
+                        onChange={(e) => {
+                          const title = e.target.value;
+                          setCategoryPageFormData({
+                            ...categoryPageFormData,
+                            pageTitle: title,
+                            slug: categoryPageFormData.slug || title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-'),
+                          });
+                        }}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="Buy Amazon Liquidation"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+                      <input
+                        type="text"
+                        value={categoryPageFormData.slug}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, slug: e.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="buy-amazon-liquidation"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Meta Title <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={categoryPageFormData.metaTitle}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, metaTitle: e.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="Buy Amazon Liquidation | TrustPallet"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Meta Description <span className="text-red-500">*</span>
+                      </label>
+                      <textarea
+                        value={categoryPageFormData.metaDescription}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, metaDescription: e.target.value })}
+                        rows={2}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="Find trusted Amazon liquidation suppliers..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Canonical URL</label>
+                      <input
+                        type="url"
+                        value={categoryPageFormData.canonicalUrl}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, canonicalUrl: e.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="https://trustpallet.com/categories/..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">OG Image</label>
+                      {ogImagePreview && (
+                        <div className="mb-2 w-full h-24 rounded-md border border-gray-300 overflow-hidden bg-gray-50">
+                          <img src={ogImagePreview} alt="OG preview" className="h-full w-full object-cover" />
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleOgImageUpload}
+                        disabled={uploadingOgImage}
+                        className="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border file:border-gray-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50 disabled:opacity-50 mb-2"
+                      />
+                      {uploadingOgImage && <p className="text-xs text-gray-500 mb-2">Uploading...</p>}
+                      <input
+                        type="url"
+                        value={categoryPageFormData.ogImage}
+                        onChange={(e) => {
+                          setCategoryPageFormData({ ...categoryPageFormData, ogImage: e.target.value });
+                          setOgImagePreview(e.target.value || null);
+                        }}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="Or enter image URL"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">OG Title</label>
+                      <input
+                        type="text"
+                        value={categoryPageFormData.ogTitle}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, ogTitle: e.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">OG Description</label>
+                      <textarea
+                        value={categoryPageFormData.ogDescription}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, ogDescription: e.target.value })}
+                        rows={2}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                      />
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={categoryPageFormData.noindex}
+                          onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, noindex: e.target.checked })}
+                          className="rounded border-gray-300 text-black focus:ring-black"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Noindex</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={categoryPageFormData.nofollow}
+                          onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, nofollow: e.target.checked })}
+                          className="rounded border-gray-300 text-black focus:ring-black"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Nofollow</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={categoryPageFormData.enableFaqSchema}
+                          onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, enableFaqSchema: e.target.checked })}
+                          className="rounded border-gray-300 text-black focus:ring-black"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Enable FAQ Schema</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={categoryPageFormData.enableBreadcrumbSchema}
+                          onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, enableBreadcrumbSchema: e.target.checked })}
+                          className="rounded border-gray-300 text-black focus:ring-black"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Enable Breadcrumb Schema</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hero Section */}
+                <div className="border-t pt-4">
+                  <h3 className="text-md font-semibold mb-3 text-gray-900">Hero Section</h3>
+                  <div className="grid gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Hero Image</label>
+                      {heroImagePreview && (
+                        <div className="mb-2 w-full h-32 rounded-md border border-gray-300 overflow-hidden bg-gray-50">
+                          <img src={heroImagePreview} alt="Hero preview" className="h-full w-full object-cover" />
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleHeroImageUpload}
+                        disabled={uploadingHeroImage}
+                        className="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border file:border-gray-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50 disabled:opacity-50 mb-2"
+                      />
+                      {uploadingHeroImage && <p className="text-xs text-gray-500 mb-2">Uploading...</p>}
+                      <input
+                        type="url"
+                        value={categoryPageFormData.heroImage}
+                        onChange={(e) => {
+                          setCategoryPageFormData({ ...categoryPageFormData, heroImage: e.target.value });
+                          setHeroImagePreview(e.target.value || null);
+                        }}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="Or enter image URL"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Hero Image Alt Text</label>
+                      <input
+                        type="text"
+                        value={categoryPageFormData.heroImageAlt}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, heroImageAlt: e.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Hero H1</label>
+                      <input
+                        type="text"
+                        value={categoryPageFormData.heroH1}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, heroH1: e.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="Buy Amazon Liquidation Truckloads & Pallets"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Hero Text</label>
+                      <textarea
+                        value={categoryPageFormData.heroText}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, heroText: e.target.value })}
+                        rows={3}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="Short intro explaining access to Amazon customer returns..."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Featured Suppliers */}
+                <div className="border-t pt-4">
+                  <h3 className="text-md font-semibold mb-3 text-gray-900">Featured Suppliers</h3>
+                  <div className="grid gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Section H2</label>
+                      <input
+                        type="text"
+                        value={categoryPageFormData.featuredSuppliersH2}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, featuredSuppliersH2: e.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="Verified Amazon Liquidation Suppliers"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Intro Text</label>
+                      <textarea
+                        value={categoryPageFormData.featuredSuppliersText}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, featuredSuppliersText: e.target.value })}
+                        rows={2}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Selection</label>
+                      <select
+                        value={categoryPageFormData.supplierSourceType}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, supplierSourceType: e.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                      >
+                        <option value="manual">Manual Selection</option>
+                        <option value="auto">Auto (Future)</option>
+                      </select>
+                    </div>
+                    {categoryPageFormData.supplierSourceType === 'manual' && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Select Suppliers</label>
+                        <div className="max-h-48 overflow-y-auto border border-gray-300 rounded-md p-2">
+                          {availableSuppliers.map((supplier) => (
+                            <label key={supplier.id} className="flex items-center py-1">
+                              <input
+                                type="checkbox"
+                                checked={categoryPageFormData.supplierIds.includes(supplier.id)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setCategoryPageFormData({
+                                      ...categoryPageFormData,
+                                      supplierIds: [...categoryPageFormData.supplierIds, supplier.id],
+                                    });
+                                  } else {
+                                    setCategoryPageFormData({
+                                      ...categoryPageFormData,
+                                      supplierIds: categoryPageFormData.supplierIds.filter((id) => id !== supplier.id),
+                                    });
+                                  }
+                                }}
+                                className="rounded border-gray-300 text-black focus:ring-black"
+                              />
+                              <span className="ml-2 text-sm text-gray-700">{supplier.name}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Centered Value Prop */}
+                <div className="border-t pt-4">
+                  <h3 className="text-md font-semibold mb-3 text-gray-900">Centered Value Proposition</h3>
+                  <div className="grid gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">H2</label>
+                      <input
+                        type="text"
+                        value={categoryPageFormData.centeredValueH2}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, centeredValueH2: e.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="The Easiest Way to Buy Amazon Liquidation"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Text</label>
+                      <textarea
+                        value={categoryPageFormData.centeredValueText}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, centeredValueText: e.target.value })}
+                        rows={3}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Content Blocks */}
+                <div className="border-t pt-4">
+                  <h3 className="text-md font-semibold mb-3 text-gray-900">Content Blocks</h3>
+                  <div className="space-y-4">
+                    {categoryPageFormData.contentBlocks.map((block: any, index: number) => (
+                      <div key={index} className="border border-gray-200 rounded-md p-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-medium">Block {index + 1}</span>
+                          <button
+                            onClick={() => {
+                              const newBlocks = [...categoryPageFormData.contentBlocks];
+                              newBlocks.splice(index, 1);
+                              setCategoryPageFormData({ ...categoryPageFormData, contentBlocks: newBlocks });
+                            }}
+                            className="text-red-600 hover:text-red-800 text-sm"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        <div className="grid gap-3">
+                          <select
+                            value={block.layout_type || 'image_left'}
+                            onChange={(e) => {
+                              const newBlocks = [...categoryPageFormData.contentBlocks];
+                              newBlocks[index] = { ...block, layout_type: e.target.value };
+                              setCategoryPageFormData({ ...categoryPageFormData, contentBlocks: newBlocks });
+                            }}
+                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                          >
+                            <option value="image_left">Image Left, Text Right</option>
+                            <option value="image_right">Image Right, Text Left</option>
+                          </select>
+                          {block.image && (
+                            <div className="mb-2 w-full h-24 rounded-md border border-gray-300 overflow-hidden bg-gray-50">
+                              <img src={block.image} alt={block.image_alt || 'Content block preview'} className="h-full w-full object-cover" />
+                            </div>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleContentBlockImageUpload(e, index)}
+                            disabled={uploadingContentBlockImages[index]}
+                            className="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border file:border-gray-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50 disabled:opacity-50 mb-2"
+                          />
+                          {uploadingContentBlockImages[index] && <p className="text-xs text-gray-500 mb-2">Uploading...</p>}
+                          <input
+                            type="url"
+                            placeholder="Or enter image URL"
+                            value={block.image || ''}
+                            onChange={(e) => {
+                              const newBlocks = [...categoryPageFormData.contentBlocks];
+                              newBlocks[index] = { ...block, image: e.target.value };
+                              setCategoryPageFormData({ ...categoryPageFormData, contentBlocks: newBlocks });
+                            }}
+                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Image Alt Text"
+                            value={block.image_alt || ''}
+                            onChange={(e) => {
+                              const newBlocks = [...categoryPageFormData.contentBlocks];
+                              newBlocks[index] = { ...block, image_alt: e.target.value };
+                              setCategoryPageFormData({ ...categoryPageFormData, contentBlocks: newBlocks });
+                            }}
+                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                          />
+                          <input
+                            type="text"
+                            placeholder="H2 Title"
+                            value={block.h2 || ''}
+                            onChange={(e) => {
+                              const newBlocks = [...categoryPageFormData.contentBlocks];
+                              newBlocks[index] = { ...block, h2: e.target.value };
+                              setCategoryPageFormData({ ...categoryPageFormData, contentBlocks: newBlocks });
+                            }}
+                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                          />
+                          <textarea
+                            placeholder="Text content"
+                            value={block.text || ''}
+                            onChange={(e) => {
+                              const newBlocks = [...categoryPageFormData.contentBlocks];
+                              newBlocks[index] = { ...block, text: e.target.value };
+                              setCategoryPageFormData({ ...categoryPageFormData, contentBlocks: newBlocks });
+                            }}
+                            rows={3}
+                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => {
+                        setCategoryPageFormData({
+                          ...categoryPageFormData,
+                          contentBlocks: [
+                            ...categoryPageFormData.contentBlocks,
+                            { layout_type: 'image_left', image: '', image_alt: '', h2: '', text: '' },
+                          ],
+                        });
+                      }}
+                      className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      + Add Content Block
+                    </button>
+                  </div>
+                </div>
+
+                {/* FAQ Section */}
+                <div className="border-t pt-4">
+                  <h3 className="text-md font-semibold mb-3 text-gray-900">FAQ Section</h3>
+                  <div className="grid gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Section H2</label>
+                      <input
+                        type="text"
+                        value={categoryPageFormData.faqSectionH2}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, faqSectionH2: e.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="Amazon Liquidation FAQ"
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      {categoryPageFormData.faqs.map((faq: any, index: number) => (
+                        <div key={index} className="border border-gray-200 rounded-md p-4">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium">FAQ {index + 1}</span>
+                            <button
+                              onClick={() => {
+                                const newFaqs = [...categoryPageFormData.faqs];
+                                newFaqs.splice(index, 1);
+                                setCategoryPageFormData({ ...categoryPageFormData, faqs: newFaqs });
+                              }}
+                              className="text-red-600 hover:text-red-800 text-sm"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="Question"
+                            value={faq.question || ''}
+                            onChange={(e) => {
+                              const newFaqs = [...categoryPageFormData.faqs];
+                              newFaqs[index] = { ...faq, question: e.target.value };
+                              setCategoryPageFormData({ ...categoryPageFormData, faqs: newFaqs });
+                            }}
+                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm mb-2"
+                          />
+                          <textarea
+                            placeholder="Answer"
+                            value={faq.answer || ''}
+                            onChange={(e) => {
+                              const newFaqs = [...categoryPageFormData.faqs];
+                              newFaqs[index] = { ...faq, answer: e.target.value };
+                              setCategoryPageFormData({ ...categoryPageFormData, faqs: newFaqs });
+                            }}
+                            rows={3}
+                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                          />
+                        </div>
+                      ))}
+                      <button
+                        onClick={() => {
+                          setCategoryPageFormData({
+                            ...categoryPageFormData,
+                            faqs: [...categoryPageFormData.faqs, { question: '', answer: '' }],
+                          });
+                        }}
+                        className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      >
+                        + Add FAQ
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Advanced Fields */}
+                <div className="border-t pt-4">
+                  <h3 className="text-md font-semibold mb-3 text-gray-900">Advanced</h3>
+                  <div className="grid gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Custom HTML</label>
+                      <textarea
+                        value={categoryPageFormData.customHtml}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, customHtml: e.target.value })}
+                        rows={4}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm font-mono focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="<script>...</script>"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Custom Schema (JSON)</label>
+                      <textarea
+                        value={categoryPageFormData.customSchema}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, customSchema: e.target.value })}
+                        rows={5}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm font-mono focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder='{"@type": "..."}'
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Topic Category</label>
+                      <input
+                        type="text"
+                        value={categoryPageFormData.topicCategory}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, topicCategory: e.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="Amazon Liquidation"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Author Override</label>
+                      <input
+                        type="text"
+                        value={categoryPageFormData.authorOverride}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, authorOverride: e.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                      />
+                    </div>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={categoryPageFormData.enableDivider}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, enableDivider: e.target.checked })}
+                        className="rounded border-gray-300 text-black focus:ring-black"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">Enable Divider Between Sections</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4 border-t">
+                  <button
+                    onClick={() =>
+                      isCreatingCategoryPage
+                        ? handleCreateCategoryPage()
+                        : categoryPageEditingId && handleUpdateCategoryPage(categoryPageEditingId)
+                    }
+                    className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                  >
+                    {isCreatingCategoryPage ? 'Create' : 'Save'}
+                  </button>
+                  <button
+                    onClick={cancelEditCategoryPage}
+                    className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {categoryPagesLoading ? (
+              <div className="text-center py-12 text-gray-500">Loading...</div>
+            ) : (
+              <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Page Title</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Slug</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Created</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 bg-white">
+                    {categoryPages.map((page) => (
+                      <tr key={page.id} className="hover:bg-gray-50">
+                        <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{page.pageTitle}</td>
+                        <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{page.slug}</td>
+                        <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
+                          {new Date(page.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium">
+                          <Link
+                            href={`/categories/${page.slug}`}
+                            target="_blank"
+                            className="text-blue-600 hover:text-blue-900 mr-4"
+                          >
+                            View
+                          </Link>
+                          <button
+                            onClick={() => startEditCategoryPage(page)}
+                            className="text-blue-600 hover:text-blue-900 mr-4"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCategoryPage(page.id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))}

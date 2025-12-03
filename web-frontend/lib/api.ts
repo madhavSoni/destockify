@@ -461,6 +461,10 @@ export const api = {
   catalog: {
     categories: () => fetchFromApi<CategorySummary[]>('/catalog/categories', { revalidate: 3600 }),
     regions: () => fetchFromApi<RegionSummary[]>('/catalog/regions', { revalidate: 3600 }),
+    categoryPages: {
+      list: () => fetchFromApi<any[]>('/catalog/category-pages', { revalidate: 60 }),
+      get: (slug: string) => fetchFromApi<any>(`/catalog/category-pages/${slug}`, { revalidate: 60 }),
+    },
     // Admin: Get category by ID
     getCategoryById: (id: number, token: string) =>
       fetchFromApi<any>(`/catalog/categories/${id}`, {
@@ -1022,6 +1026,49 @@ export const api = {
       unapprove: (id: number, token: string) =>
         fetchFromApi<any>(`/reviews/${id}/unapprove`, {
           method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+    },
+    // Category Pages management
+    categoryPages: {
+      list: (token: string, params?: { limit?: number; offset?: number }) =>
+        fetchFromApi<{ items: any[]; total: number; limit: number; offset: number }>(`/admin/category-pages${buildQueryString(params)}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      get: (id: number, token: string) =>
+        fetchFromApi<any>(`/admin/category-pages/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      create: (payload: any, token: string) =>
+        fetchFromApi<any>('/admin/category-pages', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      update: (id: number, payload: any, token: string) =>
+        fetchFromApi<any>(`/admin/category-pages/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      delete: (id: number, token: string) =>
+        fetchFromApi<{ message: string }>(`/admin/category-pages/${id}`, {
+          method: 'DELETE',
           headers: {
             Authorization: `Bearer ${token}`,
           },
