@@ -462,7 +462,7 @@ export const api = {
     categories: () => fetchFromApi<CategorySummary[]>('/catalog/categories', { revalidate: 3600 }),
     regions: () => fetchFromApi<RegionSummary[]>('/catalog/regions', { revalidate: 3600 }),
     categoryPages: {
-      list: () => fetchFromApi<any[]>('/catalog/category-pages', { revalidate: 60 }),
+      list: (topicCategory?: string) => fetchFromApi<any[]>(`/catalog/category-pages${buildQueryString(topicCategory ? { topicCategory } : undefined)}`, { revalidate: 60 }),
       get: (slug: string) => fetchFromApi<any>(`/catalog/category-pages/${slug}`, { revalidate: 60 }),
     },
     // Admin: Get category by ID

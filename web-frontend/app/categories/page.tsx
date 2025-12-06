@@ -114,7 +114,7 @@ export default async function CategoriesPage() {
           {categoryPages.map((page) => (
             <Link
               key={page.slug}
-              href={`/categories/${page.slug}`}
+              href={`/${page.slug}`}
               className="group relative flex flex-col h-48 items-center justify-center rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden"
               aria-label={page.pageTitle}
               title={page.pageTitle}

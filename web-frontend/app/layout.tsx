@@ -68,6 +68,7 @@ function SiteFooter() {
             <p className="font-semibold text-black">Marketplace</p>
             <Link href="/suppliers" className="block hover:text-blue-600 transition-colors duration-200">Supplier directory</Link>
             <Link href="/categories" className="block hover:text-blue-600 transition-colors duration-200">Categories</Link>
+            <Link href="/brands" className="block hover:text-blue-600 transition-colors duration-200">Brands</Link>
             <Link href="/locations" className="block hover:text-blue-600 transition-colors duration-200">Locations</Link>
           </div>
           <div className="space-y-2">

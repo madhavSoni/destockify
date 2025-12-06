@@ -2680,7 +2680,7 @@ export default function AdminPage() {
                         </td>
                         <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium">
                           <Link
-                            href={`/categories/${page.slug}`}
+                            href={`/${page.slug}`}
                             target="_blank"
                             className="text-blue-600 hover:text-blue-900 mr-4"
                           >

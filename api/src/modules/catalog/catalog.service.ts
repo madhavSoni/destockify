@@ -377,8 +377,15 @@ export async function deleteRegion(id: number) {
 }
 
 // CategoryPage public functions
-export async function getCategoryPages() {
+export async function getCategoryPages(topicCategory?: string) {
+  const where: any = {};
+  
+  if (topicCategory) {
+    where.topicCategory = topicCategory;
+  }
+  
   const pages = await prisma.categoryPage.findMany({
+    where,
     orderBy: { createdAt: 'desc' },
   });
 

@@ -38,9 +38,10 @@ router.get('/regions', async (_req, res) => {
 });
 
 // Public CategoryPage routes
-router.get('/category-pages', async (_req, res) => {
+router.get('/category-pages', async (req, res) => {
   try {
-    const pages = await getCategoryPages();
+    const topicCategory = typeof req.query.topicCategory === 'string' ? req.query.topicCategory : undefined;
+    const pages = await getCategoryPages(topicCategory);
     res.json(pages);
   } catch (error: any) {
     res.status(400).json({ message: error.message ?? 'Unable to load category pages' });

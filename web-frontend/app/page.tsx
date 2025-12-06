@@ -35,6 +35,7 @@ export default async function HomePage() {
   // Fetch data with error handling for build time
   let data: HomepageData;
   let regions: CategoryList;
+  let categoryPages: any[] = [];
   
   try {
     data = await api.home.get();
@@ -53,6 +54,12 @@ export default async function HomePage() {
     regions = await api.catalog.regions();
   } catch (error) {
     regions = [];
+  }
+
+  try {
+    categoryPages = await api.catalog.categoryPages.list();
+  } catch (error) {
+    categoryPages = [];
   }
 
   // Generate Schema.org structured data for homepage
@@ -110,6 +117,8 @@ export default async function HomePage() {
         <QuickActionsBar />
         <SearchDirectorySection />
         <TwoUpFeatures />
+        <BrandCarousel categoryPages={categoryPages} />
+        <CategoryCarousel categoryPages={categoryPages} />
 
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
           <ListBusinessCta />
@@ -420,6 +429,160 @@ function FaqSection() {
             </div>
           </details>
         ))}
+      </div>
+    </section>
+  );
+}
+
+/* ----------------------------- BRAND CAROUSEL ---------------------------------- */
+function BrandCarousel({ categoryPages }: { categoryPages: any[] }) {
+  // Brand order: Amazon, Home Depot, Target, Walmart, Lowe's, Kohl's
+  const brandOrder = ['amazon', 'home-depot', 'target', 'walmart', 'lowes', 'kohls'];
+  
+  const brandPages = categoryPages
+    .filter((page: any) => page.topicCategory === 'retailer')
+    .sort((a: any, b: any) => {
+      const aIndex = brandOrder.findIndex(brand => a.slug.includes(brand));
+      const bIndex = brandOrder.findIndex(brand => b.slug.includes(brand));
+      if (aIndex === -1 && bIndex === -1) return 0;
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    })
+    .slice(0, 6);
+
+  if (brandPages.length === 0) return null;
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mb-6">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">
+          Buy Liquidation Pallets Direct From Major Retailers
+        </h2>
+      </div>
+      <div className="relative">
+        <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+          <div className="flex gap-4 pb-4">
+            {brandPages.map((page: any) => (
+              <Link
+                key={page.slug}
+                href={`/${page.slug}`}
+                className="group flex-shrink-0 w-48 sm:w-56 h-40 rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden"
+              >
+                {page.heroImage ? (
+                  <div className="relative w-full h-full">
+                    <img
+                      src={page.heroImage}
+                      alt={page.heroImageAlt || page.pageTitle}
+                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <h3 className="text-lg font-semibold text-slate-900 px-4 text-center">{page.pageTitle}</h3>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center p-4">
+                    <h3 className="text-lg font-semibold text-slate-900 text-center">{page.pageTitle}</h3>
+                  </div>
+                )}
+              </Link>
+            ))}
+            <Link
+              href="/brands"
+              className="flex-shrink-0 w-48 sm:w-56 h-40 rounded-xl border-2 border-dashed border-black/20 bg-white flex items-center justify-center hover:border-blue-600 hover:bg-blue-50 transition-all duration-300 group"
+            >
+              <div className="text-center">
+                <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">→</div>
+                <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600">Show More</span>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ----------------------------- CATEGORY CAROUSEL ---------------------------------- */
+function CategoryCarousel({ categoryPages }: { categoryPages: any[] }) {
+  // Category order: Electronics, Tools, General Merchandise, Clothing, Furniture
+  const categoryOrder = ['electronics', 'tools', 'general-merchandise', 'apparel', 'furniture'];
+  const categorySlugMap: Record<string, string[]> = {
+    'electronics': ['electronics-pallets', 'electronics'],
+    'tools': ['tools-liquidation', 'tools'],
+    'general-merchandise': ['general-merchandise-liquidation', 'general-merchandise'],
+    'apparel': ['apparel-wholesale', 'apparel', 'clothing'],
+    'furniture': ['furniture-liquidation', 'furniture'],
+  };
+
+  const categoryPagesFiltered = categoryPages
+    .filter((page: any) => page.topicCategory === 'category')
+    .filter((page: any) => {
+      return categoryOrder.some(cat => 
+        categorySlugMap[cat]?.some(slug => page.slug.includes(slug))
+      );
+    })
+    .sort((a: any, b: any) => {
+      const aIndex = categoryOrder.findIndex(cat => 
+        categorySlugMap[cat]?.some(slug => a.slug.includes(slug))
+      );
+      const bIndex = categoryOrder.findIndex(cat => 
+        categorySlugMap[cat]?.some(slug => b.slug.includes(slug))
+      );
+      if (aIndex === -1 && bIndex === -1) return 0;
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    })
+    .slice(0, 5);
+
+  if (categoryPagesFiltered.length === 0) return null;
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mb-6">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">
+          Explore Liquidation Categories
+        </h2>
+      </div>
+      <div className="relative">
+        <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+          <div className="flex gap-4 pb-4">
+            {categoryPagesFiltered.map((page: any) => (
+              <Link
+                key={page.slug}
+                href={`/${page.slug}`}
+                className="group flex-shrink-0 w-48 sm:w-56 h-40 rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden"
+              >
+                {page.heroImage ? (
+                  <div className="relative w-full h-full">
+                    <img
+                      src={page.heroImage}
+                      alt={page.heroImageAlt || page.pageTitle}
+                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <h3 className="text-lg font-semibold text-slate-900 px-4 text-center">{page.pageTitle}</h3>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center p-4">
+                    <h3 className="text-lg font-semibold text-slate-900 text-center">{page.pageTitle}</h3>
+                  </div>
+                )}
+              </Link>
+            ))}
+            <Link
+              href="/categories"
+              className="flex-shrink-0 w-48 sm:w-56 h-40 rounded-xl border-2 border-dashed border-black/20 bg-white flex items-center justify-center hover:border-blue-600 hover:bg-blue-50 transition-all duration-300 group"
+            >
+              <div className="text-center">
+                <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">→</div>
+                <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600">Show More</span>
+              </div>
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   );
