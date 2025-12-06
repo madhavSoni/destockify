@@ -4,6 +4,9 @@ import { Metadata } from 'next';
 import { api } from '@/lib/api';
 import { generateFAQSchema, generateBreadcrumbSchema, schemaToJsonLd } from '@/lib/schema';
 
+// Force dynamic rendering to avoid build-time API calls
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Liquidation Categories – Buy Wholesale by Product Type | TrustPallet',
   description: 'Browse liquidation pallets and truckloads by category. Find wholesale electronics, apparel, home goods, tools, toys, and more from verified suppliers across the United States.',

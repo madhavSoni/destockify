@@ -6,6 +6,9 @@ import { api } from '@/lib/api';
 import { SupplierCard } from '@/components/supplier-card';
 import { generateFAQSchema, generateBreadcrumbSchema, schemaToJsonLd } from '@/lib/schema';
 
+// Force dynamic rendering to avoid build-time API calls
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   try {
