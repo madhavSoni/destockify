@@ -19,7 +19,9 @@
     "db:reset": "prisma migrate reset",
     "db:seed": "ts-node -r tsconfig-paths/register prisma/seed.ts",
     "seed:sheet1": "ts-node -r tsconfig-paths/register seed-scripts/seed-from-sheet1.ts",
-    "seed:sheet1:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/seed-from-sheet1.ts"
+    "seed:sheet1:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/seed-from-sheet1.ts",
+    "seed:category-pages": "ts-node -r tsconfig-paths/register seed-scripts/seed-category-pages-from-csv.ts",
+    "seed:category-pages:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/seed-category-pages-from-csv.ts"
   },
   "prisma": {
     "seed": "ts-node -r tsconfig-paths/register prisma/seed.ts"

@@ -386,12 +386,46 @@ export async function getCategoryPages() {
 }
 
 export async function getCategoryPageBySlug(slug: string) {
-  const page = await prisma.categoryPage.findUnique({
-    where: { slug },
+  // Normalize slug: decode URL encoding, trim, remove leading/trailing slashes
+  let normalizedSlug: string;
+  try {
+    normalizedSlug = decodeURIComponent(slug)
+      .trim()
+      .replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
+  } catch {
+    // If decode fails, just trim and remove slashes
+    normalizedSlug = slug.trim().replace(/^\/+|\/+$/g, '');
+  }
+  
+  // Log for debugging
+  console.log(`[CategoryPage] Looking up slug: "${slug}" -> normalized: "${normalizedSlug}"`);
+  
+  // Try exact match first
+  let page = await prisma.categoryPage.findUnique({
+    where: { slug: normalizedSlug },
   });
 
+  // If not found with exact match, try case-insensitive (if database supports it)
   if (!page) {
-    throw new Error('Category page not found');
+    // Try with lowercase
+    const lowerSlug = normalizedSlug.toLowerCase();
+    if (lowerSlug !== normalizedSlug) {
+      page = await prisma.categoryPage.findUnique({
+        where: { slug: lowerSlug },
+      });
+    }
+  }
+
+  if (!page) {
+    // Log available slugs for debugging (first 10)
+    const samplePages = await prisma.categoryPage.findMany({
+      take: 10,
+      select: { slug: true, pageTitle: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    console.log(`[CategoryPage] Not found for slug: "${normalizedSlug}". Sample slugs in DB:`, 
+      samplePages.map(p => `"${p.slug}" (${p.pageTitle})`));
+    throw new Error(`Category page not found for slug: ${slug}`);
   }
 
   return page;

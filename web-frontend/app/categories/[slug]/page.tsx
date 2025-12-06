@@ -6,10 +6,10 @@ import { api } from '@/lib/api';
 import { SupplierCard } from '@/components/supplier-card';
 import { generateFAQSchema, generateBreadcrumbSchema, schemaToJsonLd } from '@/lib/schema';
 
-export async function generateMetadata(props: any): Promise<Metadata> {
-  const { params } = props;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   try {
-    const page = await api.catalog.categoryPages.get(params.slug);
+    const page = await api.catalog.categoryPages.get(slug);
     
     const metadata: Metadata = {
       title: page.metaTitle || page.pageTitle,
@@ -42,13 +42,15 @@ export async function generateMetadata(props: any): Promise<Metadata> {
   }
 }
 
-export default async function CategoryDetailPage(props: any) {
-  const { params } = props;
+export default async function CategoryDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  // Await params since it's a Promise in Next.js 15+
+  const { slug } = await params;
   
   let page;
   try {
-    page = await api.catalog.categoryPages.get(params.slug);
-  } catch {
+    page = await api.catalog.categoryPages.get(slug);
+  } catch (error: any) {
+    console.error(`[CategoryPage] Error loading page with slug "${slug}":`, error);
     notFound();
   }
 

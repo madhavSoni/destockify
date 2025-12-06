@@ -49,11 +49,17 @@ router.get('/category-pages', async (_req, res) => {
 
 router.get('/category-pages/:slug', async (req, res) => {
   try {
-    const page = await getCategoryPageBySlug(req.params.slug);
+    const slug = req.params.slug;
+    console.log(`[API] GET /category-pages/${slug}`);
+    const page = await getCategoryPageBySlug(slug);
     res.json(page);
   } catch (error: any) {
     const statusCode = error.message?.includes('not found') ? 404 : 400;
-    res.status(statusCode).json({ message: error.message ?? 'Unable to load category page' });
+    console.error(`[API] Error loading category page:`, error.message);
+    res.status(statusCode).json({ 
+      message: error.message ?? 'Unable to load category page',
+      slug: req.params.slug 
+    });
   }
 });
 
