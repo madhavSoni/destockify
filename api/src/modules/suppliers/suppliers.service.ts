@@ -67,6 +67,7 @@ export function mapSupplierSummary(supplier: SupplierSummaryPayload) {
     : null;
 
   return {
+    id: supplier.id,
     slug: supplier.slug,
     name: supplier.name,
     shortDescription: supplier.shortDescription,
@@ -377,6 +378,61 @@ export async function listSuppliers(params: SupplierListParams): Promise<Supplie
         .filter((c): c is NonNullable<typeof c> => c !== null),
     },
   };
+}
+
+export async function getSuppliersByIds(supplierIds: number[]): Promise<Array<ReturnType<typeof mapSupplierSummary> & { ratingAverage: number | null; ratingCount: number }>> {
+  if (!supplierIds || supplierIds.length === 0) {
+    return [];
+  }
+
+  // Fetch suppliers by IDs
+  const suppliers = await prisma.supplier.findMany({
+    where: {
+      id: { in: supplierIds },
+    },
+    include: supplierSummaryInclude,
+  });
+
+  if (suppliers.length === 0) {
+    return [];
+  }
+
+  // Get ratings for these suppliers
+  const reviews = await prisma.review.findMany({
+    where: {
+      supplierId: { in: supplierIds },
+      isApproved: true,
+    },
+    select: {
+      supplierId: true,
+      ratingOverall: true,
+    },
+  });
+
+  // Calculate average rating per supplier
+  const ratingsBySupplier = new Map<number, { average: number; count: number }>();
+  for (const review of reviews) {
+    const existing = ratingsBySupplier.get(review.supplierId) || { average: 0, count: 0 };
+    existing.average = (existing.average * existing.count + review.ratingOverall) / (existing.count + 1);
+    existing.count += 1;
+    ratingsBySupplier.set(review.supplierId, existing);
+  }
+
+  // Map suppliers and preserve the order of supplierIds
+  return supplierIds
+    .map((id) => {
+      const supplier = suppliers.find((s) => s.id === id);
+      if (!supplier) return null;
+      
+      const summary = mapSupplierSummary(supplier);
+      const rating = ratingsBySupplier.get(supplier.id);
+      return {
+        ...summary,
+        ratingAverage: rating ? Number(rating.average.toFixed(1)) : null,
+        ratingCount: rating?.count || 0,
+      };
+    })
+    .filter((s): s is NonNullable<typeof s> => s !== null);
 }
 
 export async function listFeaturedSuppliers(limit = 4) {

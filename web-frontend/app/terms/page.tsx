@@ -2,15 +2,15 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://trustpallet.com/terms',
+    canonical: 'https://findliquidation.com/terms',
   },
   openGraph: {
-    url: 'https://trustpallet.com/terms',
-    siteName: 'TrustPallet',
+    url: 'https://findliquidation.com/terms',
+    siteName: 'Find Liquidation',
     type: 'website',
   },
-  title: 'Terms of Service | Trust Pallet',
-  description: 'Terms and conditions for using Trust Pallet platform.',
+  title: 'Terms of Service | Find Liquidation',
+  description: 'Terms and conditions for using Find Liquidation platform.',
 };
 
 export default function TermsPage() {
@@ -23,7 +23,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-semibold text-slate-900 mb-3">1. Acceptance of Terms</h2>
             <p>
-              By accessing and using Trust Pallet, you accept and agree to be bound by these Terms of Service. 
+              By accessing and using Find Liquidation, you accept and agree to be bound by these Terms of Service. 
               If you do not agree to these terms, please do not use our platform.
             </p>
           </section>
@@ -31,7 +31,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-semibold text-slate-900 mb-3">2. Use of Service</h2>
             <p>
-              Trust Pallet provides a directory and marketplace platform connecting buyers with liquidation and wholesale suppliers. 
+              Find Liquidation provides a directory and marketplace platform connecting buyers with liquidation and wholesale suppliers. 
               You agree to use the service only for lawful purposes and in accordance with these terms.
             </p>
           </section>
@@ -56,7 +56,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-semibold text-slate-900 mb-3">5. Reviews and Content</h2>
             <p>
-              By submitting reviews or other content to Trust Pallet, you grant us a non-exclusive, worldwide, royalty-free license 
+              By submitting reviews or other content to Find Liquidation, you grant us a non-exclusive, worldwide, royalty-free license 
               to use, display, and distribute such content. You agree that your reviews are honest and based on your actual experience.
             </p>
           </section>
@@ -76,7 +76,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-semibold text-slate-900 mb-3">7. Intellectual Property</h2>
             <p>
-              All content on Trust Pallet, including text, graphics, logos, and software, is the property of Trust Pallet 
+              All content on Find Liquidation, including text, graphics, logos, and software, is the property of Find Liquidation 
               or its licensors and is protected by copyright and intellectual property laws.
             </p>
           </section>
@@ -84,7 +84,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-semibold text-slate-900 mb-3">8. Disclaimer of Warranties</h2>
             <p>
-              Trust Pallet is provided "as is" without warranties of any kind, either express or implied. We do not warrant 
+              Find Liquidation is provided "as is" without warranties of any kind, either express or implied. We do not warrant 
               that the service will be uninterrupted, secure, or error-free.
             </p>
           </section>
@@ -92,7 +92,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-semibold text-slate-900 mb-3">9. Limitation of Liability</h2>
             <p>
-              Trust Pallet shall not be liable for any indirect, incidental, special, consequential, or punitive damages 
+              Find Liquidation shall not be liable for any indirect, incidental, special, consequential, or punitive damages 
               resulting from your use of or inability to use the service.
             </p>
           </section>

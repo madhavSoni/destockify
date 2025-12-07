@@ -38,7 +38,7 @@ export default async function LotSizeDetailPage(props: any) {
           />
           {suppliersResult.items.length === 0 ? (
             <div className="rounded-md border border-black/10 bg-white p-10 text-center text-sm text-black/70">
-              No suppliers listed for this lot size yet. Trust Pallet is actively recruiting partners for this format—check
+              No suppliers listed for this lot size yet. Find Liquidation is actively recruiting partners for this format—check
               back soon or request a sourcing consult.
             </div>
           ) : (

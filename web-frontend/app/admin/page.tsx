@@ -179,6 +179,109 @@ function SupplierListContent({
   );
 }
 
+// Category Page List Component
+interface CategoryPageListContentProps {
+  categoryPages: any[];
+  loading: boolean;
+  search: string;
+  setSearch: (value: string) => void;
+  selectedId: number | null;
+  onSelectCategoryPage: (id: number) => void;
+  bodyClassName?: string;
+}
+
+function CategoryPageListContent({
+  categoryPages,
+  loading,
+  search,
+  setSearch,
+  selectedId,
+  onSelectCategoryPage,
+  bodyClassName = 'flex-1 overflow-y-auto min-h-0',
+}: CategoryPageListContentProps) {
+  const filteredPages = categoryPages.filter((page) =>
+    page.pageTitle?.toLowerCase().includes(search.toLowerCase()) ||
+    page.slug?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <>
+      <div className="border-b px-4 py-3 space-y-3">
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search category pages..."
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+        />
+        <div className="text-xs text-gray-500">
+          {loading
+            ? 'Loading category pages...'
+            : filteredPages.length === 0
+            ? 'No category pages found'
+            : `Showing ${filteredPages.length} page${filteredPages.length !== 1 ? 's' : ''}`}
+        </div>
+      </div>
+      <div className={bodyClassName}>
+        {loading ? (
+          <div className="px-4 py-6 text-sm text-gray-500">Loading category pages…</div>
+        ) : filteredPages.length === 0 ? (
+          <div className="px-4 py-6 text-sm text-gray-500">No category pages found.</div>
+        ) : (
+          <ul>
+            {filteredPages.map((page) => {
+              const isActive = page.id === selectedId;
+              return (
+                <li key={page.id}>
+                  <button
+                    onClick={() => onSelectCategoryPage(page.id)}
+                    className={`flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition-all border-l-2 ${
+                      isActive
+                        ? 'bg-white border-l-black font-medium shadow-sm'
+                        : 'border-l-transparent hover:bg-white hover:border-l-gray-400 hover:shadow-sm'
+                    }`}
+                  >
+                    <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-gray-200 flex items-center justify-center relative">
+                      {page.heroImage ? (
+                        <img 
+                          src={page.heroImage} 
+                          alt={page.heroImageAlt || page.pageTitle || 'Category page'} 
+                          className="h-full w-full object-cover" 
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = target.parentElement?.querySelector('.fallback-initial');
+                            if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                          }} 
+                        />
+                      ) : null}
+                      <span className="fallback-initial text-gray-500 text-xs font-medium absolute inset-0 flex items-center justify-center" style={{ display: page.heroImage ? 'none' : 'flex' }}>
+                        {page.pageTitle?.charAt(0).toUpperCase() || '📄'}
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="truncate font-medium">{page.pageTitle || 'Untitled'}</p>
+                      </div>
+                      <p className="mt-1 truncate text-xs text-gray-500">
+                        /{page.slug || 'no-slug'}
+                      </p>
+                      {page.createdAt && (
+                        <p className="mt-1 text-xs text-gray-400">
+                          {new Date(page.createdAt).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </>
+  );
+}
+
 export default function AdminPage() {
   const { authToken } = useAuth();
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
@@ -237,6 +340,8 @@ export default function AdminPage() {
   const [categoryPageEditingId, setCategoryPageEditingId] = useState<number | null>(null);
   const [isCreatingCategoryPage, setIsCreatingCategoryPage] = useState(false);
   const [categoryPageError, setCategoryPageError] = useState<string | null>(null);
+  const [selectedCategoryPageId, setSelectedCategoryPageId] = useState<number | null>(null);
+  const [categoryPageSearch, setCategoryPageSearch] = useState('');
   const [categoryPageFormData, setCategoryPageFormData] = useState({
     pageTitle: '',
     metaTitle: '',
@@ -612,7 +717,8 @@ export default function AdminPage() {
       
       const newPage = await api.admin.categoryPages.create(payload, authToken);
       setCategoryPages([...categoryPages, newPage]);
-      resetCategoryPageForm();
+      setSelectedCategoryPageId(newPage.id);
+      startEditCategoryPage(newPage);
       setIsCreatingCategoryPage(false);
     } catch (err: any) {
       setCategoryPageError(err.message || 'Failed to create category page');
@@ -663,6 +769,12 @@ export default function AdminPage() {
       setCategoryPageError(null);
       await api.admin.categoryPages.delete(id, authToken);
       setCategoryPages(categoryPages.filter((p) => p.id !== id));
+      if (selectedCategoryPageId === id) {
+        setSelectedCategoryPageId(null);
+        setCategoryPageEditingId(null);
+        setIsCreatingCategoryPage(false);
+        resetCategoryPageForm();
+      }
     } catch (err: any) {
       setCategoryPageError(err.message || 'Failed to delete category page');
     }
@@ -670,6 +782,7 @@ export default function AdminPage() {
 
   const startEditCategoryPage = (page: any) => {
     setCategoryPageEditingId(page.id);
+    setSelectedCategoryPageId(page.id);
     setHeroImagePreview(page.heroImage || null);
     setOgImagePreview(page.ogImage || null);
     setCategoryPageFormData({
@@ -751,6 +864,7 @@ export default function AdminPage() {
 
   const cancelEditCategoryPage = () => {
     setCategoryPageEditingId(null);
+    setSelectedCategoryPageId(null);
     setIsCreatingCategoryPage(false);
     resetCategoryPageForm();
     setHeroImagePreview(null);
@@ -1068,6 +1182,7 @@ export default function AdminPage() {
                   onClick={() => {
                     setIsCreatingCategoryPage(true);
                     setCategoryPageEditingId(null);
+                    setSelectedCategoryPageId(null);
                     resetCategoryPageForm();
                   }}
                   className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
@@ -2090,20 +2205,82 @@ export default function AdminPage() {
               </div>
             )}
 
-            {(isCreatingCategoryPage || categoryPageEditingId !== null) && (
-              <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm space-y-6 max-h-[80vh] overflow-y-auto">
-                <h2 className="text-lg font-semibold mb-4">
-                  {isCreatingCategoryPage ? 'Create New Category Page' : 'Edit Category Page'}
-                </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[600px]">
+              {/* Left Sidebar - Category Pages List */}
+              <section className="rounded-lg border bg-white shadow-sm flex flex-col min-h-[600px]">
+                <div className="border-b px-4 py-3 flex-shrink-0 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold">Category Pages</h2>
+                    <p className="text-sm text-gray-500">Select a page to edit</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsCreatingCategoryPage(true);
+                      setCategoryPageEditingId(null);
+                      setSelectedCategoryPageId(null);
+                      resetCategoryPageForm();
+                    }}
+                    className="rounded-md bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800"
+                  >
+                    + New
+                  </button>
+                </div>
+                <CategoryPageListContent
+                  categoryPages={categoryPages}
+                  loading={categoryPagesLoading}
+                  search={categoryPageSearch}
+                  setSearch={setCategoryPageSearch}
+                  selectedId={selectedCategoryPageId}
+                  onSelectCategoryPage={(id) => {
+                    const page = categoryPages.find((p) => p.id === id);
+                    if (page) {
+                      startEditCategoryPage(page);
+                    }
+                  }}
+                  bodyClassName="flex-1 overflow-y-auto min-h-0"
+                />
+              </section>
 
-                {/* SEO Settings */}
-                <div className="border-t pt-4">
-                  <h3 className="text-md font-semibold mb-3 text-gray-900">SEO Settings</h3>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Page Title <span className="text-red-500">*</span>
-                      </label>
+              {/* Right Panel - Category Page Details/Form */}
+              <section className="rounded-lg border bg-white shadow-sm flex flex-col min-h-[600px]">
+                <div className="border-b px-4 py-3 flex-shrink-0">
+                  <div>
+                    <h2 className="text-lg font-semibold">Category Page Details</h2>
+                    <p className="text-sm text-gray-500">
+                      {selectedCategoryPageId || isCreatingCategoryPage
+                        ? isCreatingCategoryPage
+                          ? 'Create a new category page'
+                          : 'View and manage category page information'
+                        : 'Select a category page to view or edit'}
+                    </p>
+                  </div>
+                </div>
+
+                {categoryPagesLoading ? (
+                  <div className="px-4 py-12 text-center">
+                    <p className="text-sm text-gray-500">Loading category pages...</p>
+                  </div>
+                ) : !selectedCategoryPageId && !isCreatingCategoryPage ? (
+                  <div className="px-4 py-12 text-center">
+                    <p className="text-sm text-gray-500">Select a category page from the list to view or edit its details.</p>
+                  </div>
+                ) : (
+                  <div className="px-4 py-6 space-y-6 flex-1 overflow-y-auto min-h-0">
+                    {categoryPageError && (
+                      <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                        {categoryPageError}
+                      </div>
+                    )}
+
+                    <div className="space-y-6">
+                      {/* SEO Settings */}
+                      <div className="border-t pt-4">
+                        <h3 className="text-md font-semibold mb-3 text-gray-900">SEO Settings</h3>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Page Title <span className="text-red-500">*</span>
+                            </label>
                       <input
                         type="text"
                         value={categoryPageFormData.pageTitle}
@@ -2138,7 +2315,7 @@ export default function AdminPage() {
                         value={categoryPageFormData.metaTitle}
                         onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, metaTitle: e.target.value })}
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                        placeholder="Buy Amazon Liquidation | TrustPallet"
+                        placeholder="Buy Amazon Liquidation | Find Liquidation"
                       />
                     </div>
                     <div className="sm:col-span-2">
@@ -2160,7 +2337,7 @@ export default function AdminPage() {
                         value={categoryPageFormData.canonicalUrl}
                         onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, canonicalUrl: e.target.value })}
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                        placeholder="https://trustpallet.com/categories/..."
+                        placeholder="https://findliquidation.com/categories/..."
                       />
                     </div>
                     <div>
@@ -2653,58 +2830,34 @@ export default function AdminPage() {
                   >
                     Cancel
                   </button>
-                </div>
-              </div>
-            )}
-
-            {categoryPagesLoading ? (
-              <div className="text-center py-12 text-gray-500">Loading...</div>
-            ) : (
-              <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Page Title</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Slug</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Created</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white">
-                    {categoryPages.map((page) => (
-                      <tr key={page.id} className="hover:bg-gray-50">
-                        <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{page.pageTitle}</td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{page.slug}</td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
-                          {new Date(page.createdAt).toLocaleDateString()}
-                        </td>
-                        <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium">
-                          <Link
-                            href={`/${page.slug}`}
-                            target="_blank"
-                            className="text-blue-600 hover:text-blue-900 mr-4"
-                          >
-                            View
-                          </Link>
-                          <button
-                            onClick={() => startEditCategoryPage(page)}
-                            className="text-blue-600 hover:text-blue-900 mr-4"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteCategoryPage(page.id)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                        {categoryPageEditingId && (
+                          <>
+                            <Link
+                              href={`/${categoryPages.find((p) => p.id === categoryPageEditingId)?.slug || ''}`}
+                              target="_blank"
+                              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            >
+                              View Page
+                            </Link>
+                            <button
+                              onClick={() => {
+                                const page = categoryPages.find((p) => p.id === categoryPageEditingId);
+                                if (page && confirm('Are you sure you want to delete this category page?')) {
+                                  handleDeleteCategoryPage(page.id);
+                                }
+                              }}
+                              className="rounded-md border border-red-300 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 ml-auto"
+                            >
+                              Delete
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </section>
+            </div>
           </div>
         )}
       </main>

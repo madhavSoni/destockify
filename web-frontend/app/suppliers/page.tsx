@@ -695,7 +695,7 @@ function SuppliersPageContent() {
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                   <div className="flex-1">
                     <div className="text-base sm:text-lg font-semibold text-slate-900">
-                      Can I buy liquidation pallets or truckloads directly through TrustPallet?
+                      Can I buy liquidation pallets or truckloads directly through Find Liquidation?
                     </div>
                     <div className="mt-1 text-xs sm:text-sm uppercase tracking-wide text-slate-400">Purchasing</div>
                   </div>
@@ -706,7 +706,7 @@ function SuppliersPageContent() {
                   </span>
                 </summary>
                 <div className="mt-2 px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-slate-600 leading-relaxed">
-                  TrustPallet is a directory and review platform. We connect you with suppliers, but all purchases are made directly with the suppliers. Visit supplier profiles to find contact information, websites, and details about their inventory and purchasing process.
+                  Find Liquidation is a directory and review platform. We connect you with suppliers, but all purchases are made directly with the suppliers. Visit supplier profiles to find contact information, websites, and details about their inventory and purchasing process.
                 </div>
               </details>
 

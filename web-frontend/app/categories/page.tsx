@@ -8,22 +8,22 @@ import { generateFAQSchema, generateBreadcrumbSchema, schemaToJsonLd } from '@/l
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Liquidation Categories – Buy Wholesale by Product Type | TrustPallet',
+  title: 'Liquidation Categories – Buy Wholesale by Product Type | Find Liquidation',
   description: 'Browse liquidation pallets and truckloads by category. Find wholesale electronics, apparel, home goods, tools, toys, and more from verified suppliers across the United States.',
   keywords: 'liquidation categories, wholesale merchandise, liquidation pallets, truckload liquidation, electronics liquidation, apparel liquidation, home goods liquidation',
   alternates: {
-    canonical: 'https://trustpallet.com/categories',
+    canonical: 'https://findliquidation.com/categories',
   },
   openGraph: {
-    title: 'Liquidation Categories – Buy Wholesale by Product Type | TrustPallet',
+    title: 'Liquidation Categories – Buy Wholesale by Product Type | Find Liquidation',
     description: 'Browse liquidation pallets and truckloads by category. Find wholesale electronics, apparel, home goods, tools, toys, and more from verified suppliers across the United States.',
-    url: 'https://trustpallet.com/categories',
-    siteName: 'TrustPallet',
+    url: 'https://findliquidation.com/categories',
+    siteName: 'Find Liquidation',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Liquidation Categories – Buy Wholesale by Product Type | TrustPallet',
+    title: 'Liquidation Categories – Buy Wholesale by Product Type | Find Liquidation',
     description: 'Browse liquidation pallets and truckloads by category. Find wholesale electronics, apparel, home goods, tools, toys, and more from verified suppliers across the United States.',
   },
 };
@@ -36,10 +36,10 @@ export default async function CategoriesPage() {
   const faqs = [
     {
       question: "How often is supplier data refreshed?",
-      answer: "Supplier profiles, ratings, and lot availability are refreshed weekly by Trust Pallet analysts. Subscribers receive alerts when new categories or truckload programs become available.",
+      answer: "Supplier profiles, ratings, and lot availability are refreshed weekly by Find Liquidation analysts. Subscribers receive alerts when new categories or truckload programs become available.",
     },
     {
-      question: "How are Trust Pallet suppliers vetted?",
+      question: "How are Find Liquidation suppliers vetted?",
       answer: "Every supplier completes a multi-step verification including proof of retailer contracts or sourcing rights, warehouse walkthrough, insurance and compliance review, plus buyer reference checks.",
     },
     {
@@ -47,12 +47,12 @@ export default async function CategoriesPage() {
       answer: "Absolutely. Many suppliers offer bilingual account reps, export documentation, and container consolidation. Filter by \"Export Friendly\" badge to find partners experienced with overseas shipping.",
     },
     {
-      question: "Can Trust Pallet help me negotiate freight?",
+      question: "Can Find Liquidation help me negotiate freight?",
       answer: "Yes. Our sourcing advisors maintain a roster of vetted LTL and full truckload carriers familiar with liquidation hubs. Request a freight consult and we will benchmark rates for your lane.",
     },
     {
       question: "What categories of liquidation merchandise are available?",
-      answer: "TrustPallet features suppliers offering liquidation merchandise across many categories including electronics, apparel, home goods, tools, toys, groceries, and more. Browse by category to find suppliers specializing in the types of inventory you're looking for.",
+      answer: "Find Liquidation features suppliers offering liquidation merchandise across many categories including electronics, apparel, home goods, tools, toys, groceries, and more. Browse by category to find suppliers specializing in the types of inventory you're looking for.",
     }
   ];
   const faqSchema = generateFAQSchema(faqs);
@@ -218,7 +218,7 @@ export default async function CategoriesPage() {
                   </span>
                 </summary>
                 <div className="mt-2 px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-slate-600 leading-relaxed">
-                  Supplier profiles, ratings, and lot availability are refreshed weekly by Trust Pallet analysts. Subscribers receive alerts when new categories or truckload programs become available.
+                  Supplier profiles, ratings, and lot availability are refreshed weekly by Find Liquidation analysts. Subscribers receive alerts when new categories or truckload programs become available.
                 </div>
               </details>
 
@@ -226,7 +226,7 @@ export default async function CategoriesPage() {
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                   <div className="flex-1">
                     <div className="text-base sm:text-lg font-semibold text-slate-900">
-                      How are Trust Pallet suppliers vetted?
+                      How are Find Liquidation suppliers vetted?
                     </div>
                     <div className="mt-1 text-xs sm:text-sm uppercase tracking-wide text-slate-400">Getting Started</div>
                   </div>
@@ -264,7 +264,7 @@ export default async function CategoriesPage() {
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                   <div className="flex-1">
                     <div className="text-base sm:text-lg font-semibold text-slate-900">
-                      Can Trust Pallet help me negotiate freight?
+                      Can Find Liquidation help me negotiate freight?
                     </div>
                     <div className="mt-1 text-xs sm:text-sm uppercase tracking-wide text-slate-400">Logistics & Freight</div>
                   </div>
@@ -294,7 +294,7 @@ export default async function CategoriesPage() {
                   </span>
                 </summary>
                 <div className="mt-2 px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-slate-600 leading-relaxed">
-                  TrustPallet features suppliers offering liquidation merchandise across many categories including electronics, apparel, home goods, tools, toys, groceries, and more. Browse by category to find suppliers specializing in the types of inventory you're looking for.
+                  Find Liquidation features suppliers offering liquidation merchandise across many categories including electronics, apparel, home goods, tools, toys, groceries, and more. Browse by category to find suppliers specializing in the types of inventory you're looking for.
                 </div>
               </details>
             </div>

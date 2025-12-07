@@ -1,20 +1,30 @@
 import { MetadataRoute } from 'next';
 
+// Reserved routes that should not be included in sitemap as category pages
+const RESERVED_ROUTES = new Set([
+  'suppliers', 'categories', 'locations', 'admin', 'about', 'contact', 'privacy', 
+  'terms', 'list-your-business', 'submit-listing', 'my-listings', 'profile',
+  'guides', 'lot-sizes', 'liquidation-companies', 'brands', 'login', 'signup',
+  'forgot-password', 'reset-password', 'verify-email', 'not-found'
+]);
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
   try {
     // Fetch dynamic data from your API
-    const [suppliersResponse, regionsResponse] = await Promise.all([
+    const [suppliersResponse, regionsResponse, categoryPagesResponse] = await Promise.all([
       fetch(`${apiUrl}/suppliers?limit=1000`, { cache: 'no-store' }),
       fetch(`${apiUrl}/catalog/regions`, { cache: 'no-store' }),
+      fetch(`${apiUrl}/catalog/category-pages`, { cache: 'no-store' }),
     ]);
 
     const suppliers = await suppliersResponse.json();
     const regions = await regionsResponse.json();
+    const categoryPages = await categoryPagesResponse.json();
     
-    console.log(`Sitemap: Found ${suppliers.items?.length || 0} suppliers and ${regions.length || 0} regions`);
+    console.log(`Sitemap: Found ${suppliers.items?.length || 0} suppliers, ${regions.length || 0} regions, and ${categoryPages.length || 0} category pages`);
 
     // Static pages
     const staticPages: MetadataRoute.Sitemap = [
@@ -38,6 +48,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
       {
         url: `${baseUrl}/categories`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.8,
+      },
+      {
+        url: `${baseUrl}/brands`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.8,
+      },
+      {
+        url: `${baseUrl}/locations`,
         lastModified: new Date(),
         changeFrequency: 'weekly',
         priority: 0.8,
@@ -76,18 +98,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     })) || [];
 
-    // Region-filtered supplier pages (for SEO: "liquidation suppliers in Florida")
-    const regionPages: MetadataRoute.Sitemap = regions.map((region: any) => ({
-      url: `${baseUrl}/suppliers?region=${region.slug}`,
+    // Location pages (using /locations/[slug] structure)
+    const locationPages: MetadataRoute.Sitemap = regions.map((region: any) => ({
+      url: `${baseUrl}/locations/${region.slug}`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
-      priority: 0.6,
+      priority: 0.7,
     }));
+
+    // Category pages (using root slug structure /[slug] - NOT /categories/[slug])
+    // Filter out reserved routes to avoid conflicts
+    const categoryPagesList: MetadataRoute.Sitemap = (Array.isArray(categoryPages) ? categoryPages : [])
+      .filter((page: any) => page.slug && !RESERVED_ROUTES.has(page.slug))
+      .map((page: any) => ({
+        url: `${baseUrl}/${page.slug}`,
+        lastModified: page.updatedAt ? new Date(page.updatedAt) : new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+      }));
 
     return [
       ...staticPages,
       ...supplierPages,
-      ...regionPages,
+      ...locationPages,
+      ...categoryPagesList,
     ];
   } catch (error) {
     console.error('Error generating sitemap:', error);

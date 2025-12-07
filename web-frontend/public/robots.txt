@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://destockify.com/sitemap.xml
+Sitemap: https://findliquidation.com/sitemap.xml

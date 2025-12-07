@@ -6,16 +6,16 @@ import { api } from '@/lib/api';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Brand Liquidation Pages – Buy from Major Retailers | TrustPallet',
+  title: 'Brand Liquidation Pages – Buy from Major Retailers | Find Liquidation',
   description: 'Browse liquidation pallets and truckloads by retailer brand. Find Amazon, Walmart, Target, Home Depot, and other major retailer liquidation inventory from verified suppliers.',
   alternates: {
-    canonical: 'https://trustpallet.com/brands',
+    canonical: 'https://findliquidation.com/brands',
   },
   openGraph: {
-    title: 'Brand Liquidation Pages – Buy from Major Retailers | TrustPallet',
+    title: 'Brand Liquidation Pages – Buy from Major Retailers | Find Liquidation',
     description: 'Browse liquidation pallets and truckloads by retailer brand. Find Amazon, Walmart, Target, Home Depot, and other major retailer liquidation inventory from verified suppliers.',
-    url: 'https://trustpallet.com/brands',
-    siteName: 'TrustPallet',
+    url: 'https://findliquidation.com/brands',
+    siteName: 'Find Liquidation',
     type: 'website',
   },
 };
@@ -41,7 +41,7 @@ export default async function BrandsPage() {
 
         {/* Grid of brand cards */}
         <div className="mt-10 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-          {brandPages.map((page: any) => (
+          {brandPages.slice().reverse().map((page: any) => (
             <Link
               key={page.slug}
               href={`/${page.slug}`}

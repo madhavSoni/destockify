@@ -3,6 +3,7 @@ import {
   getSupplierDetail,
   listFeaturedSuppliers,
   listSuppliers,
+  getSuppliersByIds,
   createSupplier,
   updateSupplier,
   deleteSupplier,
@@ -47,6 +48,38 @@ router.get('/featured', async (_req, res) => {
     res.json(suppliers);
   } catch (error: any) {
     res.status(400).json({ message: error.message ?? 'Unable to fetch featured suppliers' });
+  }
+});
+
+// Get suppliers by IDs (public endpoint)
+router.get('/by-ids', async (req, res) => {
+  try {
+    const { ids } = req.query;
+    
+    if (!ids) {
+      return res.status(400).json({ message: 'ids parameter is required' });
+    }
+
+    // Parse IDs from query string (can be comma-separated or array)
+    let supplierIds: number[];
+    if (typeof ids === 'string') {
+      supplierIds = ids.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+    } else if (Array.isArray(ids)) {
+      supplierIds = ids
+        .map(id => typeof id === 'string' ? parseInt(id) : typeof id === 'number' ? id : null)
+        .filter((id): id is number => id !== null && !isNaN(id));
+    } else {
+      return res.status(400).json({ message: 'Invalid ids parameter format' });
+    }
+
+    if (supplierIds.length === 0) {
+      return res.status(400).json({ message: 'No valid supplier IDs provided' });
+    }
+
+    const suppliers = await getSuppliersByIds(supplierIds);
+    res.json(suppliers);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message ?? 'Unable to fetch suppliers' });
   }
 });
 

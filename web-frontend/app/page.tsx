@@ -8,22 +8,22 @@ import { StateSelector } from '@/components/state-selector';
 import { SearchAutocomplete } from '@/components/search-autocomplete';
 
 export const metadata: Metadata = {
-  title: 'TrustPallet – Buy Liquidation Truckloads | Reviews & Supplier Directory',
-  description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the TrustPallet directory to source returns, overstock, and wholesale inventory with confidence.',
+  title: 'FindLiquidation – Buy Liquidation Truckloads | Reviews & Supplier Directory',
+  description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the FindLiquidation directory to source returns, overstock, and wholesale inventory with confidence.',
   alternates: {
-    canonical: 'https://trustpallet.com',
+    canonical: 'https://findliquidation.com',
   },
   openGraph: {
-    title: 'TrustPallet – Buy Liquidation Truckloads | Reviews & Supplier Directory',
-    description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the TrustPallet directory to source returns, overstock, and wholesale inventory with confidence.',
-    url: 'https://trustpallet.com',
-    siteName: 'TrustPallet',
+    title: 'FindLiquidation – Buy Liquidation Truckloads | Reviews & Supplier Directory',
+    description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the FindLiquidation directory to source returns, overstock, and wholesale inventory with confidence.',
+    url: 'https://findliquidation.com',
+    siteName: 'Find Liquidation',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TrustPallet – Buy Liquidation Truckloads | Reviews & Supplier Directory',
-    description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the TrustPallet directory to source returns, overstock, and wholesale inventory with confidence.',
+    title: 'FindLiquidation – Buy Liquidation Truckloads | Reviews & Supplier Directory',
+    description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the FindLiquidation directory to source returns, overstock, and wholesale inventory with confidence.',
   },
 };
 
@@ -77,7 +77,7 @@ export default async function HomePage() {
       answer: "You can find a wide variety of liquidation merchandise including returns, overstock, closeout items, and brand-new products. Categories range from electronics and apparel to home goods, tools, toys, and more. Most suppliers offer pallets or full truckloads.",
     },
     {
-      question: "How are suppliers verified on TrustPallet?",
+      question: "How are suppliers verified on Find Liquidation?",
       answer: "Every supplier goes through a verification process that includes proof of sourcing rights, warehouse inspections, insurance verification, and buyer reference checks. Verified suppliers display a verification badge on their profile.",
     },
     {
@@ -113,11 +113,11 @@ export default async function HomePage() {
         {/* Trending rail with half-peek card */}
         <TrendingSuppliersRail suppliers={data.featuredSuppliers} />
 
-        <ConnectByState regions={regions} />
-        <QuickActionsBar />
         <SearchDirectorySection />
         <BrandCarousel categoryPages={categoryPages} />
         <CategoryCarousel categoryPages={categoryPages} />
+        <ConnectByState regions={regions} />
+        <QuickActionsBar />
         <TwoUpFeatures />
 
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -249,8 +249,8 @@ function QuickActionsBar() {
 /* -------------------- CONNECT BY STATE -------------------- */
 function ConnectByState({ regions }: { regions: any[] }) {
   return (
-    <section className="mx-auto w-full max-w-3xl px-4 py-16 sm:py-20 text-center sm:px-6 lg:px-8 relative bg-white">
-      <div className="relative">
+    <section className="w-full px-4 py-16 sm:py-20 text-center sm:px-6 lg:px-8 relative bg-white">
+      <div className="relative mx-auto max-w-7xl">
         <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">LOCATIONS</p>
         <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">Top-Rated Liquidation & Wholesale Suppliers Near You</h3>
         <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-base sm:text-lg text-slate-600 leading-relaxed">
@@ -270,8 +270,16 @@ function SearchDirectorySection() {
         <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">DIRECTORY</p>
         <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">The Largest Liquidation Directory</h2>
         <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-base sm:text-lg text-slate-600 leading-relaxed">
-          Use TrustPallet to find the best liquidation truckload and pallet sellers. Read reviews from bin stores, discount stores, auction houses, and more.
+          Use Find Liquidation to find the best liquidation truckload and pallet sellers. Read reviews from bin stores, discount stores, auction houses, and more.
         </p>
+        <div className="mt-6 sm:mt-8 flex justify-center">
+          <Link
+            href="/suppliers"
+            className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white hover:bg-blue-700 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
+          >
+            See all suppliers
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -280,69 +288,71 @@ function SearchDirectorySection() {
 /* --------------------------- TWO IMAGE FEATURES ------------------------------ */
 function TwoUpFeatures() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:py-20 lg:py-24 sm:px-6 lg:px-8 relative bg-white">
-      <div className="mb-8 sm:mb-10">
-        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2 text-center">HOW IT WORKS</p>
-      </div>
-      <div className="space-y-6 sm:space-y-8">
-        {/* Feature 1: Split Layout - Image Left, Content Right */}
-        <article className="grid gap-0 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-lift md:grid-cols-2 md:h-[450px] lg:h-[500px]">
-          <div className="relative h-64 sm:h-80 w-full md:h-full">
-            <Image
-              src="/PHOTO-2025-11-30-11-00-27.jpg"
-              alt="Liquidation warehouse with product pallets"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-          <div className="flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12">
-            <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
-              Buy Truckload Liquidation Direct From Verified Liquidators
-            </h3>
-            <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
-              Source pallets and truckloads for your bin store, discount store, flea market business, or auction house. Buy direct from liquidators handling inventory from Amazon, Walmart, Target, Home Depot, and other major retailers.
-            </p>
-            <Link
-              href="/suppliers"
-              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-primary-900 px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-primary-800 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
-            >
-              Browse Suppliers
-              <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
-          </div>
-        </article>
+    <section className="w-full bg-white relative">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:py-20 lg:py-24 sm:px-6 lg:px-8">
+        <div className="mb-8 sm:mb-10">
+          <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2 text-center">HOW IT WORKS</p>
+        </div>
+        <div className="space-y-6 sm:space-y-8">
+          {/* Feature 1: Split Layout - Image Left, Content Right */}
+          <article className="grid gap-0 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-lift md:grid-cols-2 md:h-[450px] lg:h-[500px]">
+            <div className="relative h-64 sm:h-80 w-full md:h-full">
+              <Image
+                src="/PHOTO-2025-11-30-11-00-27.jpg"
+                alt="Liquidation warehouse with product pallets"
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+            <div className="flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12">
+              <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
+                Buy Truckload Liquidation Direct From Verified Liquidators
+              </h3>
+              <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
+                Source pallets and truckloads for your bin store, discount store, flea market business, or auction house. Buy direct from liquidators handling inventory from Amazon, Walmart, Target, Home Depot, and other major retailers.
+              </p>
+              <Link
+                href="/suppliers"
+                className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-primary-900 px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-primary-800 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
+              >
+                Browse Suppliers
+                <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
+          </article>
 
-        {/* Feature 2: Split Layout - Content Left, Image Right */}
-        <article className="grid gap-0 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-lift md:grid-cols-2 md:h-[450px] lg:h-[500px]">
-          <div className="order-2 flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12 md:order-1">
-            <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
-              Read Supplier Reviews from Buyers
-            </h3>
-            <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
-              Get honest insights before you buy. Read reviews from real resellers about liquidation pallets, truckloads, wholesale merchandise, and liquidation inventory from suppliers near you.
-            </p>
-            <Link
-              href="/suppliers"
-              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-primary-900 px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-primary-800 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600"
-            >
-              Browse Reviews
-              <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
-          </div>
-          <div className="relative order-1 h-64 sm:h-80 w-full md:order-2 md:h-full">
-            <Image
-              src="/PHOTO-2025-11-30-10-58-35.jpg"
-              alt="Team reviewing supplier reviews on laptop"
-              fill
-              className="object-cover"
-            />
-          </div>
-        </article>
+          {/* Feature 2: Split Layout - Content Left, Image Right */}
+          <article className="grid gap-0 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-lift md:grid-cols-2 md:h-[450px] lg:h-[500px]">
+            <div className="order-2 flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12 md:order-1">
+              <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
+                Read Supplier Reviews from Buyers
+              </h3>
+              <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
+                Get honest insights before you buy. Read reviews from real resellers about liquidation pallets, truckloads, wholesale merchandise, and liquidation inventory from suppliers near you.
+              </p>
+              <Link
+                href="/suppliers"
+                className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-primary-900 px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-primary-800 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              >
+                Browse Reviews
+                <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
+            <div className="relative order-1 h-64 sm:h-80 w-full md:order-2 md:h-full">
+              <Image
+                src="/PHOTO-2025-11-30-10-58-35.jpg"
+                alt="Team reviewing supplier reviews on laptop"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </article>
+        </div>
       </div>
     </section>
   );
@@ -353,7 +363,7 @@ function ListBusinessCta() {
   return (
     <section className="my-16 sm:my-20 lg:my-24 relative">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-600/20 to-transparent" />
-      <div className="relative mx-auto max-w-6xl rounded-lg bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 p-6 sm:p-8 lg:p-10 text-white shadow-sm transition-all duration-300 hover:shadow-lift hover:scale-[1.01]">
+      <div className="relative mx-auto max-w-6xl rounded-lg bg-black p-6 sm:p-8 lg:p-10 text-white shadow-sm transition-all duration-300 hover:shadow-lift hover:scale-[1.01]">
         <div className="relative">
           <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">List your Business</h3>
           <p className="mt-3 sm:mt-4 text-lg sm:text-xl lg:text-2xl leading-relaxed">
@@ -361,7 +371,7 @@ function ListBusinessCta() {
           </p>
           <Link
             href="/list-your-business"
-            className="mt-6 sm:mt-8 inline-flex items-center justify-center rounded-md bg-amber-500 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-white hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+            className="mt-6 sm:mt-8 inline-flex items-center justify-center rounded-md bg-blue-600 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
           >
             Get Started
           </Link>
@@ -385,7 +395,7 @@ function FaqSection() {
       category: "Inventory Types"
     },
     {
-      question: "How are suppliers verified on TrustPallet?",
+      question: "How are suppliers verified on Find Liquidation?",
       answer: "Every supplier goes through a verification process that includes proof of sourcing rights, warehouse inspections, insurance verification, and buyer reference checks. Verified suppliers display a verification badge on their profile.",
       category: "Verification"
     },
@@ -453,50 +463,52 @@ function BrandCarousel({ categoryPages }: { categoryPages: any[] }) {
   if (brandPages.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:py-20 sm:px-6 lg:px-8 bg-white">
-      <div className="mb-6">
-        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">RETAILERS</p>
-        <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
-          Buy Liquidation Pallets Direct From Major Retailers
-        </h2>
-      </div>
-      <div className="relative">
-        <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-          <div className="flex gap-4 pb-4">
-            {brandPages.map((page: any) => (
+    <section className="w-full bg-white">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:py-20 sm:px-6 lg:px-8">
+        <div className="mb-6">
+          <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">RETAILERS</p>
+          <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
+            Buy Liquidation Pallets Direct From Major Retailers
+          </h2>
+        </div>
+        <div className="relative">
+          <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+            <div className="flex gap-4 pb-4">
+              {brandPages.map((page: any) => (
+                <Link
+                  key={page.slug}
+                  href={`/${page.slug}`}
+                  className="group flex-shrink-0 w-48 sm:w-56 aspect-square rounded-md bg-white border border-slate-200 shadow-sm transition-all duration-300 ease-out hover:shadow-lift hover:-translate-y-1 overflow-hidden"
+                  aria-label={page.pageTitle}
+                  title={page.pageTitle}
+                >
+                  <div className="flex items-center justify-center p-6 h-full w-full">
+                    {page.heroImage ? (
+                      <div className="relative w-32 h-32 sm:w-40 sm:h-40 group-hover:scale-105 transition-transform">
+                        <Image
+                          src={page.heroImage}
+                          alt={page.heroImageAlt || page.pageTitle}
+                          fill
+                          className="object-contain"
+                          sizes="(max-width: 640px) 128px, 160px"
+                        />
+                      </div>
+                    ) : (
+                      <div className="text-6xl">🏷️</div>
+                    )}
+                  </div>
+                </Link>
+              ))}
               <Link
-                key={page.slug}
-                href={`/${page.slug}`}
-                className="group flex-shrink-0 w-48 sm:w-56 aspect-square rounded-md bg-white border border-slate-200 shadow-sm transition-all duration-300 ease-out hover:shadow-lift hover:-translate-y-1 overflow-hidden"
-                aria-label={page.pageTitle}
-                title={page.pageTitle}
+                href="/brands"
+                className="flex-shrink-0 w-48 sm:w-56 aspect-square rounded-md border-2 border-dashed border-slate-300 bg-white shadow-sm flex items-center justify-center hover:border-blue-500 hover:bg-blue-50 hover:shadow-lift transition-all duration-300 ease-out group"
               >
-                <div className="flex items-center justify-center p-6 h-full w-full">
-                  {page.heroImage ? (
-                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 group-hover:scale-105 transition-transform">
-                      <Image
-                        src={page.heroImage}
-                        alt={page.heroImageAlt || page.pageTitle}
-                        fill
-                        className="object-contain"
-                        sizes="(max-width: 640px) 128px, 160px"
-                      />
-                    </div>
-                  ) : (
-                    <div className="text-6xl">🏷️</div>
-                  )}
+                <div className="text-center">
+                  <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">→</div>
+                  <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600">Show More</span>
                 </div>
               </Link>
-            ))}
-            <Link
-              href="/brands"
-              className="flex-shrink-0 w-48 sm:w-56 aspect-square rounded-md border-2 border-dashed border-slate-300 bg-white shadow-sm flex items-center justify-center hover:border-blue-500 hover:bg-blue-50 hover:shadow-lift transition-all duration-300 ease-out group"
-            >
-              <div className="text-center">
-                <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">→</div>
-                <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600">Show More</span>
-              </div>
-            </Link>
+            </div>
           </div>
         </div>
       </div>

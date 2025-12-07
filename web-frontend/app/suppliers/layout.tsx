@@ -2,22 +2,22 @@ import { Metadata } from 'next';
 import { generateFAQSchema, schemaToJsonLd } from '@/lib/schema';
 
 export const metadata: Metadata = {
-  title: 'Buy Liquidation Truckloads & Pallets Near You | TrustPallet',
+  title: 'Buy Liquidation Truckloads & Pallets Near You | Find Liquidation',
   description: 'Browse hundreds of verified liquidators and wholesalers across the United States. Connect with suppliers offering returned, overstock, and brand-new merchandise.',
   keywords: 'liquidation suppliers, wholesale liquidators, truckload liquidation, pallet liquidation, verified suppliers, liquidation directory',
   alternates: {
-    canonical: 'https://trustpallet.com/suppliers',
+    canonical: 'https://findliquidation.com/suppliers',
   },
   openGraph: {
-    title: 'Buy Liquidation Truckloads & Pallets Near You | TrustPallet',
+    title: 'Buy Liquidation Truckloads & Pallets Near You | Find Liquidation',
     description: 'Browse hundreds of verified liquidators and wholesalers across the United States. Connect with suppliers offering returned, overstock, and brand-new merchandise.',
-    url: 'https://trustpallet.com/suppliers',
-    siteName: 'TrustPallet',
+    url: 'https://findliquidation.com/suppliers',
+    siteName: 'Find Liquidation',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Buy Liquidation Truckloads & Pallets Near You | TrustPallet',
+    title: 'Buy Liquidation Truckloads & Pallets Near You | Find Liquidation',
     description: 'Browse hundreds of verified liquidators and wholesalers across the United States. Connect with suppliers offering returned, overstock, and brand-new merchandise.',
   },
 };
@@ -38,8 +38,8 @@ export default function SuppliersLayout({
       answer: "Verified suppliers have completed our comprehensive verification process, which includes proof of sourcing rights, warehouse inspections, insurance verification, and buyer reference checks. Unverified suppliers are listed but haven't completed this process yet. We recommend reading reviews for both types before making a purchase.",
     },
     {
-      question: "Can I buy liquidation pallets or truckloads directly through TrustPallet?",
-      answer: "TrustPallet is a directory and review platform. We connect you with suppliers, but all purchases are made directly with the suppliers. Visit supplier profiles to find contact information, websites, and details about their inventory and purchasing process.",
+      question: "Can I buy liquidation pallets or truckloads directly through Find Liquidation?",
+      answer: "Find Liquidation is a directory and review platform. We connect you with suppliers, but all purchases are made directly with the suppliers. Visit supplier profiles to find contact information, websites, and details about their inventory and purchasing process.",
     },
     {
       question: "How do I know if a supplier is trustworthy?",

@@ -112,14 +112,22 @@ export function SiteHeader() {
     setIsMobileMenuOpen(false);
   };
 
-  const toggleCategoriesDropdown = () => {
-    setIsCategoriesDropdownOpen(!isCategoriesDropdownOpen);
+  const openCategoriesDropdown = () => {
+    setIsCategoriesDropdownOpen(true);
     setIsBrandsDropdownOpen(false); // Close brands if open
   };
 
-  const toggleBrandsDropdown = () => {
-    setIsBrandsDropdownOpen(!isBrandsDropdownOpen);
+  const closeCategoriesDropdown = () => {
+    setIsCategoriesDropdownOpen(false);
+  };
+
+  const openBrandsDropdown = () => {
+    setIsBrandsDropdownOpen(true);
     setIsCategoriesDropdownOpen(false); // Close categories if open
+  };
+
+  const closeBrandsDropdown = () => {
+    setIsBrandsDropdownOpen(false);
   };
 
   const toggleMobileCategories = (e?: React.MouseEvent) => {
@@ -150,13 +158,13 @@ export function SiteHeader() {
         {/* Logo */}
         <Link
           href="/"
-          className="font-heading inline-flex items-center gap-2 text-xl sm:text-2xl font-black tracking-tight text-black hover:opacity-80 transition-opacity"
+          className="font-heading inline-flex items-center gap-2 text-2xl sm:text-3xl font-black tracking-tight text-black hover:opacity-80 transition-opacity"
           onClick={closeMobileMenu}
         >
-          <span className="sr-only">Trust Pallet</span>
+          <span className="sr-only">Find Liquidation</span>
           <span aria-hidden className="select-none">
-            <span className="font-black">Trust</span>
-            <span className="font-black text-blue-600"> Pallet</span>
+            <span className="font-black">Find</span>
+            <span className="font-black text-blue-600"> Liquidation</span>
           </span>
         </Link>
 
@@ -186,23 +194,15 @@ export function SiteHeader() {
           className="hidden lg:flex items-center gap-8 text-base font-bold"
           aria-label="Primary"
         >
-          <Link 
-            href="/about" 
-            className="text-black hover:text-blue-600 transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all hover:after:w-full"
-          >
-            About Us
-          </Link>
-          <Link 
-            href="/suppliers" 
-            className="text-black hover:text-blue-600 transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all hover:after:w-full"
-          >
-            Directory
-          </Link>
-
           {/* Categories Dropdown */}
-          <div className="relative" ref={categoriesDropdownRef}>
-            <button
-              onClick={toggleCategoriesDropdown}
+          <div 
+            className="relative" 
+            ref={categoriesDropdownRef}
+            onMouseEnter={openCategoriesDropdown}
+            onMouseLeave={closeCategoriesDropdown}
+          >
+            <Link
+              href="/categories"
               className="text-black hover:text-blue-600 transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all hover:after:w-full flex items-center gap-1"
               aria-expanded={isCategoriesDropdownOpen}
               aria-haspopup="true"
@@ -217,7 +217,7 @@ export function SiteHeader() {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
-            </button>
+            </Link>
 
             {/* Categories Dropdown Menu */}
             {isCategoriesDropdownOpen && (
@@ -256,9 +256,14 @@ export function SiteHeader() {
           </div>
 
           {/* Brands Dropdown */}
-          <div className="relative" ref={brandsDropdownRef}>
-            <button
-              onClick={toggleBrandsDropdown}
+          <div 
+            className="relative" 
+            ref={brandsDropdownRef}
+            onMouseEnter={openBrandsDropdown}
+            onMouseLeave={closeBrandsDropdown}
+          >
+            <Link
+              href="/brands"
               className="text-black hover:text-blue-600 transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all hover:after:w-full flex items-center gap-1"
               aria-expanded={isBrandsDropdownOpen}
               aria-haspopup="true"
@@ -273,7 +278,7 @@ export function SiteHeader() {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
-            </button>
+            </Link>
 
             {/* Brands Dropdown Menu */}
             {isBrandsDropdownOpen && (
@@ -284,7 +289,7 @@ export function SiteHeader() {
                   ) : brands.length === 0 ? (
                     <div className="px-4 py-3 text-sm text-black/50">No brands available</div>
                   ) : (
-                    brands.map((brand) => (
+                    [...brands].reverse().map((brand) => (
                       <Link
                         key={brand.slug}
                         href={`/${brand.slug}`}
@@ -443,41 +448,35 @@ export function SiteHeader() {
 
               {/* Menu Content */}
               <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
-                <Link 
-                  href="/about" 
-                  onClick={closeMobileMenu}
-                  className="block px-4 py-3 text-base font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 rounded-md transition-colors"
-                >
-                  About Us
-                </Link>
-                <Link 
-                  href="/suppliers" 
-                  onClick={closeMobileMenu}
-                  className="block px-4 py-3 text-base font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 rounded-md transition-colors"
-                >
-                  Directory
-                </Link>
-
                 {/* Categories Section - Collapsible */}
                 <div className="pt-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleMobileCategories(e);
-                    }}
-                    className="flex items-center justify-between w-full px-4 py-2.5 text-base font-bold text-black hover:bg-black/5 rounded-md transition-colors"
-                  >
-                    <span>Categories</span>
-                    <svg
-                      className={`h-5 w-5 text-black/50 transition-transform duration-200 flex-shrink-0 ${isMobileCategoriesOpen ? 'rotate-180' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2.5}
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href="/categories"
+                      onClick={closeMobileMenu}
+                      className="flex-1 px-4 py-2.5 text-base font-bold text-black hover:bg-black/5 rounded-md transition-colors"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
+                      Categories
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleMobileCategories(e);
+                      }}
+                      className="flex items-center justify-center w-10 h-10 text-black hover:bg-black/5 rounded-md transition-colors"
+                      aria-label="Toggle categories menu"
+                    >
+                      <svg
+                        className={`h-5 w-5 text-black/50 transition-transform duration-200 flex-shrink-0 ${isMobileCategoriesOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2.5}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
 
                   {/* Collapsible Categories Menu */}
                   {isMobileCategoriesOpen && (
@@ -521,24 +520,33 @@ export function SiteHeader() {
 
                 {/* Brands Section - Collapsible */}
                 <div className="pt-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleMobileBrands(e);
-                    }}
-                    className="flex items-center justify-between w-full px-4 py-2.5 text-base font-bold text-black hover:bg-black/5 rounded-md transition-colors"
-                  >
-                    <span>Brands</span>
-                    <svg
-                      className={`h-5 w-5 text-black/50 transition-transform duration-200 flex-shrink-0 ${isMobileBrandsOpen ? 'rotate-180' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2.5}
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href="/brands"
+                      onClick={closeMobileMenu}
+                      className="flex-1 px-4 py-2.5 text-base font-bold text-black hover:bg-black/5 rounded-md transition-colors"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
+                      Brands
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleMobileBrands(e);
+                      }}
+                      className="flex items-center justify-center w-10 h-10 text-black hover:bg-black/5 rounded-md transition-colors"
+                      aria-label="Toggle brands menu"
+                    >
+                      <svg
+                        className={`h-5 w-5 text-black/50 transition-transform duration-200 flex-shrink-0 ${isMobileBrandsOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2.5}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
 
                   {/* Collapsible Brands Menu */}
                   {isMobileBrandsOpen && (
@@ -551,7 +559,7 @@ export function SiteHeader() {
                       ) : brands.length === 0 ? (
                         <div className="px-3 py-2 text-sm text-black/50">No brands available</div>
                       ) : (
-                        brands.map((brand) => (
+                        [...brands].reverse().map((brand) => (
                           <Link
                             key={brand.slug}
                             href={`/${brand.slug}`}

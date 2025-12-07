@@ -1,15 +1,15 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Space_Grotesk, Inter, Lora } from 'next/font/google';
+import { Plus_Jakarta_Sans, Inter, Lora } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import { SiteHeader } from '@/components/site-header';
 import './globals.css';
 
-const spaceGrotesk = Space_Grotesk({
-  variable: '--font-space-grotesk',
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: '--font-heading',
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
 });
 
@@ -29,20 +29,20 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: 'Trust Pallet | Wholesale Liquidation Supplier Directory',
+  title: 'Find Liquidation | Wholesale Liquidation Supplier Directory',
   description:
-    'Trust Pallet helps liquidation buyers find vetted wholesale pallet and truckload suppliers with transparent reviews, guides, and buyer insights.',
+    'Find Liquidation helps liquidation buyers find vetted wholesale pallet and truckload suppliers with transparent reviews, guides, and buyer insights.',
   openGraph: {
-    title: 'Trust Pallet | Wholesale Liquidation Supplier Directory',
+    title: 'Find Liquidation | Wholesale Liquidation Supplier Directory',
     description:
       'Find vetted liquidation suppliers, read verified buyer reviews, and learn how to scale your wholesale sourcing with confidence.',
-    url: 'https://trustpallet.com',
-    siteName: 'Trust Pallet',
+    url: 'https://findliquidation.com',
+    siteName: 'Find Liquidation',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Trust Pallet | Wholesale Liquidation Supplier Directory',
+    title: 'Find Liquidation | Wholesale Liquidation Supplier Directory',
     description:
       'Find vetted liquidation suppliers, read verified buyer reviews, and learn how to scale your wholesale sourcing with confidence.',
   },
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${spaceGrotesk.variable} ${inter.variable} ${lora.variable} bg-white text-black antialiased`}>
+      <body className={`${plusJakartaSans.variable} ${inter.variable} ${lora.variable} bg-white text-black antialiased`}>
         <Providers>
           <div className="flex min-h-screen flex-col">
             <SiteHeader />
@@ -71,7 +71,7 @@ function SiteFooter() {
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-12 sm:px-6 lg:flex-row lg:items-start lg:justify-between lg:px-8">
         <div className="max-w-md space-y-3">
           <Link href="/" className="text-lg font-semibold text-black">
-            Trust Pallet
+            Find Liquidation
           </Link>
           <p className="text-sm leading-6 text-black/70">
             Buy Truckload Liquidation from trusted sellers across the United States. Your go to directory for Liquidation and Wholesale Suppliers.
@@ -88,6 +88,8 @@ function SiteFooter() {
           </div>
           <div className="space-y-2">
             <p className="font-semibold text-black">Company</p>
+            <Link href="/about" className="block hover:text-blue-600 transition-colors duration-200">About Us</Link>
+            <Link href="/suppliers" className="block hover:text-blue-600 transition-colors duration-200">Directory</Link>
             <Link href="/list-your-business" className="block hover:text-blue-600 transition-colors duration-200">Become a partner</Link>
             <Link href="/contact" className="block hover:text-blue-600 transition-colors duration-200">Contact</Link>
             <Link href="/privacy" className="block hover:text-blue-600 transition-colors duration-200">Privacy</Link>
@@ -96,7 +98,7 @@ function SiteFooter() {
       </div>
 
       <div className="border-t border-black/5 py-4 text-center text-xs text-black/50">
-        © {new Date().getFullYear()} Trust Pallet. Built for liquidation buyers.
+        © {new Date().getFullYear()} Find Liquidation. Built for liquidation buyers.
       </div>
     </footer>
   );

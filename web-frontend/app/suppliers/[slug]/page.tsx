@@ -12,14 +12,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   
   if (!detail) {
     return {
-      title: 'Supplier Not Found | TrustPallet',
+      title: 'Supplier Not Found | Find Liquidation',
       description: 'The requested supplier could not be found.',
     };
   }
 
   const { supplier } = detail;
   const companyName = supplier.name;
-  const supplierUrl = `https://trustpallet.com/suppliers/${supplier.slug}`;
+  const supplierUrl = `https://findliquidation.com/suppliers/${supplier.slug}`;
 
   return {
     title: `${companyName} Reviews – Are They Legit? | Truckloads & Pallets Buyer Ratings`,
@@ -28,10 +28,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       canonical: supplierUrl,
     },
     openGraph: {
-      title: `${companyName} Reviews – Are They Legit? | TrustPallet`,
+      title: `${companyName} Reviews – Are They Legit? | Find Liquidation`,
       description: `Is ${companyName} legit? Read real buyer reviews, ratings, and experiences with their liquidation truckloads and pallet sales.`,
       url: supplierUrl,
-      siteName: 'TrustPallet',
+      siteName: 'Find Liquidation',
       type: 'website',
       ...(supplier.logoImage && {
         images: [{
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${companyName} Reviews – Are They Legit? | TrustPallet`,
+      title: `${companyName} Reviews – Are They Legit? | Find Liquidation`,
       description: `Is ${companyName} legit? Read real buyer reviews, ratings, and experiences with their liquidation truckloads and pallet sales.`,
       ...(supplier.logoImage && {
         images: [supplier.logoImage],

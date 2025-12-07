@@ -3,9 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --font-space-grotesk: 'Space Grotesk', system-ui, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-inter: 'Inter', system-ui, sans-serif;
   --font-lora: 'Lora', Georgia, serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+h1 {
+  font-weight: 800;
 }
 
 body {

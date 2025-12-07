@@ -7,14 +7,14 @@ export default function ListYourBusinessPage() {
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="For Suppliers"
-          title="Apply to list your liquidation business on Trust Pallet"
+          title="Apply to list your liquidation business on Find Liquidation"
           description="We partner with supplier teams who prioritize transparency, consistent freight readiness, and buyer support. Share a few details and our marketplace team will reach out within two business days."
           align="center"
         />
 
         <div className="mt-8 space-y-6 rounded-lg border border-slate-200 bg-white p-8">
           <div className="space-y-2 text-sm text-slate-600">
-            <p>Trust Pallet reviews every supplier application for:</p>
+            <p>Find Liquidation reviews every supplier application for:</p>
             <ul className="list-inside list-disc space-y-1">
               <li>Proof of sourcing rights or retailer/manufacturer contracts</li>
               <li>Warehouse operations, inspection options, and load-out SLAs</li>
@@ -36,7 +36,7 @@ export default function ListYourBusinessPage() {
         </div>
 
         <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6 text-sm text-slate-600">
-          Already listed? <Link href="/contact" className="underline hover:text-blue-600">Contact the Trust Pallet team</Link> to update your profile, promote upcoming loads, or share buyer wins.
+          Already listed? <Link href="/contact" className="underline hover:text-blue-600">Contact the Find Liquidation team</Link> to update your profile, promote upcoming loads, or share buyer wins.
         </div>
       </div>
     </div>

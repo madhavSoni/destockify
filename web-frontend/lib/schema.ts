@@ -13,15 +13,15 @@ export function generateWebsiteSchema(): WithContext<WebSite> {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Trust Pallet',
-    alternateName: 'Trust Pallet - Wholesale Liquidation Supplier Directory',
-    url: 'https://trustpallet.com',
+    name: 'Find Liquidation',
+    alternateName: 'Find Liquidation - Wholesale Liquidation Supplier Directory',
+    url: 'https://findliquidation.com',
     description: 'Find trusted wholesale liquidation suppliers offering truckloads and pallets. Browse verified suppliers, read reviews, and discover guides to scale your sourcing.',
     potentialAction: ({
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: 'https://trustpallet.com/suppliers?search={search_term_string}'
+        urlTemplate: 'https://findliquidation.com/suppliers?search={search_term_string}'
       },
       'query-input': 'required name=search_term_string'
     } as unknown) as any
@@ -32,10 +32,10 @@ export function generateOrganizationSchema(): WithContext<Organization> {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Trust Pallet',
-    url: 'https://trustpallet.com',
-    logo: 'https://trustpallet.com/logo.png', // TODO: Update with actual logo URL
-    description: 'Trust Pallet is a wholesale liquidation supplier directory helping buyers find vetted suppliers with transparent reviews and guides.',
+    name: 'Find Liquidation',
+    url: 'https://findliquidation.com',
+    logo: 'https://findliquidation.com/logo.png', // TODO: Update with actual logo URL
+    description: 'Find Liquidation is a wholesale liquidation supplier directory helping buyers find vetted suppliers with transparent reviews and guides.',
     sameAs: [
       // TODO: Add social media URLs when available
       // 'https://twitter.com/destockify',
@@ -64,7 +64,7 @@ export function generateSupplierSchema(
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: supplier.name,
-    url: `https://trustpallet.com/suppliers/${supplier.slug}`,
+    url: `https://findliquidation.com/suppliers/${supplier.slug}`,
     description: supplier.description || supplier.shortDescription || '',
   };
 
@@ -132,19 +132,19 @@ export function generateArticleSchema(guide: any): WithContext<Article> {
     '@type': 'Article',
     headline: guide.title,
     description: guide.excerpt || guide.description,
-    url: `https://trustpallet.com/guides/${guide.slug}`,
+    url: `https://findliquidation.com/guides/${guide.slug}`,
     datePublished: guide.createdAt,
     dateModified: guide.updatedAt || guide.createdAt,
     author: {
       '@type': 'Organization',
-      name: 'Trust Pallet'
+      name: 'Find Liquidation'
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Trust Pallet',
+      name: 'Find Liquidation',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://trustpallet.com/logo.png' // TODO: Update
+        url: 'https://findliquidation.com/logo.png' // TODO: Update
       }
     },
     ...(guide.imageUrl && {
@@ -190,7 +190,7 @@ export function generateBreadcrumbSchema(items: Array<{ name: string; url: strin
       '@type': 'ListItem',
       position: index + 1,
       name: item.name,
-      item: `https://trustpallet.com${item.url}`
+      item: `https://findliquidation.com${item.url}`
     }))
   };
 }

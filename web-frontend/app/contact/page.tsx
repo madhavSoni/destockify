@@ -6,7 +6,7 @@ export default function ContactPage() {
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Contact"
-          title="Connect with the Trust Pallet sourcing team"
+          title="Connect with the Find Liquidation sourcing team"
           description="Have a question about suppliers, freight, or publishing your liquidation program? We're here to help."
           align="center"
         />

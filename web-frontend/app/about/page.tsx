@@ -2,22 +2,22 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'About Us | Trust Pallet',
-  description: 'Learn about Trust Pallet - your trusted platform for connecting with verified liquidation and wholesale suppliers across the United States.',
+  title: 'About Us | Find Liquidation',
+  description: 'Learn about Find Liquidation - your trusted platform for connecting with verified liquidation and wholesale suppliers across the United States.',
   alternates: {
-    canonical: 'https://trustpallet.com/about',
+    canonical: 'https://findliquidation.com/about',
   },
   openGraph: {
-    title: 'About Us | Trust Pallet',
-    description: 'Learn about Trust Pallet - your trusted platform for connecting with verified liquidation and wholesale suppliers across the United States.',
-    url: 'https://trustpallet.com/about',
-    siteName: 'TrustPallet',
+    title: 'About Us | Find Liquidation',
+    description: 'Learn about Find Liquidation - your trusted platform for connecting with verified liquidation and wholesale suppliers across the United States.',
+    url: 'https://findliquidation.com/about',
+    siteName: 'Find Liquidation',
     type: 'website',
   },
   twitter: {
     card: 'summary',
-    title: 'About Us | Trust Pallet',
-    description: 'Learn about Trust Pallet - your trusted platform for connecting with verified liquidation and wholesale suppliers across the United States.',
+    title: 'About Us | Find Liquidation',
+    description: 'Learn about Find Liquidation - your trusted platform for connecting with verified liquidation and wholesale suppliers across the United States.',
   },
 };
 
@@ -29,7 +29,7 @@ export default function AboutPage() {
         <div className="text-center mb-12">
           <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">ABOUT</p>
           <h1 className="font-heading text-4xl font-bold text-primary-900 sm:text-5xl mb-4">
-            About Trust Pallet
+            About Find Liquidation
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
             Connecting buyers with verified liquidation and wholesale suppliers across the United States
@@ -42,7 +42,7 @@ export default function AboutPage() {
           <section className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
             <h2 className="font-heading text-2xl font-semibold text-primary-900 mb-4">Our Mission</h2>
             <p className="text-lg text-slate-700 leading-relaxed">
-              Trust Pallet simplifies the process of finding reliable liquidation and wholesale suppliers. 
+              Find Liquidation simplifies the process of finding reliable liquidation and wholesale suppliers. 
               We provide a curated directory of vetted companies, complete with verified reviews and 
               detailed information to help you make informed business decisions.
             </p>

@@ -21,7 +21,7 @@ export function TrendingSuppliersRail({
   };
 
   return (
-    <section className="w-full bg-slate-50 py-12 sm:py-16">
+    <section className="w-full bg-slate-50 pt-12 sm:pt-16 pb-0">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mb-4 sm:mb-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
           <div>
@@ -106,15 +106,6 @@ export function TrendingSuppliersRail({
             {/* Right spacer for last card breathing room */}
             <div className="shrink-0 w-4 sm:w-8" aria-hidden />
           </div>
-        </div>
-
-        <div className="mt-6 flex justify-center">
-          <Link
-            href="/suppliers"
-            className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white hover:bg-blue-700 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
-          >
-            See all suppliers
-          </Link>
         </div>
       </div>
     </section>

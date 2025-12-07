@@ -1,18 +1,62 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 import { api } from '@/lib/api';
 import { SupplierCard } from '@/components/supplier-card';
 import { SectionHeading } from '@/components/section-heading';
 
-export default async function LocationDetailPage(props: any) {
-  const { params } = props;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  try {
+    const regions = await api.catalog.regions();
+    const region = regions.find((item) => item.slug === slug);
+    
+    if (!region) {
+      return {
+        title: 'Location Not Found | Find Liquidation',
+        description: 'The requested location could not be found.',
+      };
+    }
+
+    const regionName = region.name;
+    const locationUrl = `https://findliquidation.com/locations/${slug}`;
+
+    return {
+      title: `Liquidation Truckloads in ${regionName} | Find Liquidation`,
+      description: `Find verified liquidation suppliers in ${regionName}. Buy returns, overstock, and wholesale truckloads near you.`,
+      alternates: {
+        canonical: locationUrl,
+      },
+      openGraph: {
+        title: `Liquidation Truckloads in ${regionName} | Find Liquidation`,
+        description: `Find verified liquidation suppliers in ${regionName}. Buy returns, overstock, and wholesale truckloads near you.`,
+        url: locationUrl,
+        siteName: 'Find Liquidation',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `Liquidation Truckloads in ${regionName} | Find Liquidation`,
+        description: `Find verified liquidation suppliers in ${regionName}. Buy returns, overstock, and wholesale truckloads near you.`,
+      },
+    };
+  } catch {
+    return {
+      title: 'Location Page | Find Liquidation',
+      description: 'Find verified liquidation suppliers near you.',
+    };
+  }
+}
+
+export default async function LocationDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const [regions, suppliersResult, categories] = await Promise.all([
     api.catalog.regions(),
-    api.suppliers.list({ region: params.slug, limit: 12 }),
+    api.suppliers.list({ region: slug, limit: 12 }),
     api.catalog.categories(),
   ]);
 
-  const region = regions.find((item) => item.slug === params.slug);
+  const region = regions.find((item) => item.slug === slug);
   if (!region) {
     notFound();
   }
@@ -56,7 +100,7 @@ export default async function LocationDetailPage(props: any) {
           />
           {suppliersResult.items.length === 0 ? (
             <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center text-sm text-slate-600">
-              No suppliers published for this region yet. Trust Pallet is onboarding additional partners—reach out if you
+              No suppliers published for this region yet. Find Liquidation is onboarding additional partners—reach out if you
               need introductions in this market.
             </div>
           ) : (
@@ -80,7 +124,7 @@ export default async function LocationDetailPage(props: any) {
           <SectionHeading
             eyebrow="Popular Categories"
             title="Top categories leaving this market"
-            description="Based on the suppliers Trust Pallet tracks, these categories see the highest load velocity from this hub."
+            description="Based on the suppliers Find Liquidation tracks, these categories see the highest load velocity from this hub."
           />
           <div className="grid gap-4 md:grid-cols-2">
             {categories
@@ -89,7 +133,7 @@ export default async function LocationDetailPage(props: any) {
               .map((category) => (
                 <Link
                   key={category.slug}
-                  href={`/categories/${category.slug}`}
+                  href={`/${category.slug}`}
                   className="flex items-center justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
                 >
                   <div>

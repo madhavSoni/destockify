@@ -12,7 +12,7 @@ export default async function GuidesPage() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Guides"
-          title="Playbooks from Trust Pallet sourcing strategists"
+          title="Playbooks from Find Liquidation sourcing strategists"
           description="Practical frameworks covering supplier vetting, warehouse staffing, truckload modeling, and risk mitigation."
         />
 

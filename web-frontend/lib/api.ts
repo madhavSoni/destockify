@@ -98,6 +98,7 @@ export type SupplierAddress = {
 };
 
 export type SupplierSummary = {
+  id: number;
   slug: string;
   name: string;
   shortDescription?: string | null;
@@ -411,6 +412,7 @@ export const api = {
     list: (params?: { category?: string; region?: string; state?: string; country?: string; search?: string; cursor?: number; limit?: number; verified?: boolean; sort?: string; isContractHolder?: boolean; isBroker?: boolean }) =>
       fetchFromApi<SupplierListResponse>(`/suppliers${buildQueryString(params)}`, { cache: 'no-store' }),
     get: (slug: string) => fetchFromApi<SupplierDetailResponse>(`/suppliers/${slug}`, { revalidate: 30 }),
+    getByIds: (ids: number[]) => fetchFromApi<SupplierSummary[]>(`/suppliers/by-ids${buildQueryString({ ids: ids.join(',') })}`, { revalidate: 30 }),
     featured: () => fetchFromApi<SupplierSummary[]>('/suppliers/featured', { revalidate: 30 }),
     // Admin: Get supplier by ID
     getByIdAdmin: (id: number, token: string) =>
