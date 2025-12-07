@@ -25,7 +25,7 @@ export function TrendingSuppliersRail({
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mb-4 sm:mb-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
           <div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">Trending Wholesale Suppliers Near You</h2>
+            <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">Trending Wholesale Suppliers Near You</h2>
             <p className="mt-1 text-sm sm:text-base text-slate-600 leading-relaxed">
               Find wholesale lots of returns, overstock and mixed merchandise by the pallet or truckload.
             </p>
@@ -35,7 +35,7 @@ export function TrendingSuppliersRail({
               type="button"
               aria-label="Previous"
               onClick={() => scrollByCards(-1)}
-              className="rounded-md border border-black/10 bg-white p-2 text-black hover:bg-black/5 hover:border-blue-600 transition-all duration-200"
+              className="rounded-md border border-slate-200 bg-white shadow-sm p-2 text-black hover:bg-slate-50 hover:border-blue-500 hover:shadow-lift transition-all duration-200"
             >
               <Chevron dir="left" />
             </button>
@@ -43,7 +43,7 @@ export function TrendingSuppliersRail({
               type="button"
               aria-label="Next"
               onClick={() => scrollByCards(1)}
-              className="rounded-md border border-black/10 bg-white p-2 text-black hover:bg-black/5 hover:border-blue-600 transition-all duration-200"
+              className="rounded-md border border-slate-200 bg-white shadow-sm p-2 text-black hover:bg-slate-50 hover:border-blue-500 hover:shadow-lift transition-all duration-200"
             >
               <Chevron dir="right" />
             </button>
@@ -55,7 +55,7 @@ export function TrendingSuppliersRail({
           <button
             type="button"
             onClick={() => scrollByCards(-1)}
-            className="lg:hidden absolute left-1 top-1/2 -translate-y-1/2 z-20 rounded-md bg-white/95 p-2 shadow-lg ring-1 ring-black/10 text-black hover:bg-white transition-all duration-200"
+            className="lg:hidden absolute left-1 top-1/2 -translate-y-1/2 z-20 rounded-md bg-white border border-slate-200 p-2 shadow-sm text-black hover:bg-white hover:shadow-lift transition-all duration-200"
             aria-label="Previous"
           >
             <Chevron dir="left" />
@@ -91,7 +91,7 @@ export function TrendingSuppliersRail({
             {/* "See more" button card - half peek */}
             <Link
               href="/suppliers"
-              className="group relative shrink-0 snap-start overflow-hidden rounded-xl border border-dashed border-black/5 bg-white/70 backdrop-blur-sm hover:bg-white hover:border-blue-600 transition-all duration-300 ease-out hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1"
+              className="group relative shrink-0 snap-start overflow-hidden rounded-md border-2 border-dashed border-slate-300 bg-white shadow-sm hover:bg-white hover:border-blue-500 transition-all duration-300 ease-out hover:shadow-lift hover:-translate-y-1"
               style={{ width: '160px' }}
               aria-label="See more suppliers"
             >

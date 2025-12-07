@@ -79,7 +79,8 @@ export default async function CategoriesPage() {
       <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">
+          <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">CATEGORIES</p>
+          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
             Buy Wholesale Merchandise by the Category
           </h1>
           <p className="mt-3 sm:mt-4 max-w-xl mx-auto text-base sm:text-lg text-slate-600 leading-relaxed">
@@ -101,12 +102,12 @@ export default async function CategoriesPage() {
         </div>
 
         {/* Grid of category page cards */}
-        <div className="mt-10 grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-10 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
           {categoryPages.map((page) => (
             <Link
               key={page.slug}
               href={`/${page.slug}`}
-              className="group relative flex flex-col h-48 items-center justify-center rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden"
+              className="group relative flex flex-col h-48 items-center justify-center rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift hover:-translate-y-1 overflow-hidden"
               aria-label={page.pageTitle}
               title={page.pageTitle}
             >
@@ -124,7 +125,7 @@ export default async function CategoriesPage() {
                 ) : (
                   <div className="text-4xl mb-3">🏷️</div>
                 )}
-                <h3 className="text-sm font-semibold text-slate-900 line-clamp-2 leading-tight px-2">{page.pageTitle}</h3>
+                <h3 className="font-heading text-sm font-semibold text-slate-900 line-clamp-2 leading-tight px-2">{page.pageTitle}</h3>
               </div>
             </Link>
           ))}
@@ -135,7 +136,7 @@ export default async function CategoriesPage() {
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
           <div className="space-y-6 sm:space-y-8">
             {/* Feature 1: Split Layout - Image Left, Content Right */}
-            <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl md:grid-cols-2 md:h-[450px] lg:h-[500px]">
+            <article className="grid gap-0 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift md:grid-cols-2 md:h-[450px] lg:h-[500px]">
               <div className="relative h-64 sm:h-80 w-full md:h-full">
                 <Image
                   src="/feature-desk.png"
@@ -146,7 +147,7 @@ export default async function CategoriesPage() {
                 />
               </div>
               <div className="flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12">
-                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
+                <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
                   Buy Wholesale Electronics From Trusted Suppliers
                 </h3>
                 <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
@@ -167,9 +168,9 @@ export default async function CategoriesPage() {
             </article>
 
             {/* Feature 2: Split Layout - Content Left, Image Right */}
-            <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl md:grid-cols-2 md:h-[450px] lg:h-[500px]">
+            <article className="grid gap-0 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift md:grid-cols-2 md:h-[450px] lg:h-[500px]">
               <div className="order-2 flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12 md:order-1">
-                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
+                <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
                   Find Wholesale Clothing and Apparel Suppliers Near You
                 </h3>
                 <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
@@ -199,9 +200,10 @@ export default async function CategoriesPage() {
 
           {/* FAQ */}
           <div className="mt-16 sm:mt-20 text-center">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">Frequently Asked Questions</h2>
+            <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">FAQ</p>
+            <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">Frequently Asked Questions</h2>
             <div className="mx-auto mt-8 sm:mt-10 max-w-3xl space-y-4 text-left">
-              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+              <details className="group rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                   <div className="flex-1">
                     <div className="text-base sm:text-lg font-semibold text-slate-900">
@@ -220,7 +222,7 @@ export default async function CategoriesPage() {
                 </div>
               </details>
 
-              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+              <details className="group rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                   <div className="flex-1">
                     <div className="text-base sm:text-lg font-semibold text-slate-900">
@@ -239,7 +241,7 @@ export default async function CategoriesPage() {
                 </div>
               </details>
 
-              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+              <details className="group rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                   <div className="flex-1">
                     <div className="text-base sm:text-lg font-semibold text-slate-900">
@@ -258,7 +260,7 @@ export default async function CategoriesPage() {
                 </div>
               </details>
 
-              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+              <details className="group rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                   <div className="flex-1">
                     <div className="text-base sm:text-lg font-semibold text-slate-900">
@@ -277,7 +279,7 @@ export default async function CategoriesPage() {
                 </div>
               </details>
 
-              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+              <details className="group rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                   <div className="flex-1">
                     <div className="text-base sm:text-lg font-semibold text-slate-900">

@@ -224,7 +224,7 @@ function SubmitListingForm() {
 
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-black mb-3">
+          <h1 className="font-heading text-3xl font-bold text-primary-900 mb-3">
             {isEditMode ? 'Edit Your Business Listing' : 'Submit Your Business Listing'}
           </h1>
           <p className="text-black/70 max-w-2xl mx-auto">
@@ -238,14 +238,14 @@ function SubmitListingForm() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-8">
           {error && (
-            <div className="rounded-md border border-black/10 bg-black/5 p-4 text-sm text-black">
+            <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-black">
               {error}
             </div>
           )}
 
           {/* Basic Information */}
-          <div className="rounded-md border border-black/10 bg-white p-6">
-            <h2 className="text-xl font-semibold text-black mb-4">Basic Information</h2>
+          <div className="rounded-md border border-slate-200 bg-white shadow-sm p-6">
+            <h2 className="font-heading text-xl font-semibold text-primary-900 mb-4">Basic Information</h2>
             <div className="space-y-4">
               <div>
                 <label htmlFor="companyName" className="block text-sm font-medium text-black mb-1">
@@ -256,7 +256,7 @@ function SubmitListingForm() {
                   id="companyName"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
-                  className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 text-black focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   required
                 />
               </div>
@@ -270,7 +270,7 @@ function SubmitListingForm() {
                   id="companyAddress"
                   value={companyAddress}
                   onChange={(e) => setCompanyAddress(e.target.value)}
-                  className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 text-black focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   placeholder="123 Main St, City, State, ZIP"
                   required
                 />
@@ -285,7 +285,7 @@ function SubmitListingForm() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={4}
-                  className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 text-black focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   placeholder="Describe your products, services, and what makes your business unique..."
                   required
                 />
@@ -294,8 +294,8 @@ function SubmitListingForm() {
           </div>
 
           {/* Contact Details */}
-          <div className="rounded-md border border-black/10 bg-white p-6">
-            <h2 className="text-xl font-semibold text-black mb-4">Contact Details</h2>
+          <div className="rounded-md border border-slate-200 bg-white shadow-sm p-6">
+            <h2 className="font-heading text-xl font-semibold text-primary-900 mb-4">Contact Details</h2>
             <div className="space-y-4">
               <div>
                 <label htmlFor="contactEmail" className="block text-sm font-medium text-black mb-1">
@@ -306,7 +306,7 @@ function SubmitListingForm() {
                   id="contactEmail"
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
-                  className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 text-black focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   required
                 />
               </div>
@@ -320,7 +320,7 @@ function SubmitListingForm() {
                   id="contactPhone"
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
-                  className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 text-black focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   placeholder="(555) 123-4567"
                 />
               </div>
@@ -334,7 +334,7 @@ function SubmitListingForm() {
                   id="website"
                   value={website}
                   onChange={(e) => setWebsite(e.target.value)}
-                  className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 text-black focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   placeholder="https://www.example.com"
                 />
               </div>
@@ -342,8 +342,8 @@ function SubmitListingForm() {
           </div>
 
           {/* Branding */}
-          <div className="rounded-md border border-black/10 bg-white p-6">
-            <h2 className="text-xl font-semibold text-black mb-4">Branding</h2>
+          <div className="rounded-md border border-slate-200 bg-white shadow-sm p-6">
+            <h2 className="font-heading text-xl font-semibold text-primary-900 mb-4">Branding</h2>
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-black mb-2">
@@ -351,7 +351,7 @@ function SubmitListingForm() {
                 </label>
                 <div className="flex items-center gap-4">
                   {logoPreview && (
-                    <div className="h-24 w-24 rounded-md border border-black/10 overflow-hidden">
+                    <div className="h-24 w-24 rounded-md border border-slate-200 overflow-hidden">
                       <img src={logoPreview} alt="Logo preview" className="h-full w-full object-cover" />
                     </div>
                   )}
@@ -360,7 +360,7 @@ function SubmitListingForm() {
                       type="file"
                       accept="image/*"
                       onChange={handleLogoChange}
-                      className="block w-full text-sm text-black/70 file:mr-4 file:rounded-md file:border file:border-black/10 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-black hover:file:bg-black/5"
+                      className="block w-full text-sm text-black/70 file:mr-4 file:rounded-md file:border file:border-slate-200 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-black hover:file:bg-slate-50"
                     />
                     <p className="mt-1 text-xs text-black/50">PNG, JPG up to 5MB (Square images work best)</p>
                   </div>
@@ -373,7 +373,7 @@ function SubmitListingForm() {
                 </label>
                 <div className="space-y-4">
                   {bannerPreview && (
-                    <div className="w-full h-48 rounded-md border border-black/10 overflow-hidden">
+                    <div className="w-full h-48 rounded-md border border-slate-200 overflow-hidden">
                       <img src={bannerPreview} alt="Banner preview" className="h-full w-full object-cover" />
                     </div>
                   )}
@@ -390,8 +390,8 @@ function SubmitListingForm() {
           </div>
 
           {/* Social Media */}
-          <div className="rounded-md border border-black/10 bg-white p-6">
-            <h2 className="text-xl font-semibold text-black mb-4">Social Media Links</h2>
+          <div className="rounded-md border border-slate-200 bg-white shadow-sm p-6">
+            <h2 className="font-heading text-xl font-semibold text-primary-900 mb-4">Social Media Links</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Object.keys(socialMedia).map((platform) => (
                 <div key={platform}>
@@ -406,7 +406,7 @@ function SubmitListingForm() {
                       ...prev,
                       [platform]: e.target.value
                     }))}
-                    className="w-full rounded-md border border-black/10 px-4 py-2 text-black focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
+                    className="w-full rounded-lg border border-slate-300 px-4 py-2 text-black focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
                     placeholder={`https://...`}
                   />
                 </div>
@@ -415,8 +415,8 @@ function SubmitListingForm() {
           </div>
 
           {/* Ownership Proof */}
-          <div className="rounded-md border border-black/10 bg-white p-6">
-            <h2 className="text-xl font-semibold text-black mb-4">
+          <div className="rounded-md border border-slate-200 bg-white shadow-sm p-6">
+            <h2 className="font-heading text-xl font-semibold text-primary-900 mb-4">
               Proof of Ownership <span className="text-black">*</span>
             </h2>
             <p className="text-sm text-black/70 mb-4">
@@ -436,7 +436,7 @@ function SubmitListingForm() {
               <div className="mt-4 space-y-2">
                 <p className="text-sm font-medium text-black">Uploaded documents:</p>
                 {documentFiles.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between rounded-md border border-black/10 bg-black/5 px-3 py-2">
+                  <div key={index} className="flex items-center justify-between rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
                     <span className="text-sm text-black">{file.name}</span>
                     <button
                       type="button"
@@ -452,8 +452,8 @@ function SubmitListingForm() {
           </div>
 
           {/* Optional Notes */}
-          <div className="rounded-md border border-black/10 bg-white p-6">
-            <h2 className="text-xl font-semibold text-black mb-4">Additional Notes</h2>
+          <div className="rounded-md border border-slate-200 bg-white shadow-sm p-6">
+            <h2 className="font-heading text-xl font-semibold text-primary-900 mb-4">Additional Notes</h2>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}

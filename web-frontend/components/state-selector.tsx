@@ -62,7 +62,7 @@ export function StateSelector({ regions }: { regions: Region[] }) {
             value={selectedState}
             onChange={(e) => setSelectedState(e.target.value)}
             disabled={loading}
-            className="h-14 w-full appearance-none rounded-md border-2 border-black/10 bg-white px-5 pr-12 text-base text-black shadow-sm hover:border-blue-600/50 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="h-14 w-full appearance-none rounded-lg border border-slate-300 bg-white px-5 pr-12 text-base text-black shadow-sm hover:border-blue-500/50 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <option value="">
               {loading ? 'Loading states...' : 'Shop by State'}

@@ -30,7 +30,8 @@ export default async function BrandsPage() {
       <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">
+          <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">RETAILERS</p>
+          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
             Buy Liquidation Pallets Direct From Major Retailers
           </h1>
           <p className="mt-3 sm:mt-4 max-w-xl mx-auto text-base sm:text-lg text-slate-600 leading-relaxed">
@@ -39,12 +40,12 @@ export default async function BrandsPage() {
         </div>
 
         {/* Grid of brand cards */}
-        <div className="mt-10 grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-10 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
           {brandPages.map((page: any) => (
             <Link
               key={page.slug}
               href={`/${page.slug}`}
-              className="group relative flex flex-col h-48 items-center justify-center rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden"
+              className="group relative flex flex-col h-48 items-center justify-center rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift hover:-translate-y-1 overflow-hidden"
               aria-label={page.pageTitle}
               title={page.pageTitle}
             >

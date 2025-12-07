@@ -207,7 +207,7 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                 const isImageLeft = block.layout_type === 'image_left';
                 return (
                   <div key={index} className={page.enableDivider && index > 0 ? 'border-t border-gray-200 pt-12' : ''}>
-                    <article className={`grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md md:grid-cols-2 ${isImageLeft ? '' : 'md:flex-row-reverse'}`}>
+                    <article className={`grid gap-0 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm md:grid-cols-2 ${isImageLeft ? '' : 'md:flex-row-reverse'}`}>
                       {block.image && (
                         <div className={`relative h-64 sm:h-80 w-full md:h-full ${isImageLeft ? '' : 'md:order-2'}`}>
                           <Image
@@ -225,7 +225,7 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                           </h2>
                         )}
                         {block.text && (
-                          <p className="text-base sm:text-lg leading-relaxed text-slate-600 whitespace-pre-line">
+                          <p className="font-serif text-base sm:text-lg leading-relaxed text-slate-600 whitespace-pre-line">
                             {block.text}
                           </p>
                         )}
@@ -252,7 +252,7 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                 {faqs.map((faq: any, index: number) => (
                   <details
                     key={index}
-                    className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md"
+                    className="group rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift"
                   >
                     <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                       <div className="flex-1">

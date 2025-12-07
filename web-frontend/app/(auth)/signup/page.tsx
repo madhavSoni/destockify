@@ -88,14 +88,14 @@ export default function SignupPage() {
     return (
       <div className="min-h-screen bg-white flex items-start justify-center px-4 pt-12 pb-8">
         <div className="w-full max-w-md">
-          <div className="rounded-md border-2 border-black/10 bg-white shadow-md p-8 sm:p-10 animate-in fade-in duration-500">
+          <div className="rounded-lg border border-slate-200 bg-white shadow-sm p-8 sm:p-10 animate-in fade-in duration-500">
             <div className="text-center">
-              <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-md bg-blue-600/10 border-2 border-black/10">
+              <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-md bg-blue-600/10 border-2 border-slate-200">
                 <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h1 className="font-black text-3xl sm:text-4xl text-black mb-3">
+              <h1 className="font-heading font-black text-3xl sm:text-4xl text-primary-900 mb-3">
                 Check Your Email
               </h1>
               <p className="font-medium text-base text-black/70 mb-6">
@@ -121,7 +121,7 @@ export default function SignupPage() {
         <div className="rounded-md border-2 border-black/10 bg-white shadow-md p-8 sm:p-10 animate-in fade-in duration-500">
           {/* Logo/Header */}
           <div className="text-center mb-6">
-            <h1 className="font-black text-4xl sm:text-5xl text-black mb-1">
+            <h1 className="font-heading font-black text-4xl sm:text-5xl text-primary-900 mb-1">
               Create Account
             </h1>
             <p className="font-medium text-base text-black/70">
@@ -142,10 +142,10 @@ export default function SignupPage() {
                   id="firstName"
                   name="firstName"
                   placeholder="John"
-                  className={`w-full h-14 px-4 rounded-md border-2 ${errors.firstName ? 'border-black' : 'border-black/10'} bg-white text-black placeholder:text-black/50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200 shadow-sm`}
+                  className={`w-full h-14 px-4 rounded-lg border ${errors.firstName ? 'border-red-300 ring-2 ring-red-200' : 'border-slate-300'} bg-white text-black placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-500 transition-all duration-200 shadow-sm`}
                 />
                 {errors.firstName && (
-                  <div className="mt-2 rounded-md bg-black/5 border-2 border-black/10 p-3">
+                  <div className="mt-2 rounded-md bg-red-50 border border-red-200 p-3">
                     <p className="text-sm font-medium text-black">{errors.firstName}</p>
                   </div>
                 )}
@@ -159,10 +159,10 @@ export default function SignupPage() {
                   id="lastName"
                   name="lastName"
                   placeholder="Doe"
-                  className={`w-full h-14 px-4 rounded-md border-2 ${errors.lastName ? 'border-black' : 'border-black/10'} bg-white text-black placeholder:text-black/50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200 shadow-sm`}
+                  className={`w-full h-14 px-4 rounded-lg border ${errors.lastName ? 'border-red-300 ring-2 ring-red-200' : 'border-slate-300'} bg-white text-black placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-500 transition-all duration-200 shadow-sm`}
                 />
                 {errors.lastName && (
-                  <div className="mt-2 rounded-md bg-black/5 border-2 border-black/10 p-3">
+                  <div className="mt-2 rounded-md bg-red-50 border border-red-200 p-3">
                     <p className="text-sm font-medium text-black">{errors.lastName}</p>
                   </div>
                 )}
@@ -179,7 +179,7 @@ export default function SignupPage() {
                 id="email"
                 name="email"
                 placeholder="you@example.com"
-                className={`w-full h-14 px-4 rounded-md border-2 ${errors.email ? 'border-black' : 'border-black/10'} bg-white text-black placeholder:text-black/50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200 shadow-sm`}
+                className={`w-full h-14 px-4 rounded-lg border ${errors.email ? 'border-red-300 ring-2 ring-red-200' : 'border-slate-300'} bg-white text-black placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-500 transition-all duration-200 shadow-sm`}
               />
               {errors.email && (
                 <div className="mt-2 rounded-md bg-black/5 border-2 border-black/10 p-3">
@@ -199,7 +199,7 @@ export default function SignupPage() {
                   id="password"
                   name="password"
                   placeholder="••••••••"
-                  className={`w-full h-14 px-4 pr-12 rounded-md border-2 ${errors.password ? 'border-black' : 'border-black/10'} bg-white text-black placeholder:text-black/50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200 shadow-sm`}
+                  className={`w-full h-14 px-4 pr-12 rounded-lg border ${errors.password ? 'border-red-300 ring-2 ring-red-200' : 'border-slate-300'} bg-white text-black placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-500 transition-all duration-200 shadow-sm`}
                 />
                 <button
                   type="button"
@@ -237,7 +237,7 @@ export default function SignupPage() {
                   id="confirmPassword"
                   name="confirmPassword"
                   placeholder="••••••••"
-                  className={`w-full h-14 px-4 pr-12 rounded-md border-2 ${errors.confirmPassword ? 'border-black' : 'border-black/10'} bg-white text-black placeholder:text-black/50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200 shadow-sm`}
+                  className={`w-full h-14 px-4 pr-12 rounded-lg border ${errors.confirmPassword ? 'border-red-300 ring-2 ring-red-200' : 'border-slate-300'} bg-white text-black placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-500 transition-all duration-200 shadow-sm`}
                 />
                 <button
                   type="button"
@@ -270,7 +270,7 @@ export default function SignupPage() {
                 <input
                   type="checkbox"
                   name="terms"
-                  className="w-5 h-5 mt-0.5 rounded border-2 border-black/10 text-blue-600 focus:ring-2 focus:ring-blue-600 transition-all cursor-pointer flex-shrink-0"
+                  className="w-5 h-5 mt-0.5 rounded border-2 border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-600 transition-all cursor-pointer flex-shrink-0"
                 />
                 <span className="font-medium text-sm text-black/70 group-hover:text-black transition-colors">
                   I agree to the{' '}

@@ -135,10 +135,10 @@ function SupplierHeader({
   const count = reviewSummary.count ?? 0;
 
   return (
-    <section className="rounded-md border-2 border-black/10 bg-white overflow-hidden shadow-md">
+    <section className="rounded-md border border-slate-200 bg-white overflow-hidden shadow-sm">
       {/* Hero Image */}
       {supplier.heroImage && (
-        <div className="relative h-56 w-full border-b-2 border-black/10">
+        <div className="relative h-56 w-full border-b-2 border-slate-200">
           <Image src={supplier.heroImage} alt={supplier.name} fill className="object-cover" priority />
         </div>
       )}
@@ -147,7 +147,7 @@ function SupplierHeader({
         {/* Logo and Name */}
         <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
           {supplier.logoImage && (
-            <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-black/10 bg-white">
+            <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-slate-200 bg-white">
               <Image src={supplier.logoImage} alt="" fill className="object-contain p-3" />
             </div>
           )}
@@ -203,6 +203,20 @@ function SupplierHeader({
             
             {/* Region & Badges */}
             <div className="mt-4 flex flex-wrap items-center gap-2">
+              {(() => {
+                // Get city from supplier directly or from first address
+                const city = (supplier as any).city || supplier.addresses?.[0]?.city;
+                if (!city) return null;
+                return (
+                  <span className="inline-flex items-center gap-1.5 rounded-md bg-blue-600/10 border border-blue-600/20 px-3 py-1.5 text-sm font-medium text-blue-600">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    {city}
+                  </span>
+                );
+              })()}
               {supplier.region && (
                 <span className="inline-flex items-center gap-1.5 rounded-md bg-blue-600/10 border border-blue-600/20 px-3 py-1.5 text-sm font-medium text-blue-600">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,7 +247,7 @@ function SupplierHeader({
         </div>
 
         {/* Rating & Actions */}
-        <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t-2 border-black/5 pt-6 bg-black/5 -mx-6 sm:-mx-8 px-6 sm:px-8 py-6 rounded-b-md">
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t-2 border-slate-200 pt-6 bg-slate-50 -mx-6 sm:-mx-8 px-6 sm:px-8 py-6 rounded-b-md">
           <div className="flex items-center gap-3">
             <RatingStars rating={rating} />
             <div className="flex items-center gap-2">
@@ -250,7 +264,7 @@ function SupplierHeader({
                 href={supplier.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-md border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white shadow-sm px-4 py-2 text-sm font-medium text-black hover:bg-slate-50 hover:shadow-lift transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
@@ -282,7 +296,7 @@ function SupplierHeader({
 
 function ReadyToOrderCard({ supplier }: { supplier: SupplierDetail['supplier'] }) {
   return (
-    <section className="rounded-md border-2 border-black/10 p-8 sm:p-10 shadow-md relative overflow-hidden bg-white transition-all duration-300 hover:shadow-lg">
+    <section className="rounded-md border border-slate-200 p-8 sm:p-10 shadow-sm relative overflow-hidden bg-white transition-all duration-300 hover:shadow-lift">
       <div className="max-w-3xl mx-auto text-center relative">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-md bg-blue-600 mb-4">
           <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -321,7 +335,7 @@ function ReadyToOrderCard({ supplier }: { supplier: SupplierDetail['supplier'] }
           {supplier.phone && (
             <a
               href={`tel:${supplier.phone}`}
-              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-md border-2 border-black/10 bg-white px-8 py-4 text-base font-semibold text-black hover:bg-black/5 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto rounded-md border-2 border-slate-200 bg-white shadow-sm px-8 py-4 text-base font-semibold text-black hover:bg-slate-50 hover:shadow-lift transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -339,8 +353,8 @@ function ReadyToOrderCard({ supplier }: { supplier: SupplierDetail['supplier'] }
 
 function SupplierOverview({ supplier }: { supplier: SupplierDetail['supplier'] }) {
   return (
-    <section className="rounded-md border-2 border-black/10 bg-white p-8 sm:p-10 shadow-md">
-      <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-black/5">
+    <section className="rounded-md border border-slate-200 bg-white p-8 sm:p-10 shadow-sm">
+      <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-slate-200">
         <div className="flex h-10 w-10 items-center justify-center rounded-md bg-black/5">
           <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -359,7 +373,7 @@ function SupplierOverview({ supplier }: { supplier: SupplierDetail['supplier'] }
         {false && (
           <div className="grid gap-4 sm:grid-cols-2 pt-4">
             {false && (
-              <div className="rounded-md border-2 border-black/10 bg-white p-6 transition-all hover:border-blue-600 hover:shadow-md">
+              <div className="rounded-md border border-slate-200 bg-white shadow-sm p-6 transition-all hover:border-blue-500 hover:shadow-lift">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-md bg-black/5">
                     <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -372,7 +386,7 @@ function SupplierOverview({ supplier }: { supplier: SupplierDetail['supplier'] }
               </div>
             )}
             {false && (
-              <div className="rounded-md border-2 border-black/10 bg-white p-6 transition-all hover:border-blue-600 hover:shadow-md">
+              <div className="rounded-md border border-slate-200 bg-white shadow-sm p-6 transition-all hover:border-blue-500 hover:shadow-lift">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-md bg-black/5">
                     <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -396,6 +410,7 @@ function SupplierOverview({ supplier }: { supplier: SupplierDetail['supplier'] }
 function RatingStars({ rating }: { rating: number }) {
   const fullStars = Math.floor(rating);
   const hasHalf = rating % 1 >= 0.5;
+  const starColor = "#FBBF24"; // Yellow color
   
   return (
     <div className="flex items-center gap-0.5">
@@ -407,8 +422,8 @@ function RatingStars({ rating }: { rating: number }) {
           <svg
             key={i}
             className="w-5 h-5"
-            fill={isFilled ? "#3388FF" : isHalf ? "#3388FF" : "none"}
-            stroke="#3388FF"
+            fill={isFilled ? starColor : isHalf ? starColor : "none"}
+            stroke={starColor}
             strokeWidth={isFilled || isHalf ? 0 : 1.5}
             viewBox="0 0 24 24"
           >
@@ -416,13 +431,13 @@ function RatingStars({ rating }: { rating: number }) {
               <>
                 <defs>
                   <linearGradient id={`half-${i}`}>
-                    <stop offset="50%" stopColor="#3388FF" />
+                    <stop offset="50%" stopColor={starColor} />
                     <stop offset="50%" stopColor="white" />
                   </linearGradient>
                 </defs>
                 <path
                   fill={`url(#half-${i})`}
-                  stroke="#3388FF"
+                  stroke={starColor}
                   strokeWidth={1.5}
                   d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
                 />

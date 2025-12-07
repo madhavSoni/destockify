@@ -69,7 +69,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Profile Header */}
-        <div className="mb-8 rounded-md border border-black/10 bg-white p-4 sm:p-8">
+        <div className="mb-8 rounded-md border border-slate-200 bg-white shadow-sm p-4 sm:p-8">
           <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
             {/* Avatar */}
             <div className="flex h-20 w-20 sm:h-24 sm:w-24 flex-shrink-0 items-center justify-center rounded-md bg-blue-600 text-3xl sm:text-4xl font-bold text-white border-4 border-white shadow-lg">
@@ -106,7 +106,7 @@ export default function ProfilePage() {
 
             {/* Stats */}
             <div className="w-full sm:w-auto mt-4 sm:mt-0">
-              <div className="rounded-md border border-black/10 bg-blue-600/10 px-6 py-4 text-center">
+              <div className="rounded-md border border-slate-200 bg-blue-600/10 px-6 py-4 text-center">
                 <div className="text-3xl font-bold text-black mb-1">{reviews.length}</div>
                 <div className="text-sm font-medium text-black/70">
                   {reviews.length === 1 ? 'Review' : 'Reviews'}
@@ -117,7 +117,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Reviews Section */}
-        <div className="rounded-md border border-black/10 bg-white p-4 sm:p-8">
+        <div className="rounded-md border border-slate-200 bg-white shadow-sm p-4 sm:p-8">
           <h2 className="text-xl sm:text-2xl font-bold text-black mb-6">My Reviews</h2>
 
           {isLoading ? (
@@ -143,7 +143,7 @@ export default function ProfilePage() {
             <div className="relative">
               {/* Review Carousel */}
               <div className="overflow-hidden">
-                <div className="rounded-md border border-black/10 bg-white p-6">
+                <div className="rounded-md border border-slate-200 bg-white shadow-sm p-6">
                   {/* Supplier Name */}
                   <Link
                     href={`/suppliers/${reviews[currentReviewIndex].supplier.slug}`}
@@ -194,7 +194,7 @@ export default function ProfilePage() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
                   <button
                     onClick={prevReview}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-md border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 transition-colors"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white shadow-sm px-4 py-2 text-sm font-medium text-black hover:bg-slate-50 hover:shadow-lift transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -218,7 +218,7 @@ export default function ProfilePage() {
 
                   <button
                     onClick={nextReview}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-md border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 transition-colors"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white shadow-sm px-4 py-2 text-sm font-medium text-black hover:bg-slate-50 hover:shadow-lift transition-colors"
                   >
                     Next
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

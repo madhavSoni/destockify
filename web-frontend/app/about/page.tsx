@@ -27,7 +27,8 @@ export default function AboutPage() {
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-900 sm:text-5xl mb-4">
+          <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">ABOUT</p>
+          <h1 className="font-heading text-4xl font-bold text-primary-900 sm:text-5xl mb-4">
             About Trust Pallet
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
@@ -38,8 +39,8 @@ export default function AboutPage() {
         {/* Main Content */}
         <div className="space-y-12">
           {/* Mission Section */}
-          <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-            <h2 className="text-2xl font-semibold text-slate-900 mb-4">Our Mission</h2>
+          <section className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+            <h2 className="font-heading text-2xl font-semibold text-primary-900 mb-4">Our Mission</h2>
             <p className="text-lg text-slate-700 leading-relaxed">
               Trust Pallet simplifies the process of finding reliable liquidation and wholesale suppliers. 
               We provide a curated directory of vetted companies, complete with verified reviews and 
@@ -48,8 +49,8 @@ export default function AboutPage() {
           </section>
 
           {/* What We Do */}
-          <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">What We Do</h2>
+          <section className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+            <h2 className="font-heading text-2xl font-semibold text-primary-900 mb-6">What We Do</h2>
             <div className="space-y-6">
               <div className="flex gap-4">
                 <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
@@ -58,7 +59,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">Verify Suppliers</h3>
+                  <h3 className="font-heading text-lg font-semibold text-slate-900 mb-2">Verify Suppliers</h3>
                   <p className="text-slate-600">
                     We carefully vet and verify liquidation suppliers to ensure they meet our quality standards, 
                     helping you avoid scams and unreliable partners.
@@ -73,7 +74,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">Collect Reviews</h3>
+                  <h3 className="font-heading text-lg font-semibold text-slate-900 mb-2">Collect Reviews</h3>
                   <p className="text-slate-600">
                     Real buyers share their experiences with suppliers, providing transparency and 
                     helping you choose the right partner for your business needs.
@@ -88,7 +89,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">Build Community</h3>
+                  <h3 className="font-heading text-lg font-semibold text-slate-900 mb-2">Build Community</h3>
                   <p className="text-slate-600">
                     Connect buyers and sellers in a trusted marketplace, fostering relationships 
                     that drive success in the liquidation industry.
@@ -101,8 +102,8 @@ export default function AboutPage() {
           {/* For Buyers & Sellers */}
           <div className="grid md:grid-cols-2 gap-6">
             {/* For Buyers */}
-            <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-              <h2 className="text-2xl font-semibold text-slate-900 mb-4">For Buyers</h2>
+            <section className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+              <h2 className="font-heading text-2xl font-semibold text-primary-900 mb-4">For Buyers</h2>
               <ul className="space-y-3 text-slate-700">
                 <li className="flex items-start gap-3">
                   <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -138,8 +139,8 @@ export default function AboutPage() {
             </section>
 
             {/* For Sellers */}
-            <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-              <h2 className="text-2xl font-semibold text-slate-900 mb-4">For Sellers</h2>
+            <section className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+              <h2 className="font-heading text-2xl font-semibold text-primary-900 mb-4">For Sellers</h2>
               <ul className="space-y-3 text-slate-700">
                 <li className="flex items-start gap-3">
                   <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -177,7 +178,7 @@ export default function AboutPage() {
 
           {/* Contact CTA */}
           <section className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-slate-50 p-8 shadow-sm text-center">
-            <h2 className="text-2xl font-semibold text-slate-900 mb-3">Have Questions?</h2>
+            <h2 className="font-heading text-2xl font-semibold text-primary-900 mb-3">Have Questions?</h2>
             <p className="text-lg text-slate-600 mb-6 max-w-2xl mx-auto">
               We're here to help. Reach out to us with any questions about our platform, 
               listings, or how to get started.

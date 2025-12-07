@@ -186,7 +186,7 @@ export function SearchAutocomplete({ onSelect, className = '' }: SearchAutocompl
   const dropdownContent = isOpen && suggestions.length > 0 && (
     <div
       ref={dropdownRef}
-      className="bg-white border border-black/10 rounded-md shadow-lg max-h-64 overflow-y-auto"
+      className="bg-white border border-slate-200 rounded-md shadow-sm max-h-64 overflow-y-auto"
       role="listbox"
       style={{
         position: 'absolute',
@@ -203,12 +203,12 @@ export function SearchAutocomplete({ onSelect, className = '' }: SearchAutocompl
               onClick={handleSuggestionClick}
               className={`flex items-center gap-3 px-4 py-3 hover:bg-blue-600/10 transition-colors cursor-pointer ${
                 index === selectedIndex ? 'bg-blue-600/20' : ''
-              } ${index > 0 ? 'border-t border-black/5' : ''}`}
+              } ${index > 0 ? 'border-t border-slate-200' : ''}`}
               role="option"
               aria-selected={index === selectedIndex}
             >
               {supplier.logoImage && (
-                <div className="flex-shrink-0 relative w-10 h-10 rounded-md overflow-hidden border border-black/10 bg-white">
+                <div className="flex-shrink-0 relative w-10 h-10 rounded-md overflow-hidden border border-slate-200 bg-white">
                   <Image
                     src={supplier.logoImage}
                     alt={`${supplier.name} logo`}
@@ -267,7 +267,7 @@ export function SearchAutocomplete({ onSelect, className = '' }: SearchAutocompl
               }
             }}
             placeholder="Search supplier or keywords"
-            className="h-14 sm:h-16 w-full bg-transparent border-0 text-sm sm:text-base text-black placeholder:text-black/50 focus:outline-none px-4 sm:px-6 pr-12 sm:pr-14 flex-1"
+            className="h-14 sm:h-16 w-full bg-transparent border-0 text-sm sm:text-base text-black placeholder:text-slate-400 focus:outline-none px-4 sm:px-6 pr-12 sm:pr-14 flex-1"
             aria-label="Search suppliers"
             autoComplete="off"
             aria-expanded={isOpen}

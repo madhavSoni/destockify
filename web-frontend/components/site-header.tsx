@@ -1,15 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 
 export function SiteHeader() {
   const { user, isAuthenticated, logout } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -82,7 +84,7 @@ export function SiteHeader() {
   // Close mobile menu when screen size changes to desktop
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768 && isMobileMenuOpen) {
+      if (window.innerWidth >= 1024 && isMobileMenuOpen) {
         setIsMobileMenuOpen(false);
       }
     };
@@ -110,10 +112,6 @@ export function SiteHeader() {
     setIsMobileMenuOpen(false);
   };
 
-  const toggleMobileProfile = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
   const toggleCategoriesDropdown = () => {
     setIsCategoriesDropdownOpen(!isCategoriesDropdownOpen);
     setIsBrandsDropdownOpen(false); // Close brands if open
@@ -124,12 +122,14 @@ export function SiteHeader() {
     setIsCategoriesDropdownOpen(false); // Close categories if open
   };
 
-  const toggleMobileCategories = () => {
+  const toggleMobileCategories = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setIsMobileCategoriesOpen(!isMobileCategoriesOpen);
     setIsMobileBrandsOpen(false); // Close brands if open
   };
 
-  const toggleMobileBrands = () => {
+  const toggleMobileBrands = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setIsMobileBrandsOpen(!isMobileBrandsOpen);
     setIsMobileCategoriesOpen(false); // Close categories if open
   };
@@ -145,12 +145,12 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b-2 border-black/10 bg-white/95 backdrop-blur-md shadow-sm">
+    <header className="sticky top-0 z-50 border-b-2 border-slate-200 bg-white/95 backdrop-blur-md shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-xl sm:text-2xl font-black tracking-tight text-black hover:opacity-80 transition-opacity"
+          className="font-heading inline-flex items-center gap-2 text-xl sm:text-2xl font-black tracking-tight text-black hover:opacity-80 transition-opacity"
           onClick={closeMobileMenu}
         >
           <span className="sr-only">Trust Pallet</span>
@@ -163,7 +163,7 @@ export function SiteHeader() {
         {/* Hamburger Button (Mobile) */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="md:hidden flex items-center justify-center w-10 h-10 rounded-md border-2 border-black/10 bg-white hover:bg-black/5 transition-colors"
+          className="lg:hidden flex items-center justify-center w-10 h-10 rounded-md border-2 border-slate-200 bg-white shadow-sm hover:bg-slate-50 transition-colors"
           aria-label="Toggle menu"
         >
           <svg
@@ -183,7 +183,7 @@ export function SiteHeader() {
 
         {/* Desktop Navigation */}
         <nav
-          className="hidden md:flex items-center gap-8 text-base font-bold"
+          className="hidden lg:flex items-center gap-8 text-base font-bold"
           aria-label="Primary"
         >
           <Link 
@@ -221,7 +221,7 @@ export function SiteHeader() {
 
             {/* Categories Dropdown Menu */}
             {isCategoriesDropdownOpen && (
-              <div className="absolute left-0 top-full mt-3 w-64 rounded-md border-2 border-black/10 bg-white shadow-lg animate-in fade-in slide-in-from-top-2 duration-200 z-50 max-h-96 overflow-y-auto">
+              <div className="absolute left-0 top-full mt-3 w-64 rounded-lg border border-slate-200 bg-white shadow-sm animate-in fade-in slide-in-from-top-2 duration-200 z-50 max-h-96 overflow-y-auto">
                 <div className="p-2">
                   {isCategoriesLoading ? (
                     <div className="px-4 py-3 text-sm text-black/50">Loading...</div>
@@ -233,9 +233,20 @@ export function SiteHeader() {
                         key={category.slug}
                         href={`/${category.slug}`}
                         onClick={handleCategoryClick}
-                        className="flex w-full items-center gap-3 rounded-md px-4 py-2.5 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 transition-colors duration-150"
+                        className="flex w-full items-center justify-between gap-3 rounded-md px-4 py-2.5 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 transition-colors duration-150"
                       >
-                        {category.pageTitle}
+                        <span className="flex-1">{category.pageTitle}</span>
+                        {category.heroImage && (
+                          <div className="relative w-8 h-8 flex-shrink-0">
+                            <Image
+                              src={category.heroImage}
+                              alt={category.heroImageAlt || category.pageTitle}
+                              fill
+                              className="object-contain"
+                              sizes="32px"
+                            />
+                          </div>
+                        )}
                       </Link>
                     ))
                   )}
@@ -266,7 +277,7 @@ export function SiteHeader() {
 
             {/* Brands Dropdown Menu */}
             {isBrandsDropdownOpen && (
-              <div className="absolute left-0 top-full mt-3 w-64 rounded-md border-2 border-black/10 bg-white shadow-lg animate-in fade-in slide-in-from-top-2 duration-200 z-50 max-h-96 overflow-y-auto">
+              <div className="absolute left-0 top-full mt-3 w-64 rounded-lg border border-slate-200 bg-white shadow-sm animate-in fade-in slide-in-from-top-2 duration-200 z-50 max-h-96 overflow-y-auto">
                 <div className="p-2">
                   {isBrandsLoading ? (
                     <div className="px-4 py-3 text-sm text-black/50">Loading...</div>
@@ -278,9 +289,20 @@ export function SiteHeader() {
                         key={brand.slug}
                         href={`/${brand.slug}`}
                         onClick={handleBrandClick}
-                        className="flex w-full items-center gap-3 rounded-md px-4 py-2.5 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 transition-colors duration-150"
+                        className="flex w-full items-center justify-between gap-3 rounded-md px-4 py-2.5 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 transition-colors duration-150"
                       >
-                        {brand.pageTitle}
+                        <span className="flex-1">{brand.pageTitle}</span>
+                        {brand.heroImage && (
+                          <div className="relative w-8 h-8 flex-shrink-0">
+                            <Image
+                              src={brand.heroImage}
+                              alt={brand.heroImageAlt || brand.pageTitle}
+                              fill
+                              className="object-contain"
+                              sizes="32px"
+                            />
+                          </div>
+                        )}
                       </Link>
                     ))
                   )}
@@ -306,10 +328,10 @@ export function SiteHeader() {
           </Link>
           
           {isAuthenticated && user && (
-            <div className="relative ml-2 pl-6 border-l-2 border-black/10" ref={dropdownRef}>
+            <div className="relative ml-2 pl-6 border-l-2 border-slate-200" ref={dropdownRef}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center gap-3 rounded-md border-2 border-black/10 bg-white px-3 py-2 hover:bg-black/5 transition-all duration-200"
+                className="flex items-center gap-3 rounded-md border-2 border-slate-200 bg-white shadow-sm px-3 py-2 hover:bg-slate-50 hover:shadow-lift transition-all duration-200"
               >
                 {/* Profile Icon - Large Blue Circle with Initial */}
                 <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-blue-600 text-base font-black text-white border-2 border-white">
@@ -336,7 +358,7 @@ export function SiteHeader() {
               {/* Dropdown Menu */}
               {isDropdownOpen && (
                 <div className="absolute right-0 top-full mt-3 w-64 rounded-md border-2 border-black/10 bg-white shadow-lg animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                  <div className="p-4 border-b-2 border-black/5">
+                  <div className="p-4 border-b-2 border-slate-200">
                     <p className="text-base font-bold text-black">
                       {user.firstName} {user.lastName}
                     </p>
@@ -375,7 +397,7 @@ export function SiteHeader() {
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm font-bold text-black hover:bg-black/5 transition-colors duration-150 border-2 border-transparent hover:border-black/10"
+                      className="flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm font-bold text-black hover:bg-slate-50 transition-colors duration-150 border-2 border-transparent hover:border-slate-200"
                     >
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -395,15 +417,18 @@ export function SiteHeader() {
         <>
           {/* Backdrop */}
           <div 
-            className="md:hidden fixed inset-0 bg-black/30 z-[60] animate-in fade-in duration-200"
+            className="lg:hidden fixed inset-0 bg-black/30 z-[60] animate-in fade-in duration-200"
             onClick={closeMobileMenu}
           />
           
           {/* Side Menu */}
-          <div className="md:hidden fixed right-0 top-0 h-full w-72 bg-white border-l-2 border-black/10 shadow-lg z-[60] animate-in slide-in-from-right duration-300">
+          <div 
+            className="lg:hidden fixed right-0 top-0 h-full w-72 bg-white border-l-2 border-slate-200 shadow-sm z-[70] animate-in slide-in-from-right duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex flex-col h-full">
               {/* Menu Header */}
-              <div className="flex items-center justify-between px-4 py-4 border-b-2 border-black/10">
+              <div className="flex items-center justify-between px-4 py-4 border-b-2 border-slate-200">
                 <span className="text-lg font-black text-black">Menu</span>
                 <button
                   onClick={closeMobileMenu}
@@ -436,7 +461,10 @@ export function SiteHeader() {
                 {/* Categories Section - Collapsible */}
                 <div className="pt-2">
                   <button
-                    onClick={toggleMobileCategories}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleMobileCategories(e);
+                    }}
                     className="flex items-center justify-between w-full px-4 py-2.5 text-base font-bold text-black hover:bg-black/5 rounded-md transition-colors"
                   >
                     <span>Categories</span>
@@ -453,7 +481,10 @@ export function SiteHeader() {
 
                   {/* Collapsible Categories Menu */}
                   {isMobileCategoriesOpen && (
-                    <div className="mt-1 ml-4 pl-4 border-l-2 border-black/5 space-y-1 animate-in slide-in-from-top-2 duration-200 max-h-64 overflow-y-auto">
+                    <div 
+                      className="mt-1 ml-4 pl-4 border-l-2 border-slate-200 space-y-1 animate-in slide-in-from-top-2 duration-200 max-h-64 overflow-y-auto"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       {isCategoriesLoading ? (
                         <div className="px-3 py-2 text-sm text-black/50">Loading...</div>
                       ) : categories.length === 0 ? (
@@ -463,10 +494,24 @@ export function SiteHeader() {
                           <Link
                             key={category.slug}
                             href={`/${category.slug}`}
-                            onClick={handleCategoryClick}
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 rounded-md transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCategoryClick();
+                            }}
+                            className="flex items-center justify-between gap-3 px-3 py-2 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 rounded-md transition-colors"
                           >
-                            {category.pageTitle}
+                            <span className="flex-1">{category.pageTitle}</span>
+                            {category.heroImage && (
+                              <div className="relative w-8 h-8 flex-shrink-0">
+                                <Image
+                                  src={category.heroImage}
+                                  alt={category.heroImageAlt || category.pageTitle}
+                                  fill
+                                  className="object-contain"
+                                  sizes="32px"
+                                />
+                              </div>
+                            )}
                           </Link>
                         ))
                       )}
@@ -477,7 +522,10 @@ export function SiteHeader() {
                 {/* Brands Section - Collapsible */}
                 <div className="pt-2">
                   <button
-                    onClick={toggleMobileBrands}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleMobileBrands(e);
+                    }}
                     className="flex items-center justify-between w-full px-4 py-2.5 text-base font-bold text-black hover:bg-black/5 rounded-md transition-colors"
                   >
                     <span>Brands</span>
@@ -494,7 +542,10 @@ export function SiteHeader() {
 
                   {/* Collapsible Brands Menu */}
                   {isMobileBrandsOpen && (
-                    <div className="mt-1 ml-4 pl-4 border-l-2 border-black/5 space-y-1 animate-in slide-in-from-top-2 duration-200 max-h-64 overflow-y-auto">
+                    <div 
+                      className="mt-1 ml-4 pl-4 border-l-2 border-slate-200 space-y-1 animate-in slide-in-from-top-2 duration-200 max-h-64 overflow-y-auto"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       {isBrandsLoading ? (
                         <div className="px-3 py-2 text-sm text-black/50">Loading...</div>
                       ) : brands.length === 0 ? (
@@ -504,10 +555,24 @@ export function SiteHeader() {
                           <Link
                             key={brand.slug}
                             href={`/${brand.slug}`}
-                            onClick={handleBrandClick}
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 rounded-md transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleBrandClick();
+                            }}
+                            className="flex items-center justify-between gap-3 px-3 py-2 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 rounded-md transition-colors"
                           >
-                            {brand.pageTitle}
+                            <span className="flex-1">{brand.pageTitle}</span>
+                            {brand.heroImage && (
+                              <div className="relative w-8 h-8 flex-shrink-0">
+                                <Image
+                                  src={brand.heroImage}
+                                  alt={brand.heroImageAlt || brand.pageTitle}
+                                  fill
+                                  className="object-contain"
+                                  sizes="32px"
+                                />
+                              </div>
+                            )}
                           </Link>
                         ))
                       )}
@@ -525,73 +590,61 @@ export function SiteHeader() {
                   </Link>
                 )}
 
-                {/* Profile Section - Collapsible */}
+                {/* Profile Section - flat items on mobile */}
                 {isAuthenticated && user && (
-                  <div className="pt-2 mt-2 border-t-2 border-black/5">
-                    <button
-                      onClick={toggleMobileProfile}
-                      className="flex items-center justify-between w-full px-4 py-2.5 text-base font-bold text-black hover:bg-black/5 rounded-md transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-blue-600 text-sm font-black text-white border-2 border-white shadow-sm">
-                          {user.firstName.charAt(0).toUpperCase()}
-                        </div>
-                        <span>{user.firstName}</span>
+                  <div className="pt-2 mt-2 border-t-2 border-slate-200 space-y-1">
+                    <div className="flex items-center gap-3 px-4 py-2.5 text-base font-bold text-black">
+                      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-blue-600 text-sm font-black text-white border-2 border-white shadow-sm">
+                        {user.firstName.charAt(0).toUpperCase()}
                       </div>
-                      <svg
-                        className={`h-5 w-5 text-black/50 transition-transform duration-200 flex-shrink-0 ${isDropdownOpen ? 'rotate-180' : ''}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2.5}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      <span>{user.firstName}</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        closeMobileMenu();
+                        router.push('/profile');
+                      }}
+                      className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 rounded-md transition-colors"
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
+                      My Profile
                     </button>
 
-                    {/* Collapsible Profile Menu */}
-                    {isDropdownOpen && (
-                      <div className="mt-1 ml-4 pl-4 border-l-2 border-black/5 space-y-1 animate-in slide-in-from-top-2 duration-200">
-                        <Link
-                          href="/profile"
-                          onClick={closeMobileMenu}
-                          className="flex items-center gap-3 px-3 py-2 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 rounded-md transition-colors"
-                        >
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                          My Profile
-                        </Link>
-                        
-                        <Link
-                          href="/my-listings"
-                          onClick={closeMobileMenu}
-                          className="flex items-center gap-3 px-3 py-2 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 rounded-md transition-colors"
-                        >
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          My Listings
-                        </Link>
-                        
-                        <button
-                          onClick={handleLogout}
-                          className="flex items-center gap-3 w-full px-3 py-2 text-sm font-bold text-black hover:bg-black/5 rounded-md transition-colors"
-                        >
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                          </svg>
-                          Logout
-                        </button>
-                      </div>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        closeMobileMenu();
+                        router.push('/my-listings');
+                      }}
+                      className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 rounded-md transition-colors"
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      My Listings
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm font-bold text-black hover:bg-black/5 rounded-md transition-colors"
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      Logout
+                    </button>
                   </div>
                 )}
               </nav>
 
               {/* Menu Footer */}
               {!isAuthenticated && (
-                <div className="px-4 py-4 border-t-2 border-black/5">
+                <div className="px-4 py-4 border-t-2 border-slate-200">
                   <Link
                     href="/list-your-business"
                     onClick={closeMobileMenu}

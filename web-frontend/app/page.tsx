@@ -107,7 +107,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: schemaToJsonLd(faqSchema) }}
       />
 
-      <div className="bg-white scroll-smooth">
+      <div className="bg-slate-50 scroll-smooth">
         <HeroSection />
 
         {/* Trending rail with half-peek card */}
@@ -134,7 +134,7 @@ export default async function HomePage() {
 /* --------------------------- HERO --------------------------- */
 function HeroSection() {
   return (
-    <section className="relative border-b border-black/10 min-h-[300px] sm:min-h-[350px]">
+    <section className="relative min-h-[300px] sm:min-h-[350px]">
       {/* Background image */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -145,15 +145,17 @@ function HeroSection() {
           priority
           quality={90}
         />
-        {/* Dark overlay with subtle gradient for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40" />
+        {/* Enhanced dark overlay with subtle gradient for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/25 to-black/30" />
+        {/* Subtle brand gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-transparent to-primary-800/5" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-11 pb-4 sm:py-10 lg:py-12">
         {/* Left-anchored content block like Zillow */}
         <div className="max-w-xl space-y-3 sm:space-y-4">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight text-center sm:text-left antialiased m-0">
+        <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight text-center sm:text-left antialiased m-0">
         Buy Liquidation Truckloads – Find Verified Suppliers
           </h1>
 
@@ -161,9 +163,9 @@ function HeroSection() {
             Read real reviews from liquidation companies selling truckloads and pallets of returns, overstock, and wholesale merchandise.
           </p>
 
-          {/* Search bar with autocomplete */}
+          {/* Search bar with autocomplete - square geometric style */}
           <div className="mt-4 sm:mt-5 relative z-30">
-            <div className="rounded-md bg-white shadow-lg border-2 border-black/10 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600 transition-all relative">
+            <div className="rounded-lg bg-white shadow-sm border border-slate-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all relative">
               <SearchAutocomplete />
             </div>
           </div>
@@ -209,24 +211,20 @@ function QuickActionsBar() {
   ];
 
   return (
-    <section className="border-y border-black/10 bg-slate-50 py-12 sm:py-16 relative">
-      <div className="absolute inset-0 opacity-3 pointer-events-none" style={{
-        backgroundImage: 'linear-gradient(45deg, transparent 30%, rgba(0,85,255,0.05) 50%, transparent 70%)',
-        backgroundSize: '40px 40px'
-      }} />
+    <section className="bg-white py-16 sm:py-20 relative">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item, index) => (
             <Link
               key={`${item.href}-${index}`}
               href={item.href}
-              className="group relative flex flex-col items-center rounded-xl border border-black/5 bg-white p-6 sm:p-8 text-center shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300 ease-out hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:border-blue-600 hover:-translate-y-1"
+              className="group relative flex flex-col items-center rounded-md bg-white border border-slate-200 p-6 sm:p-8 text-center shadow-sm transition-all duration-300 ease-out hover:shadow-lift hover:-translate-y-1"
             >
               <div className="relative mb-4 sm:mb-5 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-md bg-blue-600 text-white transition-all duration-300 group-hover:bg-blue-700 group-hover:scale-105">
                 {item.icon}
               </div>
               
-              <h3 className="relative text-lg sm:text-xl font-bold text-slate-900 transition-colors group-hover:text-blue-600">
+              <h3 className="font-heading relative text-lg sm:text-xl font-bold text-slate-900 transition-colors group-hover:text-blue-600">
                 {item.label}
               </h3>
               
@@ -251,13 +249,10 @@ function QuickActionsBar() {
 /* -------------------- CONNECT BY STATE -------------------- */
 function ConnectByState({ regions }: { regions: any[] }) {
   return (
-    <section className="mx-auto w-full max-w-3xl px-4 py-12 sm:py-16 text-center sm:px-6 lg:px-8 relative">
-      <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
-        backgroundImage: 'radial-gradient(circle, #0055FF 1px, transparent 1px)',
-        backgroundSize: '24px 24px'
-      }} />
+    <section className="mx-auto w-full max-w-3xl px-4 py-16 sm:py-20 text-center sm:px-6 lg:px-8 relative bg-white">
       <div className="relative">
-        <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">Top-Rated Liquidation & Wholesale Suppliers Near You</h3>
+        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">LOCATIONS</p>
+        <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">Top-Rated Liquidation & Wholesale Suppliers Near You</h3>
         <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-base sm:text-lg text-slate-600 leading-relaxed">
           Discover wholesale lots of returns, overstock, and liquidation inventory sold by the pallet or by the truckload.
         </p>
@@ -270,9 +265,10 @@ function ConnectByState({ regions }: { regions: any[] }) {
 /* -------------------- SEARCH DIRECTORY SECTION -------------------- */
 function SearchDirectorySection() {
   return (
-    <section className="mx-auto w-full max-w-3xl px-4 py-12 sm:py-16 text-center sm:px-6 lg:px-8 relative">
+    <section className="mx-auto w-full max-w-3xl px-4 py-16 sm:py-20 text-center sm:px-6 lg:px-8 relative bg-slate-50">
       <div className="relative">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">The Largest Liquidation Directory</h2>
+        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">DIRECTORY</p>
+        <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">The Largest Liquidation Directory</h2>
         <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-base sm:text-lg text-slate-600 leading-relaxed">
           Use TrustPallet to find the best liquidation truckload and pallet sellers. Read reviews from bin stores, discount stores, auction houses, and more.
         </p>
@@ -284,11 +280,13 @@ function SearchDirectorySection() {
 /* --------------------------- TWO IMAGE FEATURES ------------------------------ */
 function TwoUpFeatures() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-12 sm:py-16 lg:py-20 sm:px-6 lg:px-8 relative">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:py-20 lg:py-24 sm:px-6 lg:px-8 relative bg-white">
+      <div className="mb-8 sm:mb-10">
+        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2 text-center">HOW IT WORKS</p>
+      </div>
       <div className="space-y-6 sm:space-y-8">
         {/* Feature 1: Split Layout - Image Left, Content Right */}
-        <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl md:grid-cols-2 md:h-[450px] lg:h-[500px]">
+        <article className="grid gap-0 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-lift md:grid-cols-2 md:h-[450px] lg:h-[500px]">
           <div className="relative h-64 sm:h-80 w-full md:h-full">
             <Image
               src="/PHOTO-2025-11-30-11-00-27.jpg"
@@ -299,7 +297,7 @@ function TwoUpFeatures() {
             />
           </div>
           <div className="flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12">
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
+            <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
               Buy Truckload Liquidation Direct From Verified Liquidators
             </h3>
             <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
@@ -307,7 +305,7 @@ function TwoUpFeatures() {
             </p>
             <Link
               href="/suppliers"
-              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-black px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-black/90 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
+              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-primary-900 px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-primary-800 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
             >
               Browse Suppliers
               <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -318,9 +316,9 @@ function TwoUpFeatures() {
         </article>
 
         {/* Feature 2: Split Layout - Content Left, Image Right */}
-        <article className="grid gap-0 overflow-hidden rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl md:grid-cols-2 md:h-[450px] lg:h-[500px]">
+        <article className="grid gap-0 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-lift md:grid-cols-2 md:h-[450px] lg:h-[500px]">
           <div className="order-2 flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12 md:order-1">
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
+            <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
               Read Supplier Reviews from Buyers
             </h3>
             <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
@@ -328,7 +326,7 @@ function TwoUpFeatures() {
             </p>
             <Link
               href="/suppliers"
-              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-black px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-black/90 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="mt-6 sm:mt-8 inline-flex w-fit items-center justify-center rounded-md bg-primary-900 px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-primary-800 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
               Browse Reviews
               <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -353,17 +351,17 @@ function TwoUpFeatures() {
 /* ----------------------------- SUPPLIER CTA ---------------------------------- */
 function ListBusinessCta() {
   return (
-    <section className="my-12 sm:my-16 lg:my-20 relative">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
-      <div className="relative mx-auto max-w-6xl rounded-xl border border-black/10 bg-black p-6 sm:p-8 lg:p-10 text-white shadow-md transition-all duration-300 hover:shadow-lg hover:scale-[1.01]">
+    <section className="my-16 sm:my-20 lg:my-24 relative">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-600/20 to-transparent" />
+      <div className="relative mx-auto max-w-6xl rounded-lg bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 p-6 sm:p-8 lg:p-10 text-white shadow-sm transition-all duration-300 hover:shadow-lift hover:scale-[1.01]">
         <div className="relative">
-          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">List your Business</h3>
+          <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">List your Business</h3>
           <p className="mt-3 sm:mt-4 text-lg sm:text-xl lg:text-2xl leading-relaxed">
             Get seen by 1M people looking for merchandise from top suppliers.
           </p>
           <Link
             href="/list-your-business"
-            className="mt-6 sm:mt-8 inline-flex items-center justify-center rounded-md bg-blue-600 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+            className="mt-6 sm:mt-8 inline-flex items-center justify-center rounded-md bg-amber-500 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-white hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
           >
             Get Started
           </Link>
@@ -404,16 +402,17 @@ function FaqSection() {
   ];
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 lg:py-20 sm:px-6 lg:px-8">
+    <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:py-20 lg:py-24 sm:px-6 lg:px-8 bg-slate-50">
       <div className="text-center mb-8 sm:mb-10">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">Frequently Asked Questions</h2>
+        <div className="text-xs sm:text-sm uppercase tracking-widest text-slate-500 font-semibold mb-2">FAQ</div>
+        <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">Frequently Asked Questions</h2>
       </div>
       <div className="mx-auto max-w-3xl space-y-4">
         {faqs.map((faq, index) => (
-          <details key={index} className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+          <details key={index} className="group rounded-md bg-white border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-md">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
               <div className="flex-1">
-                <div className="text-base sm:text-lg font-semibold text-slate-900">
+                <div className="text-base sm:text-lg font-semibold text-primary-900">
                   {faq.question}
                 </div>
                 <div className="mt-1 text-xs sm:text-sm uppercase tracking-wide text-slate-400">{faq.category}</div>
@@ -454,9 +453,10 @@ function BrandCarousel({ categoryPages }: { categoryPages: any[] }) {
   if (brandPages.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:py-20 sm:px-6 lg:px-8 bg-white">
       <div className="mb-6">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">
+        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">RETAILERS</p>
+        <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
           Buy Liquidation Pallets Direct From Major Retailers
         </h2>
       </div>
@@ -467,7 +467,7 @@ function BrandCarousel({ categoryPages }: { categoryPages: any[] }) {
               <Link
                 key={page.slug}
                 href={`/${page.slug}`}
-                className="group flex-shrink-0 w-48 sm:w-56 h-48 rounded-xl border border-black/5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300 ease-out hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1 overflow-hidden"
+                className="group flex-shrink-0 w-48 sm:w-56 aspect-square rounded-md bg-white border border-slate-200 shadow-sm transition-all duration-300 ease-out hover:shadow-lift hover:-translate-y-1 overflow-hidden"
                 aria-label={page.pageTitle}
                 title={page.pageTitle}
               >
@@ -490,7 +490,7 @@ function BrandCarousel({ categoryPages }: { categoryPages: any[] }) {
             ))}
             <Link
               href="/brands"
-              className="flex-shrink-0 w-48 sm:w-56 h-48 rounded-xl border border-dashed border-black/5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.03)] flex items-center justify-center hover:border-blue-600 hover:bg-blue-50 hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out group"
+              className="flex-shrink-0 w-48 sm:w-56 aspect-square rounded-md border-2 border-dashed border-slate-300 bg-white shadow-sm flex items-center justify-center hover:border-blue-500 hover:bg-blue-50 hover:shadow-lift transition-all duration-300 ease-out group"
             >
               <div className="text-center">
                 <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">→</div>
@@ -540,9 +540,10 @@ function CategoryCarousel({ categoryPages }: { categoryPages: any[] }) {
   if (categoryPagesFiltered.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:py-20 sm:px-6 lg:px-8 bg-slate-50">
       <div className="mb-6">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">
+        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">CATEGORIES</p>
+        <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
           Explore Liquidation Categories
         </h2>
       </div>
@@ -553,7 +554,7 @@ function CategoryCarousel({ categoryPages }: { categoryPages: any[] }) {
               <Link
                 key={page.slug}
                 href={`/${page.slug}`}
-                className="group flex-shrink-0 w-48 sm:w-56 h-48 rounded-xl border border-black/5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300 ease-out hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1 overflow-hidden"
+                className="group flex-shrink-0 w-48 sm:w-56 aspect-square rounded-md bg-white border border-slate-200 shadow-sm transition-all duration-300 ease-out hover:shadow-lift hover:-translate-y-1 overflow-hidden"
                 aria-label={page.pageTitle}
                 title={page.pageTitle}
               >
@@ -571,13 +572,13 @@ function CategoryCarousel({ categoryPages }: { categoryPages: any[] }) {
                   ) : (
                     <div className="text-4xl mb-3">🏷️</div>
                   )}
-                  <h3 className="text-sm font-semibold text-slate-900 line-clamp-2 leading-tight px-2">{page.pageTitle}</h3>
+                  <h3 className="font-heading text-sm font-semibold text-slate-900 line-clamp-2 leading-tight px-2">{page.pageTitle}</h3>
                 </div>
               </Link>
             ))}
             <Link
               href="/categories"
-              className="flex-shrink-0 w-48 sm:w-56 h-48 rounded-xl border border-dashed border-black/5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.03)] flex items-center justify-center hover:border-blue-600 hover:bg-blue-50 hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out group"
+              className="flex-shrink-0 w-48 sm:w-56 aspect-square rounded-md border-2 border-dashed border-slate-300 bg-white shadow-sm flex items-center justify-center hover:border-blue-500 hover:bg-blue-50 hover:shadow-lift transition-all duration-300 ease-out group"
             >
               <div className="text-center">
                 <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">→</div>

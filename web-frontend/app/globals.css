@@ -3,13 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --font-sora: 'Sora', system-ui, sans-serif;
+  --font-space-grotesk: 'Space Grotesk', system-ui, sans-serif;
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-lora: 'Lora', Georgia, serif;
 }
 
 body {
-  font-family: var(--font-sora);
+  font-family: var(--font-inter);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #F8FAFC;
 }
 
 a {
@@ -29,4 +32,15 @@ a {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Global transition defaults for interactive elements */
+a, button, [role="button"] {
+  transition: all 0.2s ease-out;
+}
+
+/* Focus states for accessibility */
+*:focus-visible {
+  outline: 2px solid #2563EB;
+  outline-offset: 2px;
 }

@@ -1,16 +1,31 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Sora } from 'next/font/google';
+import { Space_Grotesk, Inter, Lora } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import { SiteHeader } from '@/components/site-header';
 import './globals.css';
 
-const sora = Sora({
-  variable: '--font-sora',
+const spaceGrotesk = Space_Grotesk({
+  variable: '--font-space-grotesk',
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700'],
   display: 'swap',
+});
+
+const inter = Inter({
+  variable: '--font-inter',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
+
+const lora = Lora({
+  variable: '--font-lora',
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  display: 'swap',
+  style: ['normal', 'italic'],
 });
 
 export const metadata: Metadata = {
@@ -36,7 +51,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${sora.variable} bg-white text-black antialiased`}>
+      <body className={`${spaceGrotesk.variable} ${inter.variable} ${lora.variable} bg-white text-black antialiased`}>
         <Providers>
           <div className="flex min-h-screen flex-col">
             <SiteHeader />

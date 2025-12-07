@@ -13,7 +13,7 @@ function formatDate(input?: string | Date) {
 
 export function ReviewCard({ review }: { review: ReviewHighlight }) {
   return (
-    <article className="flex h-full flex-col justify-between rounded-md border border-black/10 bg-white p-6 shadow-sm transition hover:shadow-md">
+    <article className="flex h-full flex-col justify-between rounded-md border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-lift">
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="text-xs font-medium uppercase tracking-wide text-blue-600">Buyer Review</div>
@@ -25,14 +25,14 @@ export function ReviewCard({ review }: { review: ReviewHighlight }) {
 
       <p className="mt-4 text-sm text-black/70">"{review.body}"</p>
 
-      <div className="mt-6 border-t border-black/5 pt-4 text-sm text-black/50">
+      <div className="mt-6 border-t border-slate-200 pt-4 text-sm text-black/50">
         <div className="font-medium text-black">
           {review.author}
         </div>
         <div>{formatDate(review.publishedAt)}</div>
       </div>
 
-      <div className="mt-6 flex items-center justify-between rounded-md bg-black/5 p-4">
+      <div className="mt-6 flex items-center justify-between rounded-md bg-slate-50 border border-slate-200 p-4">
         <div>
           <div className="text-xs uppercase tracking-wide text-black/50">Supplier</div>
           <div className="text-sm font-semibold text-black">{review.supplier.name}</div>

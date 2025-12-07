@@ -214,8 +214,8 @@ function SuppliersPageContent() {
     <div className="min-h-screen bg-white">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <div className="mb-8 rounded-md border-2 border-black/10 bg-gradient-to-br from-blue-600 to-blue-700 p-8 sm:p-12 shadow-md">
-          <h1 className="font-black text-3xl sm:text-4xl lg:text-5xl text-white mb-4 leading-tight">
+        <div className="mb-8 rounded-lg border border-slate-200 bg-gradient-to-br from-blue-600 to-blue-700 p-8 sm:p-12 shadow-sm">
+          <h1 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-white mb-4 leading-tight">
             Buy Liquidation Truckloads & Pallets Near You.
           </h1>
           <p className="font-normal text-lg text-white/90 max-w-3xl leading-relaxed">
@@ -227,7 +227,7 @@ function SuppliersPageContent() {
         <div className="lg:hidden mb-6 flex items-center justify-between">
           <button
             onClick={() => setShowFiltersModal(true)}
-            className="flex items-center gap-2 rounded-lg border-2 border-black/10 bg-white px-4 py-2 font-semibold text-black hover:bg-blue-50 hover:border-blue-600 transition-colors"
+            className="flex items-center gap-2 rounded-lg border-2 border-slate-200 bg-white shadow-sm px-4 py-2 font-semibold text-black hover:bg-blue-50 hover:border-blue-500 hover:shadow-lift transition-colors"
           >
             <SlidersHorizontalIcon size={20} />
             <span>Filters</span>
@@ -245,7 +245,7 @@ function SuppliersPageContent() {
           <aside className="hidden lg:block space-y-6">
             <div className="space-y-6">
               {/* Search */}
-              <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
+              <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
                 <h3 className="font-semibold text-lg text-black mb-4">Search</h3>
                 <input
                   type="text"
@@ -258,7 +258,7 @@ function SuppliersPageContent() {
 
               {/* Category Filter */}
               {categoryOptions.length > 0 && (
-                <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
+                <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
                   <h3 className="font-semibold text-lg text-black mb-4">Category</h3>
                   <div className="space-y-2 max-h-[300px] overflow-y-auto">
                     <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
@@ -268,7 +268,7 @@ function SuppliersPageContent() {
                         value=""
                         checked={filters.category === ''}
                         onChange={(e) => updateFilters({ category: e.target.value })}
-                        className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-600"
                       />
                       <span className="font-normal text-sm text-black/70">All Categories</span>
                     </label>
@@ -283,7 +283,7 @@ function SuppliersPageContent() {
                           value={cat.slug}
                           checked={filters.category === cat.slug}
                           onChange={(e) => updateFilters({ category: e.target.value })}
-                          className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-600"
                         />
                         <span className="font-normal text-sm text-black/70">{cat.name}</span>
                       </label>
@@ -294,7 +294,7 @@ function SuppliersPageContent() {
 
               {/* Location Filter - Region Based */}
               {stateOptions.length > 0 && (
-                <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
+                <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
                   <h3 className="font-semibold text-lg text-black mb-4">Location</h3>
                   <div className="space-y-2 max-h-[400px] overflow-y-auto">
                     <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
@@ -304,7 +304,7 @@ function SuppliersPageContent() {
                         value=""
                         checked={filters.state === ''}
                         onChange={(e) => updateFilters({ state: e.target.value })}
-                        className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-600"
                       />
                       <span className="font-normal text-sm text-black/70">All States</span>
                     </label>
@@ -338,7 +338,7 @@ function SuppliersPageContent() {
                                   value={state.code}
                                   checked={filters.state === state.code}
                                   onChange={(e) => updateFilters({ state: e.target.value })}
-                                  className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-600"
                                 />
                                 <span className="font-normal text-sm text-black/70">
                                   {state.name} ({state.count})
@@ -354,7 +354,7 @@ function SuppliersPageContent() {
               )}
 
               {/* Verified Filter */}
-              <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
+              <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
                 <h3 className="font-semibold text-lg text-black mb-4">Verification Status</h3>
                 <div className="space-y-2">
                   <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
@@ -394,7 +394,7 @@ function SuppliersPageContent() {
               </div>
 
               {/* Supplier Type Filter */}
-              <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
+              <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
                 <h3 className="font-semibold text-lg text-black mb-4">Supplier Type</h3>
                 <div className="space-y-2">
                   <label className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-600/10 cursor-pointer transition-colors">
@@ -419,7 +419,7 @@ function SuppliersPageContent() {
               </div>
 
               {/* Sort */}
-              <div className="rounded-md border-2 border-black/10 bg-white p-6 shadow-sm">
+              <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
                 <h3 className="font-semibold text-lg text-black mb-4">Sort By</h3>
                 <div className="space-y-2">
                   {sortOptions.map((option) => (
@@ -433,7 +433,7 @@ function SuppliersPageContent() {
                         value={option.value}
                         checked={filters.sort === option.value}
                         onChange={(e) => updateFilters({ sort: e.target.value })}
-                        className="h-4 w-4 rounded border-black/20 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-600"
                       />
                       <span className="font-normal text-sm text-black/70">{option.label}</span>
                     </label>
@@ -478,7 +478,7 @@ function SuppliersPageContent() {
             {loading ? (
               <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 items-stretch">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="h-64 bg-slate-200 animate-pulse rounded-2xl" />
+                  <div key={i} className="h-64 bg-slate-200 animate-pulse rounded-md border border-slate-200" />
                 ))}
               </div>
             ) : suppliers.length === 0 ? (
@@ -624,9 +624,9 @@ function SuppliersPageContent() {
 
         {/* Bottom CTA */}
         <section className="mt-16">
-          <div className="mx-auto max-w-4xl rounded-md border-2 border-black/10 bg-black p-8 sm:p-12 text-white shadow-md transition-all duration-300 hover:shadow-lg">
+          <div className="mx-auto max-w-4xl rounded-lg border border-slate-200 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 p-8 sm:p-12 text-white shadow-sm transition-all duration-300 hover:shadow-lift">
             <div className="text-center">
-              <h3 className="font-black text-3xl sm:text-4xl mb-4">
+              <h3 className="font-heading font-black text-3xl sm:text-4xl mb-4">
                 List Your Business
               </h3>
               <p className="font-medium text-lg text-white/80 mb-8 max-w-2xl mx-auto">
@@ -649,10 +649,11 @@ function SuppliersPageContent() {
         <section className="mt-16 mb-8">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-8 sm:mb-10">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">Frequently Asked Questions</h2>
+              <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">FAQ</p>
+              <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">Frequently Asked Questions</h2>
             </div>
             <div className="mx-auto max-w-3xl space-y-4">
-              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+              <details className="group rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                   <div className="flex-1">
                     <div className="text-base sm:text-lg font-semibold text-slate-900">
@@ -671,7 +672,7 @@ function SuppliersPageContent() {
                 </div>
               </details>
 
-              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+              <details className="group rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                   <div className="flex-1">
                     <div className="text-base sm:text-lg font-semibold text-slate-900">
@@ -690,7 +691,7 @@ function SuppliersPageContent() {
                 </div>
               </details>
 
-              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+              <details className="group rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                   <div className="flex-1">
                     <div className="text-base sm:text-lg font-semibold text-slate-900">
@@ -709,7 +710,7 @@ function SuppliersPageContent() {
                 </div>
               </details>
 
-              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+              <details className="group rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                   <div className="flex-1">
                     <div className="text-base sm:text-lg font-semibold text-slate-900">
@@ -728,7 +729,7 @@ function SuppliersPageContent() {
                 </div>
               </details>
 
-              <details className="group rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+              <details className="group rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                   <div className="flex-1">
                     <div className="text-base sm:text-lg font-semibold text-slate-900">

@@ -51,10 +51,10 @@ export default function LoginPage() {
     <div className="min-h-screen bg-white flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Main card */}
-        <div className="rounded-md border-2 border-black/10 bg-white shadow-md p-8 sm:p-12 animate-in fade-in zoom-in-95 duration-500">
+        <div className="rounded-lg border border-slate-200 bg-white shadow-sm p-8 sm:p-12 animate-in fade-in zoom-in-95 duration-500">
           {/* Logo/Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl sm:text-5xl font-black text-black mb-3">
+            <h1 className="font-heading text-4xl sm:text-5xl font-black text-primary-900 mb-3">
               Welcome Back
             </h1>
             <p className="text-base font-medium text-black/70">
@@ -74,7 +74,7 @@ export default function LoginPage() {
                 id="email"
                 name="email"
                 placeholder="you@example.com"
-                className={`w-full h-14 px-5 rounded-md border-2 ${errors.email ? 'border-black ring-2 ring-black/20' : 'border-black/10'} bg-white text-black text-base font-medium placeholder:text-black/50 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200`}
+                className={`w-full h-14 px-5 rounded-lg border ${errors.email ? 'border-red-300 ring-2 ring-red-200' : 'border-slate-300'} bg-white text-black text-base font-medium placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-500 transition-all duration-200`}
               />
               {errors.email && (
                 <p className="mt-2 text-sm font-semibold text-black">{errors.email}</p>
@@ -92,7 +92,7 @@ export default function LoginPage() {
                   id="password"
                   name="password"
                   placeholder="••••••••"
-                  className={`w-full h-14 px-5 pr-14 rounded-md border-2 ${errors.password ? 'border-black ring-2 ring-black/20' : 'border-black/10'} bg-white text-black text-base font-medium placeholder:text-black/50 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200`}
+                  className={`w-full h-14 px-5 pr-14 rounded-lg border ${errors.password ? 'border-red-300 ring-2 ring-red-200' : 'border-slate-300'} bg-white text-black text-base font-medium placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-500 transition-all duration-200`}
                 />
                 <button
                   type="button"
@@ -123,7 +123,7 @@ export default function LoginPage() {
                 <input
                   type="checkbox"
                   name="remember"
-                  className="w-5 h-5 rounded border-2 border-black/10 text-blue-600 focus:ring-2 focus:ring-blue-600 transition-all cursor-pointer"
+                  className="w-5 h-5 rounded border-2 border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-600 transition-all cursor-pointer"
                 />
                 <span className="text-sm font-medium text-black/70 group-hover:text-black transition-colors">
                   Remember me
@@ -148,7 +148,7 @@ export default function LoginPage() {
 
             {/* General error message */}
             {errors.general && (
-              <div className="mt-4 p-4 rounded-md bg-black/5 border-2 border-black/10">
+              <div className="mt-4 p-4 rounded-md bg-red-50 border border-red-200">
                 <p className="text-sm font-semibold text-black text-center">{errors.general}</p>
               </div>
             )}
