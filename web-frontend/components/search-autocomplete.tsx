@@ -23,6 +23,7 @@ export function SearchAutocomplete({ onSelect, className = '' }: SearchAutocompl
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Debounced search function
@@ -90,7 +91,9 @@ export function SearchAutocomplete({ onSelect, className = '' }: SearchAutocompl
       case 'Enter':
         e.preventDefault();
         if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
-          handleSuggestionClick(suggestions[selectedIndex]);
+          const supplier = suggestions[selectedIndex];
+          handleSuggestionClick();
+          router.push(`/suppliers/${supplier.slug}`);
         } else if (query.trim()) {
           handleSubmit(e);
         }
@@ -116,21 +119,22 @@ export function SearchAutocomplete({ onSelect, className = '' }: SearchAutocompl
     }
   };
 
-  // Handle suggestion click
-  const handleSuggestionClick = (supplier: SupplierSummary) => {
+  // Handle suggestion click - just close dropdown, let Link handle navigation
+  const handleSuggestionClick = () => {
     setQuery('');
     setIsOpen(false);
     setSelectedIndex(-1);
-    router.push(`/suppliers/${supplier.slug}`);
   };
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      const target = event.target as Node;
+      const isClickInContainer = containerRef.current?.contains(target);
+      const isClickInDropdown = dropdownRef.current?.contains(target);
+      
+      // Only close if click is outside both container and dropdown
+      if (!isClickInContainer && !isClickInDropdown) {
         setIsOpen(false);
         setSelectedIndex(-1);
       }
@@ -181,6 +185,7 @@ export function SearchAutocomplete({ onSelect, className = '' }: SearchAutocompl
 
   const dropdownContent = isOpen && suggestions.length > 0 && (
     <div
+      ref={dropdownRef}
       className="bg-white border border-black/10 rounded-md shadow-lg max-h-64 overflow-y-auto"
       role="listbox"
       style={{
@@ -195,7 +200,7 @@ export function SearchAutocomplete({ onSelect, className = '' }: SearchAutocompl
             <Link
               key={supplier.slug}
               href={`/suppliers/${supplier.slug}`}
-              onClick={() => handleSuggestionClick(supplier)}
+              onClick={handleSuggestionClick}
               className={`flex items-center gap-3 px-4 py-3 hover:bg-blue-600/10 transition-colors cursor-pointer ${
                 index === selectedIndex ? 'bg-blue-600/20' : ''
               } ${index > 0 ? 'border-t border-black/5' : ''}`}

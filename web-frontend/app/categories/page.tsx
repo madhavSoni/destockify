@@ -29,7 +29,8 @@ export const metadata: Metadata = {
 };
 
 export default async function CategoriesPage() {
-  const categoryPages = await api.catalog.categoryPages.list();
+  const allPages = await api.catalog.categoryPages.list();
+  const categoryPages = allPages.filter((page: any) => page.topicCategory === 'category');
 
   // FAQ data for schema
   const faqs = [
@@ -62,16 +63,6 @@ export default async function CategoriesPage() {
     { name: 'Categories', url: '/categories' }
   ]);
 
-  // simple emoji placeholders (swap to icons later)
-  const iconFor = (slug: string) => {
-    if (/\b(appar|clothes|fashion|apparel)\b/i.test(slug)) return '🧥';
-    if (/\b(elec|tech|computer|phone)\b/i.test(slug)) return '💻';
-    if (/\btools?|hardware\b/i.test(slug)) return '🛠️';
-    if (/\bhome|house|furni\b/i.test(slug)) return '🏠';
-    if (/\btoys?\b/i.test(slug)) return '🧸';
-    if (/\bgrocery|food\b/i.test(slug)) return '🛒';
-    return '🏷️';
-  };
 
   return (
     <>
@@ -119,16 +110,21 @@ export default async function CategoriesPage() {
               aria-label={page.pageTitle}
               title={page.pageTitle}
             >
-              {page.heroImage && (
-                <div className="absolute inset-0">
-                  <img src={page.heroImage} alt={page.heroImageAlt || page.pageTitle} className="w-full h-full object-cover opacity-20" />
-                </div>
-              )}
-              <div className="relative z-10 text-center px-4">
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">{page.pageTitle}</h3>
-                {page.metaDescription && (
-                  <p className="text-xs text-slate-600 line-clamp-2">{page.metaDescription.substring(0, 100)}...</p>
+              <div className="flex flex-col items-center justify-center p-6 h-full text-center">
+                {page.heroImage ? (
+                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 mb-3 group-hover:scale-105 transition-transform">
+                    <Image
+                      src={page.heroImage}
+                      alt={page.heroImageAlt || page.pageTitle}
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 640px) 96px, 112px"
+                    />
+                  </div>
+                ) : (
+                  <div className="text-4xl mb-3">🏷️</div>
                 )}
+                <h3 className="text-sm font-semibold text-slate-900 line-clamp-2 leading-tight px-2">{page.pageTitle}</h3>
               </div>
             </Link>
           ))}

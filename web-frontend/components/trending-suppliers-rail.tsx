@@ -91,7 +91,7 @@ export function TrendingSuppliersRail({
             {/* "See more" button card - half peek */}
             <Link
               href="/suppliers"
-              className="group relative shrink-0 snap-start overflow-hidden rounded-md border-2 border-dashed border-black/20 bg-white/70 backdrop-blur-sm hover:bg-white hover:border-blue-600 transition-all duration-300 hover:shadow-md"
+              className="group relative shrink-0 snap-start overflow-hidden rounded-xl border border-dashed border-black/5 bg-white/70 backdrop-blur-sm hover:bg-white hover:border-blue-600 transition-all duration-300 ease-out hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1"
               style={{ width: '160px' }}
               aria-label="See more suppliers"
             >

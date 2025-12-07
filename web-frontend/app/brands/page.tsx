@@ -24,26 +24,6 @@ export default async function BrandsPage() {
   const allPages = await api.catalog.categoryPages.list();
   const brandPages = allPages.filter((page: any) => page.topicCategory === 'retailer');
 
-  // Simple emoji placeholders for brand logos (can be replaced with actual logos later)
-  const iconFor = (slug: string) => {
-    if (slug.includes('amazon')) return '📦';
-    if (slug.includes('walmart')) return '🛒';
-    if (slug.includes('target')) return '🎯';
-    if (slug.includes('home-depot')) return '🔨';
-    if (slug.includes('lowes')) return '🛠️';
-    if (slug.includes('kohls')) return '👔';
-    if (slug.includes('costco')) return '🏪';
-    if (slug.includes('sams-club')) return '🏬';
-    if (slug.includes('best-buy')) return '📱';
-    if (slug.includes('macys')) return '👗';
-    if (slug.includes('nordstrom')) return '💼';
-    if (slug.includes('jcpenney')) return '👕';
-    if (slug.includes('tjmaxx')) return '🛍️';
-    if (slug.includes('cvs')) return '💊';
-    if (slug.includes('walgreens')) return '🏥';
-    if (slug.includes('ace-hardware')) return '🔧';
-    return '🏷️';
-  };
 
   return (
     <div className="bg-white">
@@ -68,16 +48,19 @@ export default async function BrandsPage() {
               aria-label={page.pageTitle}
               title={page.pageTitle}
             >
-              {page.heroImage && (
-                <div className="absolute inset-0">
-                  <img src={page.heroImage} alt={page.heroImageAlt || page.pageTitle} className="w-full h-full object-cover opacity-20" />
-                </div>
-              )}
-              <div className="relative z-10 text-center px-4">
-                <div className="text-4xl mb-2">{iconFor(page.slug)}</div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">{page.pageTitle}</h3>
-                {page.metaDescription && (
-                  <p className="text-xs text-slate-600 line-clamp-2">{page.metaDescription.substring(0, 100)}...</p>
+              <div className="flex items-center justify-center p-6 h-full w-full">
+                {page.heroImage ? (
+                  <div className="relative w-32 h-32 sm:w-40 sm:h-40 group-hover:scale-105 transition-transform">
+                    <Image
+                      src={page.heroImage}
+                      alt={page.heroImageAlt || page.pageTitle}
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 640px) 128px, 160px"
+                    />
+                  </div>
+                ) : (
+                  <div className="text-6xl">🏷️</div>
                 )}
               </div>
             </Link>

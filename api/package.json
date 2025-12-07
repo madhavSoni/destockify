@@ -21,7 +21,9 @@
     "seed:sheet1": "ts-node -r tsconfig-paths/register seed-scripts/seed-from-sheet1.ts",
     "seed:sheet1:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/seed-from-sheet1.ts",
     "seed:category-pages": "ts-node -r tsconfig-paths/register seed-scripts/seed-category-pages-from-csv.ts",
-    "seed:category-pages:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/seed-category-pages-from-csv.ts"
+    "seed:category-pages:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/seed-category-pages-from-csv.ts",
+    "upload:images": "ts-node -r tsconfig-paths/register scripts/upload-category-brand-images.ts",
+    "upload:images:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register scripts/upload-category-brand-images.ts"
   },
   "prisma": {
     "seed": "ts-node -r tsconfig-paths/register prisma/seed.ts"

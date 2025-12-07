@@ -109,11 +109,6 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
   const contentBlocks = Array.isArray(page.contentBlocks) ? page.contentBlocks : [];
   const faqs = Array.isArray(page.faqs) ? page.faqs : [];
 
-  // Fetch category and inventory_type pages for filters
-  const allCategoryPages = await api.catalog.categoryPages.list();
-  const categoryPages = allCategoryPages.filter((p: any) => p.topicCategory === 'category');
-  const inventoryTypePages = allCategoryPages.filter((p: any) => p.topicCategory === 'inventory_type');
-
   return (
     <>
       {/* Schema.org JSON-LD */}
@@ -171,63 +166,6 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
         )}
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-          {/* Filter Section - Only show inventory_type and category */}
-          {(categoryPages.length > 0 || inventoryTypePages.length > 0) && (
-            <section className="mb-16">
-              <div className="border-t border-gray-200 pt-12">
-                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-6">Browse Related Categories</h2>
-                
-                {categoryPages.length > 0 && (
-                  <div className="mb-8">
-                    <h3 className="text-lg font-semibold text-slate-700 mb-4">Categories</h3>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                      {categoryPages.map((catPage: any) => (
-                        <Link
-                          key={catPage.slug}
-                          href={`/${catPage.slug}`}
-                          className="group relative flex flex-col h-32 items-center justify-center rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 overflow-hidden"
-                        >
-                          {catPage.heroImage && (
-                            <div className="absolute inset-0">
-                              <img src={catPage.heroImage} alt={catPage.heroImageAlt || catPage.pageTitle} className="w-full h-full object-cover opacity-10" />
-                            </div>
-                          )}
-                          <div className="relative z-10 text-center px-4">
-                            <h4 className="text-sm font-semibold text-slate-900">{catPage.pageTitle}</h4>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {inventoryTypePages.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-slate-700 mb-4">Inventory Types</h3>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                      {inventoryTypePages.map((invPage: any) => (
-                        <Link
-                          key={invPage.slug}
-                          href={`/${invPage.slug}`}
-                          className="group relative flex flex-col h-32 items-center justify-center rounded-lg border border-black/10 bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 overflow-hidden"
-                        >
-                          {invPage.heroImage && (
-                            <div className="absolute inset-0">
-                              <img src={invPage.heroImage} alt={invPage.heroImageAlt || invPage.pageTitle} className="w-full h-full object-cover opacity-10" />
-                            </div>
-                          )}
-                          <div className="relative z-10 text-center px-4">
-                            <h4 className="text-sm font-semibold text-slate-900">{invPage.pageTitle}</h4>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
-
           {/* Featured Suppliers Section */}
           {page.featuredSuppliersH2 && (
             <section className="mb-16">

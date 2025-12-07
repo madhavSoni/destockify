@@ -4,24 +4,74 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { usePathname } from 'next/navigation';
+import { api } from '@/lib/api';
 
 export function SiteHeader() {
   const { user, isAuthenticated, logout } = useAuth();
+  const pathname = usePathname();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Categories and Brands state
+  const [categories, setCategories] = useState<any[]>([]);
+  const [brands, setBrands] = useState<any[]>([]);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
+  const [isBrandsLoading, setIsBrandsLoading] = useState(true);
+  
+  // Desktop dropdown states
+  const [isCategoriesDropdownOpen, setIsCategoriesDropdownOpen] = useState(false);
+  const [isBrandsDropdownOpen, setIsBrandsDropdownOpen] = useState(false);
+  const categoriesDropdownRef = useRef<HTMLDivElement>(null);
+  const brandsDropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Mobile dropdown states
+  const [isMobileCategoriesOpen, setIsMobileCategoriesOpen] = useState(false);
+  const [isMobileBrandsOpen, setIsMobileBrandsOpen] = useState(false);
 
   // Ensure we're mounted before using portal
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Close dropdown when clicking outside
+  // Fetch categories and brands
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [categoriesData, brandsData] = await Promise.all([
+          api.catalog.categoryPages.list('category'),
+          api.catalog.categoryPages.list('retailer'),
+        ]);
+        setCategories(categoriesData || []);
+        setBrands(brandsData || []);
+      } catch (error) {
+        console.error('Failed to fetch categories/brands:', error);
+        setCategories([]);
+        setBrands([]);
+      } finally {
+        setIsCategoriesLoading(false);
+        setIsBrandsLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // Close user profile dropdown
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
+      }
+      // Close categories dropdown
+      if (categoriesDropdownRef.current && !categoriesDropdownRef.current.contains(event.target as Node)) {
+        setIsCategoriesDropdownOpen(false);
+      }
+      // Close brands dropdown
+      if (brandsDropdownRef.current && !brandsDropdownRef.current.contains(event.target as Node)) {
+        setIsBrandsDropdownOpen(false);
       }
     };
 
@@ -41,6 +91,15 @@ export function SiteHeader() {
     return () => window.removeEventListener('resize', handleResize);
   }, [isMobileMenuOpen]);
 
+  // Close all dropdowns when route changes
+  useEffect(() => {
+    setIsCategoriesDropdownOpen(false);
+    setIsBrandsDropdownOpen(false);
+    setIsMobileCategoriesOpen(false);
+    setIsMobileBrandsOpen(false);
+    setIsDropdownOpen(false);
+  }, [pathname]);
+
   const handleLogout = () => {
     logout();
     setIsDropdownOpen(false);
@@ -53,6 +112,36 @@ export function SiteHeader() {
 
   const toggleMobileProfile = () => {
     setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const toggleCategoriesDropdown = () => {
+    setIsCategoriesDropdownOpen(!isCategoriesDropdownOpen);
+    setIsBrandsDropdownOpen(false); // Close brands if open
+  };
+
+  const toggleBrandsDropdown = () => {
+    setIsBrandsDropdownOpen(!isBrandsDropdownOpen);
+    setIsCategoriesDropdownOpen(false); // Close categories if open
+  };
+
+  const toggleMobileCategories = () => {
+    setIsMobileCategoriesOpen(!isMobileCategoriesOpen);
+    setIsMobileBrandsOpen(false); // Close brands if open
+  };
+
+  const toggleMobileBrands = () => {
+    setIsMobileBrandsOpen(!isMobileBrandsOpen);
+    setIsMobileCategoriesOpen(false); // Close categories if open
+  };
+
+  const handleCategoryClick = () => {
+    setIsCategoriesDropdownOpen(false);
+    closeMobileMenu();
+  };
+
+  const handleBrandClick = () => {
+    setIsBrandsDropdownOpen(false);
+    closeMobileMenu();
   };
 
   return (
@@ -109,6 +198,96 @@ export function SiteHeader() {
           >
             Directory
           </Link>
+
+          {/* Categories Dropdown */}
+          <div className="relative" ref={categoriesDropdownRef}>
+            <button
+              onClick={toggleCategoriesDropdown}
+              className="text-black hover:text-blue-600 transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all hover:after:w-full flex items-center gap-1"
+              aria-expanded={isCategoriesDropdownOpen}
+              aria-haspopup="true"
+            >
+              Categories
+              <svg
+                className={`h-4 w-4 text-black/50 transition-transform duration-200 ${isCategoriesDropdownOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2.5}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* Categories Dropdown Menu */}
+            {isCategoriesDropdownOpen && (
+              <div className="absolute left-0 top-full mt-3 w-64 rounded-md border-2 border-black/10 bg-white shadow-lg animate-in fade-in slide-in-from-top-2 duration-200 z-50 max-h-96 overflow-y-auto">
+                <div className="p-2">
+                  {isCategoriesLoading ? (
+                    <div className="px-4 py-3 text-sm text-black/50">Loading...</div>
+                  ) : categories.length === 0 ? (
+                    <div className="px-4 py-3 text-sm text-black/50">No categories available</div>
+                  ) : (
+                    categories.map((category) => (
+                      <Link
+                        key={category.slug}
+                        href={`/${category.slug}`}
+                        onClick={handleCategoryClick}
+                        className="flex w-full items-center gap-3 rounded-md px-4 py-2.5 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 transition-colors duration-150"
+                      >
+                        {category.pageTitle}
+                      </Link>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Brands Dropdown */}
+          <div className="relative" ref={brandsDropdownRef}>
+            <button
+              onClick={toggleBrandsDropdown}
+              className="text-black hover:text-blue-600 transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all hover:after:w-full flex items-center gap-1"
+              aria-expanded={isBrandsDropdownOpen}
+              aria-haspopup="true"
+            >
+              Brands
+              <svg
+                className={`h-4 w-4 text-black/50 transition-transform duration-200 ${isBrandsDropdownOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2.5}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* Brands Dropdown Menu */}
+            {isBrandsDropdownOpen && (
+              <div className="absolute left-0 top-full mt-3 w-64 rounded-md border-2 border-black/10 bg-white shadow-lg animate-in fade-in slide-in-from-top-2 duration-200 z-50 max-h-96 overflow-y-auto">
+                <div className="p-2">
+                  {isBrandsLoading ? (
+                    <div className="px-4 py-3 text-sm text-black/50">Loading...</div>
+                  ) : brands.length === 0 ? (
+                    <div className="px-4 py-3 text-sm text-black/50">No brands available</div>
+                  ) : (
+                    brands.map((brand) => (
+                      <Link
+                        key={brand.slug}
+                        href={`/${brand.slug}`}
+                        onClick={handleBrandClick}
+                        className="flex w-full items-center gap-3 rounded-md px-4 py-2.5 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 transition-colors duration-150"
+                      >
+                        {brand.pageTitle}
+                      </Link>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {!isAuthenticated && (
             <Link 
@@ -253,6 +432,88 @@ export function SiteHeader() {
                 >
                   Directory
                 </Link>
+
+                {/* Categories Section - Collapsible */}
+                <div className="pt-2">
+                  <button
+                    onClick={toggleMobileCategories}
+                    className="flex items-center justify-between w-full px-4 py-2.5 text-base font-bold text-black hover:bg-black/5 rounded-md transition-colors"
+                  >
+                    <span>Categories</span>
+                    <svg
+                      className={`h-5 w-5 text-black/50 transition-transform duration-200 flex-shrink-0 ${isMobileCategoriesOpen ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2.5}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Collapsible Categories Menu */}
+                  {isMobileCategoriesOpen && (
+                    <div className="mt-1 ml-4 pl-4 border-l-2 border-black/5 space-y-1 animate-in slide-in-from-top-2 duration-200 max-h-64 overflow-y-auto">
+                      {isCategoriesLoading ? (
+                        <div className="px-3 py-2 text-sm text-black/50">Loading...</div>
+                      ) : categories.length === 0 ? (
+                        <div className="px-3 py-2 text-sm text-black/50">No categories available</div>
+                      ) : (
+                        categories.map((category) => (
+                          <Link
+                            key={category.slug}
+                            href={`/${category.slug}`}
+                            onClick={handleCategoryClick}
+                            className="flex items-center gap-3 px-3 py-2 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 rounded-md transition-colors"
+                          >
+                            {category.pageTitle}
+                          </Link>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Brands Section - Collapsible */}
+                <div className="pt-2">
+                  <button
+                    onClick={toggleMobileBrands}
+                    className="flex items-center justify-between w-full px-4 py-2.5 text-base font-bold text-black hover:bg-black/5 rounded-md transition-colors"
+                  >
+                    <span>Brands</span>
+                    <svg
+                      className={`h-5 w-5 text-black/50 transition-transform duration-200 flex-shrink-0 ${isMobileBrandsOpen ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2.5}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Collapsible Brands Menu */}
+                  {isMobileBrandsOpen && (
+                    <div className="mt-1 ml-4 pl-4 border-l-2 border-black/5 space-y-1 animate-in slide-in-from-top-2 duration-200 max-h-64 overflow-y-auto">
+                      {isBrandsLoading ? (
+                        <div className="px-3 py-2 text-sm text-black/50">Loading...</div>
+                      ) : brands.length === 0 ? (
+                        <div className="px-3 py-2 text-sm text-black/50">No brands available</div>
+                      ) : (
+                        brands.map((brand) => (
+                          <Link
+                            key={brand.slug}
+                            href={`/${brand.slug}`}
+                            onClick={handleBrandClick}
+                            className="flex items-center gap-3 px-3 py-2 text-sm font-bold text-black hover:bg-blue-600/10 hover:text-blue-600 rounded-md transition-colors"
+                          >
+                            {brand.pageTitle}
+                          </Link>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {!isAuthenticated && (
                   <Link 

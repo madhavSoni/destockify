@@ -116,9 +116,9 @@ export default async function HomePage() {
         <ConnectByState regions={regions} />
         <QuickActionsBar />
         <SearchDirectorySection />
-        <TwoUpFeatures />
         <BrandCarousel categoryPages={categoryPages} />
         <CategoryCarousel categoryPages={categoryPages} />
+        <TwoUpFeatures />
 
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
           <ListBusinessCta />
@@ -134,7 +134,7 @@ export default async function HomePage() {
 /* --------------------------- HERO --------------------------- */
 function HeroSection() {
   return (
-    <section className="relative border-b border-black/10 min-h-[400px] sm:min-h-[500px]">
+    <section className="relative border-b border-black/10 min-h-[300px] sm:min-h-[350px]">
       {/* Background image */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -150,19 +150,19 @@ function HeroSection() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
         {/* Left-anchored content block like Zillow */}
-        <div className="max-w-xl space-y-4 sm:space-y-5">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-tight text-center sm:text-left antialiased m-0">
+        <div className="max-w-xl space-y-3 sm:space-y-4">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight text-center sm:text-left antialiased m-0">
         Buy Liquidation Truckloads – Find Verified Suppliers
           </h1>
 
-          <p className="text-base sm:text-lg lg:text-xl leading-relaxed text-white/90 font-normal">
+          <p className="text-sm sm:text-base lg:text-lg leading-relaxed text-white/90 font-normal">
             Read real reviews from liquidation companies selling truckloads and pallets of returns, overstock, and wholesale merchandise.
           </p>
 
           {/* Search bar with autocomplete */}
-          <div className="mt-6 sm:mt-8 relative z-30">
+          <div className="mt-4 sm:mt-5 relative z-30">
             <div className="rounded-md bg-white shadow-lg border-2 border-black/10 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600 transition-all relative">
               <SearchAutocomplete />
             </div>
@@ -220,7 +220,7 @@ function QuickActionsBar() {
             <Link
               key={`${item.href}-${index}`}
               href={item.href}
-              className="group relative flex flex-col items-center rounded-xl border-2 border-black/10 bg-white p-6 sm:p-8 text-center transition-all duration-300 hover:shadow-xl hover:border-blue-600 hover:-translate-y-1"
+              className="group relative flex flex-col items-center rounded-xl border border-black/5 bg-white p-6 sm:p-8 text-center shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300 ease-out hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:border-blue-600 hover:-translate-y-1"
             >
               <div className="relative mb-4 sm:mb-5 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-md bg-blue-600 text-white transition-all duration-300 group-hover:bg-blue-700 group-hover:scale-105">
                 {item.icon}
@@ -234,7 +234,7 @@ function QuickActionsBar() {
                 {item.description}
               </p>
               
-              <div className="relative mt-4 sm:mt-5 flex items-center text-sm font-semibold text-blue-600 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-y-0 translate-y-2">
+              <div className="relative mt-4 sm:mt-5 flex items-center text-sm font-semibold text-blue-600 transition-all">
                 Learn more
                 <svg className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -467,29 +467,30 @@ function BrandCarousel({ categoryPages }: { categoryPages: any[] }) {
               <Link
                 key={page.slug}
                 href={`/${page.slug}`}
-                className="group flex-shrink-0 w-48 sm:w-56 h-40 rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden"
+                className="group flex-shrink-0 w-48 sm:w-56 h-48 rounded-xl border border-black/5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300 ease-out hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1 overflow-hidden"
+                aria-label={page.pageTitle}
+                title={page.pageTitle}
               >
-                {page.heroImage ? (
-                  <div className="relative w-full h-full">
-                    <img
-                      src={page.heroImage}
-                      alt={page.heroImageAlt || page.pageTitle}
-                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <h3 className="text-lg font-semibold text-slate-900 px-4 text-center">{page.pageTitle}</h3>
+                <div className="flex items-center justify-center p-6 h-full w-full">
+                  {page.heroImage ? (
+                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 group-hover:scale-105 transition-transform">
+                      <Image
+                        src={page.heroImage}
+                        alt={page.heroImageAlt || page.pageTitle}
+                        fill
+                        className="object-contain"
+                        sizes="(max-width: 640px) 128px, 160px"
+                      />
                     </div>
-                  </div>
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center p-4">
-                    <h3 className="text-lg font-semibold text-slate-900 text-center">{page.pageTitle}</h3>
-                  </div>
-                )}
+                  ) : (
+                    <div className="text-6xl">🏷️</div>
+                  )}
+                </div>
               </Link>
             ))}
             <Link
               href="/brands"
-              className="flex-shrink-0 w-48 sm:w-56 h-40 rounded-xl border-2 border-dashed border-black/20 bg-white flex items-center justify-center hover:border-blue-600 hover:bg-blue-50 transition-all duration-300 group"
+              className="flex-shrink-0 w-48 sm:w-56 h-48 rounded-xl border border-dashed border-black/5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.03)] flex items-center justify-center hover:border-blue-600 hover:bg-blue-50 hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out group"
             >
               <div className="text-center">
                 <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">→</div>
@@ -552,29 +553,31 @@ function CategoryCarousel({ categoryPages }: { categoryPages: any[] }) {
               <Link
                 key={page.slug}
                 href={`/${page.slug}`}
-                className="group flex-shrink-0 w-48 sm:w-56 h-40 rounded-xl border border-black/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden"
+                className="group flex-shrink-0 w-48 sm:w-56 h-48 rounded-xl border border-black/5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300 ease-out hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1 overflow-hidden"
+                aria-label={page.pageTitle}
+                title={page.pageTitle}
               >
-                {page.heroImage ? (
-                  <div className="relative w-full h-full">
-                    <img
-                      src={page.heroImage}
-                      alt={page.heroImageAlt || page.pageTitle}
-                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <h3 className="text-lg font-semibold text-slate-900 px-4 text-center">{page.pageTitle}</h3>
+                <div className="flex flex-col items-center justify-center p-6 h-full text-center">
+                  {page.heroImage ? (
+                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 mb-3 group-hover:scale-105 transition-transform">
+                      <Image
+                        src={page.heroImage}
+                        alt={page.heroImageAlt || page.pageTitle}
+                        fill
+                        className="object-contain"
+                        sizes="(max-width: 640px) 96px, 112px"
+                      />
                     </div>
-                  </div>
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center p-4">
-                    <h3 className="text-lg font-semibold text-slate-900 text-center">{page.pageTitle}</h3>
-                  </div>
-                )}
+                  ) : (
+                    <div className="text-4xl mb-3">🏷️</div>
+                  )}
+                  <h3 className="text-sm font-semibold text-slate-900 line-clamp-2 leading-tight px-2">{page.pageTitle}</h3>
+                </div>
               </Link>
             ))}
             <Link
               href="/categories"
-              className="flex-shrink-0 w-48 sm:w-56 h-40 rounded-xl border-2 border-dashed border-black/20 bg-white flex items-center justify-center hover:border-blue-600 hover:bg-blue-50 transition-all duration-300 group"
+              className="flex-shrink-0 w-48 sm:w-56 h-48 rounded-xl border border-dashed border-black/5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.03)] flex items-center justify-center hover:border-blue-600 hover:bg-blue-50 hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out group"
             >
               <div className="text-center">
                 <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">→</div>
