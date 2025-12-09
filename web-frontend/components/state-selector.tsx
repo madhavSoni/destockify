@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { US_STATES, getStateCode, getStateName } from '@/lib/constants/states';
 
 type Region = {
   slug: string;
@@ -27,14 +28,60 @@ export function StateSelector({ regions }: { regions: Region[] }) {
       try {
         const response = await api.suppliers.list({ limit: 1 });
         if (response.availableFilters?.states) {
-          // Sort states by name for better UX
-          const sortedStates = [...response.availableFilters.states].sort((a, b) => 
-            a.name.trim().localeCompare(b.name.trim())
+          // Normalize and map states to consistent format
+          const normalizedStates = response.availableFilters.states
+            .map((state: any) => {
+              // Normalize state code/name
+              let stateCode = state.code || '';
+              let stateName = state.name || '';
+              
+              // If we have a name but no code, try to find the code
+              if (stateName && !stateCode) {
+                const foundCode = getStateCode(stateName.trim());
+                if (foundCode) {
+                  stateCode = foundCode;
+                }
+              }
+              
+              // If we have a code but no name, try to find the name
+              if (stateCode && !stateName) {
+                const foundName = getStateName(stateCode.trim().toUpperCase());
+                if (foundName) {
+                  stateName = foundName;
+                }
+              }
+              
+              // Normalize code to uppercase and trim
+              stateCode = stateCode.trim().toUpperCase();
+              stateName = stateName.trim();
+              
+              // Only include if we have both code and name
+              if (stateCode && stateName) {
+                return {
+                  code: stateCode,
+                  name: stateName,
+                  count: state.count || 0,
+                };
+              }
+              return null;
+            })
+            .filter((state: StateOption | null): state is StateOption => state !== null);
+          
+          // Remove duplicates by code
+          const uniqueStates = Array.from(
+            new Map(normalizedStates.map(state => [state.code, state])).values()
           );
+          
+          // Sort states by name for better UX
+          const sortedStates = uniqueStates.sort((a, b) => 
+            a.name.localeCompare(b.name)
+          );
+          
           setAvailableStates(sortedStates);
         }
       } catch (error) {
         console.error('Failed to fetch states:', error);
+        setAvailableStates([]);
       } finally {
         setLoading(false);
       }
@@ -50,8 +97,9 @@ export function StateSelector({ regions }: { regions: Region[] }) {
     }
 
     // Navigate to suppliers page filtered by the selected state
-    // The state value matches what's in the database
-    router.push(`/suppliers?state=${encodeURIComponent(selectedState)}`);
+    // Normalize the state code to uppercase for consistency
+    const normalizedState = selectedState.trim().toUpperCase();
+    router.push(`/suppliers?state=${encodeURIComponent(normalizedState)}`);
   };
 
   return (

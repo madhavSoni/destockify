@@ -246,7 +246,8 @@ export async function listSuppliers(params: SupplierListParams): Promise<Supplie
   } else if (params.homeOnly) {
     orderBy.push({ homeRank: 'asc' } as Prisma.SupplierOrderByWithRelationInput);
   } else {
-    // Default: sort by verified first, then name
+    // Default: sort by homeRank first (ascending, lower numbers first), then verified, then name
+    orderBy.push({ homeRank: 'asc' } as Prisma.SupplierOrderByWithRelationInput);
     orderBy.push({ isVerified: 'desc' } as Prisma.SupplierOrderByWithRelationInput);
     orderBy.push({ name: 'asc' });
   }

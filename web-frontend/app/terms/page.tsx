@@ -111,8 +111,8 @@ export default function TermsPage() {
             </p>
             <p className="mt-4 text-sm text-slate-600">
               For questions about these terms, please contact us at{' '}
-              <a className="underline hover:text-slate-900" href="mailto:legal@destockify.com">
-                legal@destockify.com
+              <a className="underline hover:text-slate-900" href="mailto:legal@findliquidation.com">
+                legal@findliquidation.com
               </a>
             </p>
           </section>

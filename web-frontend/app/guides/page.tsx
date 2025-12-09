@@ -23,7 +23,7 @@ export default async function GuidesPage() {
         </div>
 
         <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-600 shadow-sm">
-          Looking for a specific playbook? Email <a className="underline" href="mailto:hello@destockify.com">hello@destockify.com</a>{' '}
+          Looking for a specific playbook? Email <a className="underline" href="mailto:hello@findliquidation.com">hello@findliquidation.com</a>{' '}
           and our sourcing team will share template manifests, freight models, and supplier introduction scripts tailored to your operation.
         </div>
       </div>

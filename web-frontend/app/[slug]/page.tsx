@@ -82,14 +82,62 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
   // Fetch featured suppliers if supplierIds are provided
   let featuredSuppliers: any[] = [];
   
-  if (page.supplierIds && Array.isArray(page.supplierIds) && page.supplierIds.length > 0) {
+  // Recommended suppliers to auto-select (in order)
+  const recommendedSupplierNames = ['B-Stock', 'Liquidation.com', 'Select Liquidation', 'Direct Liquidation'];
+  
+  let supplierIdsToFetch = page.supplierIds && Array.isArray(page.supplierIds) && page.supplierIds.length > 0
+    ? page.supplierIds
+    : [];
+  
+  // If no supplierIds are set, auto-select recommended suppliers
+  if (supplierIdsToFetch.length === 0) {
+    try {
+      // Fetch all suppliers and find the recommended ones by name
+      const allSuppliers = await api.suppliers.list({ limit: 1000 });
+      const recommendedIds: number[] = [];
+      
+      for (const name of recommendedSupplierNames) {
+        const supplier = allSuppliers.items.find((s: any) => 
+          s.name.toLowerCase().includes(name.toLowerCase()) || 
+          name.toLowerCase().includes(s.name.toLowerCase())
+        );
+        if (supplier) {
+          recommendedIds.push(supplier.id);
+        }
+      }
+      
+      supplierIdsToFetch = recommendedIds;
+    } catch (error) {
+      console.error('[CategoryPage] Error finding recommended suppliers:', error);
+    }
+  }
+  
+  if (supplierIdsToFetch.length > 0) {
     try {
       // Normalize IDs to numbers
-      const normalizedIds = page.supplierIds.map((id: any) => Number(id)).filter((id: number) => !isNaN(id));
+      const normalizedIds = supplierIdsToFetch.map((id: any) => Number(id)).filter((id: number) => !isNaN(id));
       
       if (normalizedIds.length > 0) {
         // Fetch suppliers by IDs using the new backend endpoint
-        featuredSuppliers = await api.suppliers.getByIds(normalizedIds);
+        const fetchedSuppliers = await api.suppliers.getByIds(normalizedIds);
+        
+        // Preserve the order of recommended suppliers
+        if (page.supplierIds && page.supplierIds.length === 0 && supplierIdsToFetch.length > 0) {
+          // Auto-selected: maintain recommended order
+          featuredSuppliers = recommendedSupplierNames
+            .map(name => {
+              return fetchedSuppliers.find((s: any) => 
+                s.name.toLowerCase().includes(name.toLowerCase()) || 
+                name.toLowerCase().includes(s.name.toLowerCase())
+              );
+            })
+            .filter((s): s is any => s !== undefined);
+        } else {
+          // Manual selection: maintain provided order
+          featuredSuppliers = normalizedIds
+            .map((id: number) => fetchedSuppliers.find((s: any) => s.id === id))
+            .filter((s: any): s is any => s !== undefined);
+        }
       }
     } catch (error) {
       console.error('[CategoryPage] Error fetching featured suppliers:', error);
@@ -136,6 +184,25 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
       ))}
 
       <div className="bg-slate-50 scroll-smooth">
+        {/* Logo Section */}
+        {page.logoImage && (
+          <section className="w-full bg-white py-8 sm:py-12">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-center">
+                <div className="relative h-24 w-24 sm:h-32 sm:w-32">
+                  <Image
+                    src={page.logoImage}
+                    alt={page.logoImageAlt || page.pageTitle}
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Hero Section */}
         {page.heroImage && (
           <section className="relative min-h-[300px] sm:min-h-[350px]">

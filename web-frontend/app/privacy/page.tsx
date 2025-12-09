@@ -7,7 +7,7 @@ export default function PrivacyPage() {
           Find Liquidation collects basic analytics and supplier application information to operate the marketplace. We do not
           sell buyer data, and we only share supplier application details with our internal review team. A full privacy
           statement will be published as the marketplace launches. For any questions, email{' '}
-          <a className="underline" href="mailto:privacy@destockify.com">privacy@destockify.com</a>.
+          <a className="underline" href="mailto:privacy@findliquidation.com">privacy@findliquidation.com</a>.
         </p>
       </div>
     </div>

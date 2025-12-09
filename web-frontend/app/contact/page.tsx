@@ -15,9 +15,9 @@ export default function ContactPage() {
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Email</h2>
             <p className="mt-2 text-sm text-slate-600">
-              Buyers: <a className="underline" href="mailto:hello@destockify.com">hello@destockify.com</a>
+              Buyers: <a className="underline" href="mailto:hello@findliquidation.com">hello@findliquidation.com</a>
               <br />
-              Suppliers: <a className="underline" href="mailto:suppliers@destockify.com">suppliers@destockify.com</a>
+              Suppliers: <a className="underline" href="mailto:suppliers@findliquidation.com">suppliers@findliquidation.com</a>
             </p>
           </div>
           <div>

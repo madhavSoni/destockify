@@ -8,7 +8,7 @@ import { US_STATES } from '@/lib/constants/states';
 import { COUNTRIES } from '@/lib/constants/countries';
 import type { SupplierAddress } from '@/lib/api';
 
-type AdminTab = 'dashboard' | 'suppliers' | 'reviews' | 'categories' | 'regions' | 'category-pages';
+type AdminTab = 'dashboard' | 'suppliers' | 'reviews' | 'category-pages';
 
 interface Category {
   id: number;
@@ -356,6 +356,8 @@ export default function AdminPage() {
     enableFaqSchema: true,
     enableBreadcrumbSchema: true,
     customSchema: '',
+    logoImage: '',
+    logoImageAlt: '',
     heroImage: '',
     heroImageAlt: '',
     heroH1: '',
@@ -379,6 +381,9 @@ export default function AdminPage() {
   const [availableSuppliers, setAvailableSuppliers] = useState<Array<{ id: number; name: string; slug: string }>>([]);
   
   // Category Page image upload state
+  const [logoImageFile, setLogoImageFile] = useState<File | null>(null);
+  const [logoImagePreview, setLogoImagePreview] = useState<string | null>(null);
+  const [uploadingLogoImage, setUploadingLogoImage] = useState(false);
   const [heroImageFile, setHeroImageFile] = useState<File | null>(null);
   const [heroImagePreview, setHeroImagePreview] = useState<string | null>(null);
   const [uploadingHeroImage, setUploadingHeroImage] = useState(false);
@@ -502,35 +507,6 @@ export default function AdminPage() {
     }
   }, [authToken, activeTab, reviewFilter]);
 
-  // Load categories
-  useEffect(() => {
-    if (authToken && activeTab === 'categories') {
-      setCategoriesLoading(true);
-      api.admin.categories
-        .list(authToken)
-        .then(setCategories)
-        .catch((err: any) => {
-          setCategoryError(err.message);
-          setCategories([]);
-        })
-        .finally(() => setCategoriesLoading(false));
-    }
-  }, [authToken, activeTab]);
-
-  // Load regions
-  useEffect(() => {
-    if (authToken && activeTab === 'regions') {
-      setRegionsLoading(true);
-      api.admin.regions
-        .list(authToken)
-        .then(setRegions)
-        .catch((err: any) => {
-          setRegionError(err.message);
-          setRegions([]);
-        })
-        .finally(() => setRegionsLoading(false));
-    }
-  }, [authToken, activeTab]);
 
   // Load category pages
   useEffect(() => {
@@ -715,6 +691,11 @@ export default function AdminPage() {
       if (!Array.isArray(payload.faqs)) payload.faqs = [];
       if (!Array.isArray(payload.supplierIds)) payload.supplierIds = [];
       
+      // Set OG defaults if not explicitly set
+      if (!payload.ogImage && payload.logoImage) payload.ogImage = payload.logoImage;
+      if (!payload.ogTitle && payload.metaTitle) payload.ogTitle = payload.metaTitle;
+      if (!payload.ogDescription && payload.metaDescription) payload.ogDescription = payload.metaDescription;
+      
       const newPage = await api.admin.categoryPages.create(payload, authToken);
       setCategoryPages([...categoryPages, newPage]);
       setSelectedCategoryPageId(newPage.id);
@@ -753,6 +734,11 @@ export default function AdminPage() {
       if (!Array.isArray(payload.contentBlocks)) payload.contentBlocks = [];
       if (!Array.isArray(payload.faqs)) payload.faqs = [];
       if (!Array.isArray(payload.supplierIds)) payload.supplierIds = [];
+      
+      // Set OG defaults if not explicitly set
+      if (!payload.ogImage && payload.logoImage) payload.ogImage = payload.logoImage;
+      if (!payload.ogTitle && payload.metaTitle) payload.ogTitle = payload.metaTitle;
+      if (!payload.ogDescription && payload.metaDescription) payload.ogDescription = payload.metaDescription;
       
       const updated = await api.admin.categoryPages.update(id, payload, authToken);
       setCategoryPages(categoryPages.map((p) => (p.id === id ? updated : p)));
@@ -799,6 +785,8 @@ export default function AdminPage() {
       enableFaqSchema: page.enableFaqSchema ?? true,
       enableBreadcrumbSchema: page.enableBreadcrumbSchema ?? true,
       customSchema: page.customSchema ? JSON.stringify(page.customSchema, null, 2) : '',
+      logoImage: page.logoImage || '',
+      logoImageAlt: page.logoImageAlt || '',
       heroImage: page.heroImage || '',
       heroImageAlt: page.heroImageAlt || '',
       heroH1: page.heroH1 || '',
@@ -836,6 +824,8 @@ export default function AdminPage() {
       enableFaqSchema: true,
       enableBreadcrumbSchema: true,
       customSchema: '',
+      logoImage: '',
+      logoImageAlt: '',
       heroImage: '',
       heroImageAlt: '',
       heroH1: '',
@@ -867,13 +857,44 @@ export default function AdminPage() {
     setSelectedCategoryPageId(null);
     setIsCreatingCategoryPage(false);
     resetCategoryPageForm();
+    setLogoImagePreview(null);
     setHeroImagePreview(null);
     setOgImagePreview(null);
+    setLogoImageFile(null);
     setHeroImageFile(null);
     setOgImageFile(null);
   };
 
   // Category Page image upload handlers
+  const handleLogoImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !authToken) return;
+
+    setLogoImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setLogoImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    setUploadingLogoImage(true);
+    try {
+      const url = await api.admin.uploadImage(file, authToken);
+      setCategoryPageFormData({ 
+        ...categoryPageFormData, 
+        logoImage: url,
+        // Auto-update OG Image if it's currently empty or matches old logo
+        ogImage: categoryPageFormData.ogImage === categoryPageFormData.logoImage || !categoryPageFormData.ogImage 
+          ? '' 
+          : categoryPageFormData.ogImage
+      });
+    } catch (error: any) {
+      alert(error.message || 'Failed to upload logo image');
+    } finally {
+      setUploadingLogoImage(false);
+    }
+  };
+
   const handleHeroImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !authToken) return;
@@ -1141,7 +1162,7 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-2xl font-semibold">Destockify Admin Panel</h1>
+              <h1 className="text-2xl font-semibold">FindLiquidation Admin Panel</h1>
               <p className="text-sm text-gray-600">Manage suppliers, reviews, categories, and regions.</p>
             </div>
             <div className="flex items-center gap-3">
@@ -1152,30 +1173,6 @@ export default function AdminPage() {
                 >
                   + Add Supplier
                 </Link>
-              )}
-              {activeTab === 'categories' && (
-                <button
-                  onClick={() => {
-                    setIsCreatingCategory(true);
-                    setCategoryEditingId(null);
-                    setCategoryFormData({ name: '', slug: '', headline: '', description: '', icon: '' });
-                  }}
-                  className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-                >
-                  + Add Category
-                </button>
-              )}
-              {activeTab === 'regions' && (
-                <button
-                  onClick={() => {
-                    setIsCreatingRegion(true);
-                    setRegionEditingId(null);
-                    setRegionFormData({ name: '', slug: '', headline: '', description: '', stateCode: '', mapImage: '', marketStats: '' });
-                  }}
-                  className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-                >
-                  + Add Region
-                </button>
               )}
               {activeTab === 'category-pages' && (
                 <button
@@ -1211,18 +1208,6 @@ export default function AdminPage() {
                 className={activeTab === 'reviews' ? 'bg-amber-100 text-amber-700 font-medium px-3 py-1.5 rounded-md' : 'text-gray-700 hover:bg-amber-50 hover:text-amber-600 px-3 py-1.5 rounded-md transition-colors'}
               >
                 Reviews <span className="text-gray-500">({reviews.length})</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('categories')}
-                className={activeTab === 'categories' ? 'bg-sky-100 text-sky-700 font-medium px-3 py-1.5 rounded-md' : 'text-gray-700 hover:bg-sky-50 hover:text-sky-600 px-3 py-1.5 rounded-md transition-colors'}
-              >
-                Categories <span className="text-gray-500">({categories.length})</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('regions')}
-                className={activeTab === 'regions' ? 'bg-emerald-100 text-emerald-700 font-medium px-3 py-1.5 rounded-md' : 'text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 px-3 py-1.5 rounded-md transition-colors'}
-              >
-                Regions <span className="text-gray-500">({regions.length})</span>
               </button>
               <button
                 onClick={() => setActiveTab('category-pages')}
@@ -1877,320 +1862,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {activeTab === 'categories' && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Categories</h2>
-              <p className="mt-1 text-sm text-gray-600">Manage supplier categories</p>
-            </div>
-
-            {categoryError && (
-              <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                {categoryError}
-              </div>
-            )}
-
-            {(isCreatingCategory || categoryEditingId !== null) && (
-              <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 className="text-lg font-semibold mb-4">
-                  {isCreatingCategory ? 'Create Category' : 'Edit Category'}
-                </h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={categoryFormData.name}
-                      onChange={(e) => {
-                        const name = e.target.value;
-                        setCategoryFormData({
-                          ...categoryFormData,
-                          name,
-                          slug: categoryFormData.slug || name.toLowerCase().replace(/\s+/g, '-'),
-                        });
-                      }}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                      placeholder="Category Name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-                    <input
-                      type="text"
-                      value={categoryFormData.slug}
-                      onChange={(e) => setCategoryFormData({ ...categoryFormData, slug: e.target.value })}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                      placeholder="category-slug"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Headline</label>
-                    <input
-                      type="text"
-                      value={categoryFormData.headline}
-                      onChange={(e) => setCategoryFormData({ ...categoryFormData, headline: e.target.value })}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                      placeholder="Category headline"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea
-                      value={categoryFormData.description}
-                      onChange={(e) => setCategoryFormData({ ...categoryFormData, description: e.target.value })}
-                      rows={3}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                      placeholder="Category description"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Icon URL</label>
-                    <input
-                      type="text"
-                      value={categoryFormData.icon}
-                      onChange={(e) => setCategoryFormData({ ...categoryFormData, icon: e.target.value })}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                      placeholder="https://example.com/icon.png"
-                    />
-                  </div>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() =>
-                        isCreatingCategory ? handleCreateCategory() : categoryEditingId && handleUpdateCategory(categoryEditingId)
-                      }
-                      className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-                    >
-                      {isCreatingCategory ? 'Create' : 'Save'}
-                    </button>
-                    <button
-                      onClick={cancelEditCategory}
-                      className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {categoriesLoading ? (
-              <div className="text-center py-12 text-gray-500">Loading...</div>
-            ) : (
-              <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Name</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Slug</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Suppliers</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white">
-                    {categories.map((category) => (
-                      <tr key={category.id} className="hover:bg-gray-50">
-                        <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{category.name}</td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{category.slug}</td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{category.supplierCount}</td>
-                        <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium">
-                          <button
-                            onClick={() => startEditCategory(category)}
-                            className="text-blue-600 hover:text-blue-900 mr-4"
-                          >
-                            Edit
-                          </button>
-                          {category.supplierCount === 0 ? (
-                            <button
-                              onClick={() => handleDeleteCategory(category.id)}
-                              className="text-red-600 hover:text-red-900"
-                            >
-                              Delete
-                            </button>
-                          ) : (
-                            <span className="text-gray-400 text-xs" title="Cannot delete: has suppliers">
-                              Delete
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'regions' && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Regions</h2>
-              <p className="mt-1 text-sm text-gray-600">Manage supplier regions</p>
-            </div>
-
-            {regionError && (
-              <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                {regionError}
-              </div>
-            )}
-
-            {(isCreatingRegion || regionEditingId !== null) && (
-              <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 className="text-lg font-semibold mb-4">
-                  {isCreatingRegion ? 'Create Region' : 'Edit Region'}
-                </h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={regionFormData.name}
-                      onChange={(e) => {
-                        const name = e.target.value;
-                        setRegionFormData({
-                          ...regionFormData,
-                          name,
-                          slug: regionFormData.slug || name.toLowerCase().replace(/\s+/g, '-'),
-                        });
-                      }}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                      placeholder="Region Name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-                    <input
-                      type="text"
-                      value={regionFormData.slug}
-                      onChange={(e) => setRegionFormData({ ...regionFormData, slug: e.target.value })}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                      placeholder="region-slug"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Headline</label>
-                    <input
-                      type="text"
-                      value={regionFormData.headline}
-                      onChange={(e) => setRegionFormData({ ...regionFormData, headline: e.target.value })}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                      placeholder="Region headline"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea
-                      value={regionFormData.description}
-                      onChange={(e) => setRegionFormData({ ...regionFormData, description: e.target.value })}
-                      rows={3}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                      placeholder="Region description"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">State Code</label>
-                    <input
-                      type="text"
-                      value={regionFormData.stateCode}
-                      onChange={(e) => setRegionFormData({ ...regionFormData, stateCode: e.target.value })}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                      placeholder="NY"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Map Image URL</label>
-                    <input
-                      type="text"
-                      value={regionFormData.mapImage}
-                      onChange={(e) => setRegionFormData({ ...regionFormData, mapImage: e.target.value })}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                      placeholder="https://example.com/map.png"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Market Stats (JSON)</label>
-                    <textarea
-                      value={regionFormData.marketStats}
-                      onChange={(e) => setRegionFormData({ ...regionFormData, marketStats: e.target.value })}
-                      rows={5}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm font-mono focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                      placeholder='{"key": "value"}'
-                    />
-                    <p className="mt-1 text-xs text-gray-500">Enter valid JSON or leave empty</p>
-                  </div>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() =>
-                        isCreatingRegion ? handleCreateRegion() : regionEditingId && handleUpdateRegion(regionEditingId)
-                      }
-                      className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-                    >
-                      {isCreatingRegion ? 'Create' : 'Save'}
-                    </button>
-                    <button
-                      onClick={cancelEditRegion}
-                      className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {regionsLoading ? (
-              <div className="text-center py-12 text-gray-500">Loading...</div>
-            ) : (
-              <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Name</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Slug</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">State</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Suppliers</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white">
-                    {regions.map((region) => (
-                      <tr key={region.id} className="hover:bg-gray-50">
-                        <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{region.name}</td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{region.slug}</td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{region.stateCode || '—'}</td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{region.supplierCount}</td>
-                        <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium">
-                          <button
-                            onClick={() => startEditRegion(region)}
-                            className="text-blue-600 hover:text-blue-900 mr-4"
-                          >
-                            Edit
-                          </button>
-                          {region.supplierCount === 0 ? (
-                            <button
-                              onClick={() => handleDeleteRegion(region.id)}
-                              className="text-red-600 hover:text-red-900"
-                            >
-                              Delete
-                            </button>
-                          ) : (
-                            <span className="text-gray-400 text-xs" title="Cannot delete: has suppliers">
-                              Delete
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
 
         {activeTab === 'category-pages' && (
           <div className="space-y-6">
@@ -2313,7 +1984,16 @@ export default function AdminPage() {
                       <input
                         type="text"
                         value={categoryPageFormData.metaTitle}
-                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, metaTitle: e.target.value })}
+                        onChange={(e) => {
+                          setCategoryPageFormData({ 
+                            ...categoryPageFormData, 
+                            metaTitle: e.target.value,
+                            // Auto-update OG Title if it's currently empty or matches old meta title
+                            ogTitle: categoryPageFormData.ogTitle === categoryPageFormData.metaTitle || !categoryPageFormData.ogTitle 
+                              ? '' 
+                              : categoryPageFormData.ogTitle
+                          });
+                        }}
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
                         placeholder="Buy Amazon Liquidation | Find Liquidation"
                       />
@@ -2324,24 +2004,24 @@ export default function AdminPage() {
                       </label>
                       <textarea
                         value={categoryPageFormData.metaDescription}
-                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, metaDescription: e.target.value })}
+                        onChange={(e) => {
+                          setCategoryPageFormData({ 
+                            ...categoryPageFormData, 
+                            metaDescription: e.target.value,
+                            // Auto-update OG Description if it's currently empty or matches old meta description
+                            ogDescription: categoryPageFormData.ogDescription === categoryPageFormData.metaDescription || !categoryPageFormData.ogDescription 
+                              ? '' 
+                              : categoryPageFormData.ogDescription
+                          });
+                        }}
                         rows={2}
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
                         placeholder="Find trusted Amazon liquidation suppliers..."
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Canonical URL</label>
-                      <input
-                        type="url"
-                        value={categoryPageFormData.canonicalUrl}
-                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, canonicalUrl: e.target.value })}
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                        placeholder="https://findliquidation.com/categories/..."
-                      />
-                    </div>
-                    <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">OG Image</label>
+                      <p className="text-xs text-gray-500 mb-2">Defaults to Logo Image if not set</p>
                       {ogImagePreview && (
                         <div className="mb-2 w-full h-24 rounded-md border border-gray-300 overflow-hidden bg-gray-50">
                           <img src={ogImagePreview} alt="OG preview" className="h-full w-full object-cover" />
@@ -2357,10 +2037,11 @@ export default function AdminPage() {
                       {uploadingOgImage && <p className="text-xs text-gray-500 mb-2">Uploading...</p>}
                       <input
                         type="url"
-                        value={categoryPageFormData.ogImage}
+                        value={categoryPageFormData.ogImage || categoryPageFormData.logoImage}
                         onChange={(e) => {
-                          setCategoryPageFormData({ ...categoryPageFormData, ogImage: e.target.value });
-                          setOgImagePreview(e.target.value || null);
+                          const newOgImage = e.target.value === categoryPageFormData.logoImage ? '' : e.target.value;
+                          setCategoryPageFormData({ ...categoryPageFormData, ogImage: newOgImage });
+                          setOgImagePreview(newOgImage || categoryPageFormData.logoImage || null);
                         }}
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
                         placeholder="Or enter image URL"
@@ -2368,20 +2049,30 @@ export default function AdminPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">OG Title</label>
+                      <p className="text-xs text-gray-500 mb-2">Defaults to Meta Title if not set</p>
                       <input
                         type="text"
-                        value={categoryPageFormData.ogTitle}
-                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, ogTitle: e.target.value })}
+                        value={categoryPageFormData.ogTitle || categoryPageFormData.metaTitle}
+                        onChange={(e) => {
+                          const newOgTitle = e.target.value === categoryPageFormData.metaTitle ? '' : e.target.value;
+                          setCategoryPageFormData({ ...categoryPageFormData, ogTitle: newOgTitle });
+                        }}
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder={categoryPageFormData.metaTitle || 'Will use Meta Title'}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">OG Description</label>
+                      <p className="text-xs text-gray-500 mb-2">Defaults to Meta Description if not set</p>
                       <textarea
-                        value={categoryPageFormData.ogDescription}
-                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, ogDescription: e.target.value })}
+                        value={categoryPageFormData.ogDescription || categoryPageFormData.metaDescription}
+                        onChange={(e) => {
+                          const newOgDescription = e.target.value === categoryPageFormData.metaDescription ? '' : e.target.value;
+                          setCategoryPageFormData({ ...categoryPageFormData, ogDescription: newOgDescription });
+                        }}
                         rows={2}
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder={categoryPageFormData.metaDescription || 'Will use Meta Description'}
                       />
                     </div>
                     <div className="flex items-center gap-4">
@@ -2421,6 +2112,60 @@ export default function AdminPage() {
                         />
                         <span className="ml-2 text-sm text-gray-700">Enable Breadcrumb Schema</span>
                       </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Logo Section */}
+                <div className="border-t pt-4">
+                  <h3 className="text-md font-semibold mb-3 text-gray-900">Logo Section</h3>
+                  <div className="grid gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Logo Image</label>
+                      {logoImagePreview && (
+                        <div className="mb-2 w-full h-32 rounded-md border border-gray-300 overflow-hidden bg-gray-50">
+                          <img src={logoImagePreview} alt="Logo preview" className="h-full w-full object-contain" />
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoImageUpload}
+                        disabled={uploadingLogoImage}
+                        className="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border file:border-gray-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50 disabled:opacity-50 mb-2"
+                      />
+                      {uploadingLogoImage && <p className="text-xs text-gray-500 mb-2">Uploading...</p>}
+                      <input
+                        type="url"
+                        value={categoryPageFormData.logoImage}
+                        onChange={(e) => {
+                          const newLogoImage = e.target.value;
+                          setCategoryPageFormData({ 
+                            ...categoryPageFormData, 
+                            logoImage: newLogoImage,
+                            // Auto-update OG Image if it's currently empty or matches old logo
+                            ogImage: categoryPageFormData.ogImage === categoryPageFormData.logoImage || !categoryPageFormData.ogImage 
+                              ? '' 
+                              : categoryPageFormData.ogImage
+                          });
+                          setLogoImagePreview(newLogoImage || null);
+                          // Update OG preview if OG image should default to logo
+                          if (!categoryPageFormData.ogImage || categoryPageFormData.ogImage === categoryPageFormData.logoImage) {
+                            setOgImagePreview(newLogoImage || null);
+                          }
+                        }}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                        placeholder="Or enter image URL"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Logo Image Alt Text</label>
+                      <input
+                        type="text"
+                        value={categoryPageFormData.logoImageAlt}
+                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, logoImageAlt: e.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
+                      />
                     </div>
                   </div>
                 </div>
@@ -2758,60 +2503,6 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* Advanced Fields */}
-                <div className="border-t pt-4">
-                  <h3 className="text-md font-semibold mb-3 text-gray-900">Advanced</h3>
-                  <div className="grid gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Custom HTML</label>
-                      <textarea
-                        value={categoryPageFormData.customHtml}
-                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, customHtml: e.target.value })}
-                        rows={4}
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm font-mono focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                        placeholder="<script>...</script>"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Custom Schema (JSON)</label>
-                      <textarea
-                        value={categoryPageFormData.customSchema}
-                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, customSchema: e.target.value })}
-                        rows={5}
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm font-mono focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                        placeholder='{"@type": "..."}'
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Topic Category</label>
-                      <input
-                        type="text"
-                        value={categoryPageFormData.topicCategory}
-                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, topicCategory: e.target.value })}
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                        placeholder="Amazon Liquidation"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Author Override</label>
-                      <input
-                        type="text"
-                        value={categoryPageFormData.authorOverride}
-                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, authorOverride: e.target.value })}
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-gray-200"
-                      />
-                    </div>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={categoryPageFormData.enableDivider}
-                        onChange={(e) => setCategoryPageFormData({ ...categoryPageFormData, enableDivider: e.target.checked })}
-                        className="rounded border-gray-300 text-black focus:ring-black"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">Enable Divider Between Sections</span>
-                    </label>
-                  </div>
-                </div>
 
                 <div className="flex gap-3 pt-4 border-t">
                   <button

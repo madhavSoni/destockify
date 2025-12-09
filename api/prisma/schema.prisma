@@ -199,6 +199,10 @@ model CategoryPage {
   enableBreadcrumbSchema Boolean @default(true)
   customSchema          Json?
   
+  // Logo Section
+  logoImage             String?
+  logoImageAlt          String?
+  
   // Hero Section
   heroImage             String?
   heroImageAlt          String?

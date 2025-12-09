@@ -28,6 +28,8 @@ export function SiteHeader() {
   const [isBrandsDropdownOpen, setIsBrandsDropdownOpen] = useState(false);
   const categoriesDropdownRef = useRef<HTMLDivElement>(null);
   const brandsDropdownRef = useRef<HTMLDivElement>(null);
+  const categoriesCloseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const brandsCloseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Mobile dropdown states
   const [isMobileCategoriesOpen, setIsMobileCategoriesOpen] = useState(false);
@@ -100,7 +102,28 @@ export function SiteHeader() {
     setIsMobileCategoriesOpen(false);
     setIsMobileBrandsOpen(false);
     setIsDropdownOpen(false);
+    // Clear any pending timeouts
+    if (categoriesCloseTimeoutRef.current) {
+      clearTimeout(categoriesCloseTimeoutRef.current);
+      categoriesCloseTimeoutRef.current = null;
+    }
+    if (brandsCloseTimeoutRef.current) {
+      clearTimeout(brandsCloseTimeoutRef.current);
+      brandsCloseTimeoutRef.current = null;
+    }
   }, [pathname]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (categoriesCloseTimeoutRef.current) {
+        clearTimeout(categoriesCloseTimeoutRef.current);
+      }
+      if (brandsCloseTimeoutRef.current) {
+        clearTimeout(brandsCloseTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -113,21 +136,39 @@ export function SiteHeader() {
   };
 
   const openCategoriesDropdown = () => {
+    // Clear any pending close timeout
+    if (categoriesCloseTimeoutRef.current) {
+      clearTimeout(categoriesCloseTimeoutRef.current);
+      categoriesCloseTimeoutRef.current = null;
+    }
     setIsCategoriesDropdownOpen(true);
     setIsBrandsDropdownOpen(false); // Close brands if open
   };
 
   const closeCategoriesDropdown = () => {
-    setIsCategoriesDropdownOpen(false);
+    // Add a small delay before closing to allow mouse movement
+    categoriesCloseTimeoutRef.current = setTimeout(() => {
+      setIsCategoriesDropdownOpen(false);
+      categoriesCloseTimeoutRef.current = null;
+    }, 150);
   };
 
   const openBrandsDropdown = () => {
+    // Clear any pending close timeout
+    if (brandsCloseTimeoutRef.current) {
+      clearTimeout(brandsCloseTimeoutRef.current);
+      brandsCloseTimeoutRef.current = null;
+    }
     setIsBrandsDropdownOpen(true);
     setIsCategoriesDropdownOpen(false); // Close categories if open
   };
 
   const closeBrandsDropdown = () => {
-    setIsBrandsDropdownOpen(false);
+    // Add a small delay before closing to allow mouse movement
+    brandsCloseTimeoutRef.current = setTimeout(() => {
+      setIsBrandsDropdownOpen(false);
+      brandsCloseTimeoutRef.current = null;
+    }, 150);
   };
 
   const toggleMobileCategories = (e?: React.MouseEvent) => {
@@ -221,7 +262,11 @@ export function SiteHeader() {
 
             {/* Categories Dropdown Menu */}
             {isCategoriesDropdownOpen && (
-              <div className="absolute left-0 top-full mt-3 w-64 rounded-lg border border-slate-200 bg-white shadow-sm animate-in fade-in slide-in-from-top-2 duration-200 z-50 max-h-96 overflow-y-auto">
+              <div 
+                className="absolute left-0 top-full mt-1 w-64 rounded-lg border border-slate-200 bg-white shadow-sm animate-in fade-in slide-in-from-top-2 duration-200 z-50 max-h-96 overflow-y-auto"
+                onMouseEnter={openCategoriesDropdown}
+                onMouseLeave={closeCategoriesDropdown}
+              >
                 <div className="p-2">
                   {isCategoriesLoading ? (
                     <div className="px-4 py-3 text-sm text-black/50">Loading...</div>
@@ -282,7 +327,11 @@ export function SiteHeader() {
 
             {/* Brands Dropdown Menu */}
             {isBrandsDropdownOpen && (
-              <div className="absolute left-0 top-full mt-3 w-64 rounded-lg border border-slate-200 bg-white shadow-sm animate-in fade-in slide-in-from-top-2 duration-200 z-50 max-h-96 overflow-y-auto">
+              <div 
+                className="absolute left-0 top-full mt-1 w-64 rounded-lg border border-slate-200 bg-white shadow-sm animate-in fade-in slide-in-from-top-2 duration-200 z-50 max-h-96 overflow-y-auto"
+                onMouseEnter={openBrandsDropdown}
+                onMouseLeave={closeBrandsDropdown}
+              >
                 <div className="p-2">
                   {isBrandsLoading ? (
                     <div className="px-4 py-3 text-sm text-black/50">Loading...</div>

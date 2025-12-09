@@ -733,7 +733,7 @@ export default function EditCompanyPage() {
           <h3 className="text-lg font-semibold text-slate-900 border-b pb-2">Status & Ranking</h3>
           
           <div>
-            <label className="block text-sm font-medium text-slate-700">Home Page Rank</label>
+            <label className="block text-sm font-medium text-slate-700">Display Order (Home Rank)</label>
             <input
               type="number"
               min="0"
@@ -741,7 +741,7 @@ export default function EditCompanyPage() {
               onChange={(e) => setFormData({ ...formData, homeRank: parseInt(e.target.value) || 0 })}
               className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
             />
-            <p className="mt-1 text-xs text-slate-500">Higher = more prominent</p>
+            <p className="mt-1 text-xs text-slate-500">Lower numbers appear first on homepage and directory. Default: 0</p>
           </div>
 
           <div className="flex flex-wrap gap-6">

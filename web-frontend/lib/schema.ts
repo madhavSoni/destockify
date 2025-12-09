@@ -38,9 +38,9 @@ export function generateOrganizationSchema(): WithContext<Organization> {
     description: 'Find Liquidation is a wholesale liquidation supplier directory helping buyers find vetted suppliers with transparent reviews and guides.',
     sameAs: [
       // TODO: Add social media URLs when available
-      // 'https://twitter.com/destockify',
-      // 'https://facebook.com/destockify',
-      // 'https://linkedin.com/company/destockify'
+      // 'https://twitter.com/findliquidation',
+      // 'https://facebook.com/findliquidation',
+      // 'https://linkedin.com/company/findliquidation'
     ]
   };
 }

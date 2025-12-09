@@ -31,7 +31,7 @@ export default function ListYourBusinessPage() {
           </Link>
 
           <p className="text-xs text-slate-500">
-            Prefer a conversation first? Email <a className="underline hover:text-blue-600" href="mailto:suppliers@destockify.com">suppliers@destockify.com</a> with your company details and our marketplace team will schedule a 30 minute call.
+            Prefer a conversation first? Email <a className="underline hover:text-blue-600" href="mailto:suppliers@findliquidation.com">suppliers@findliquidation.com</a> with your company details and our marketplace team will schedule a 30 minute call.
           </p>
         </div>
 
