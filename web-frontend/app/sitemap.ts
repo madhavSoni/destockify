@@ -14,10 +14,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     // Fetch dynamic data from your API
+    // Use revalidate to allow static generation while keeping data fresh
     const [suppliersResponse, regionsResponse, categoryPagesResponse] = await Promise.all([
-      fetch(`${apiUrl}/suppliers?limit=1000`, { cache: 'no-store' }),
-      fetch(`${apiUrl}/catalog/regions`, { cache: 'no-store' }),
-      fetch(`${apiUrl}/catalog/category-pages`, { cache: 'no-store' }),
+      fetch(`${apiUrl}/suppliers?limit=1000`, { next: { revalidate: 3600 } }), // Revalidate every hour
+      fetch(`${apiUrl}/catalog/regions`, { next: { revalidate: 3600 } }),
+      fetch(`${apiUrl}/catalog/category-pages`, { next: { revalidate: 3600 } }),
     ]);
 
     const suppliers = await suppliersResponse.json();

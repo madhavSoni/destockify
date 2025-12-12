@@ -3,7 +3,6 @@ const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
   images: {
-    domains: ['storage.googleapis.com', 'via.placeholder.com'],
     remotePatterns: [
       {
         protocol: 'https',
