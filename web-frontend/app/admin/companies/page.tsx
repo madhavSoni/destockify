@@ -30,6 +30,8 @@ export default function CompaniesPage() {
   const [suppliers, setSuppliers] = useState<SupplierSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState<{ id: number; name: string } | null>(null);
 
   useEffect(() => {
     if (authToken) {
@@ -117,17 +119,65 @@ export default function CompaniesPage() {
                     {new Date(supplier.createdAt).toLocaleDateString()}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium" onClick={(e) => e.stopPropagation()}>
-                    <Link
-                      href={`/admin/companies/${supplier.id}`}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
-                      Edit
-                    </Link>
+                    <div className="flex items-center justify-end gap-3">
+                      <Link
+                        href={`/admin/companies/${supplier.id}`}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => setShowDeleteModal({ id: supplier.id, name: supplier.name })}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Delete Company</h3>
+            <p className="text-sm text-slate-600 mb-6">
+              Are you sure you want to delete <strong>{showDeleteModal.name}</strong>? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowDeleteModal(null)}
+                disabled={deletingId === showDeleteModal.id}
+                className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  if (!authToken || !showDeleteModal) return;
+                  setDeletingId(showDeleteModal.id);
+                  try {
+                    await api.suppliers.delete(showDeleteModal.id, authToken);
+                    setSuppliers(suppliers.filter(s => s.id !== showDeleteModal.id));
+                    setShowDeleteModal(null);
+                  } catch (error: any) {
+                    alert(error.message || 'Failed to delete company');
+                  } finally {
+                    setDeletingId(null);
+                  }
+                }}
+                disabled={deletingId === showDeleteModal.id}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                {deletingId === showDeleteModal.id ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

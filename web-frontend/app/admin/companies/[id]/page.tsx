@@ -73,6 +73,8 @@ export default function EditCompanyPage() {
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const fetchSupplier = async () => {
@@ -799,6 +801,13 @@ export default function EditCompanyPage() {
           >
             Cancel
           </button>
+          <button
+            type="button"
+            onClick={() => setShowDeleteModal(true)}
+            className="rounded-lg bg-red-600 px-6 py-2 text-sm font-medium text-white hover:bg-red-700"
+          >
+            Delete Company
+          </button>
         </div>
       </form>
 
@@ -860,6 +869,44 @@ export default function EditCompanyPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Delete Company</h3>
+            <p className="text-sm text-slate-600 mb-6">
+              Are you sure you want to delete this company? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleting}
+                className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  if (!authToken) return;
+                  setDeleting(true);
+                  try {
+                    await api.suppliers.delete(id, authToken);
+                    router.push('/admin/companies');
+                  } catch (error: any) {
+                    alert(error.message || 'Failed to delete company');
+                    setDeleting(false);
+                  }
+                }}
+                disabled={deleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

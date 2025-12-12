@@ -318,6 +318,138 @@ export async function sendPasswordResetEmail(email: string, resetToken: string) 
   }
 }
 
+export async function sendSubmissionEmail(submission: any) {
+  const adminEmail = process.env.ADMIN_EMAIL || 'listings@findliquidation.com';
+  
+  try {
+    await transporter.sendMail({
+      from: FROM_EMAIL,
+      to: adminEmail,
+      subject: `New Listing Submission: ${submission.companyName}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <style>
+              body { 
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                line-height: 1.6; 
+                color: #0f172a;
+                background-color: #f8fafc;
+                margin: 0;
+                padding: 0;
+              }
+              .container { 
+                max-width: 600px; 
+                margin: 40px auto; 
+                background: white;
+              }
+              .header { 
+                background: linear-gradient(135deg, #3388FF 0%, #2670E6 100%);
+                color: white; 
+                padding: 40px 30px; 
+                text-align: center; 
+                border-radius: 24px 24px 0 0;
+              }
+              .content { 
+                background: #ffffff;
+                padding: 40px 30px;
+              }
+              .field {
+                margin: 16px 0;
+                padding: 12px;
+                background: #f8fafc;
+                border-radius: 8px;
+                border-left: 3px solid #3388FF;
+              }
+              .field-label {
+                font-weight: 600;
+                color: #334155;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              }
+              .field-value {
+                color: #0f172a;
+                font-size: 16px;
+              }
+              .footer { 
+                text-align: center; 
+                padding: 30px;
+                color: #64748b;
+                font-size: 14px;
+                background: #f8fafc;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>New Listing Submission</h1>
+              </div>
+              <div class="content">
+                <div class="field">
+                  <div class="field-label">Company Name</div>
+                  <div class="field-value">${submission.companyName}</div>
+                </div>
+                <div class="field">
+                  <div class="field-label">Contact Email</div>
+                  <div class="field-value">${submission.contactEmail}</div>
+                </div>
+                <div class="field">
+                  <div class="field-label">Company Address</div>
+                  <div class="field-value">${submission.companyAddress}</div>
+                </div>
+                ${submission.contactPhone ? `
+                <div class="field">
+                  <div class="field-label">Contact Phone</div>
+                  <div class="field-value">${submission.contactPhone}</div>
+                </div>
+                ` : ''}
+                ${submission.website ? `
+                <div class="field">
+                  <div class="field-label">Website</div>
+                  <div class="field-value"><a href="${submission.website}">${submission.website}</a></div>
+                </div>
+                ` : ''}
+                <div class="field">
+                  <div class="field-label">Description</div>
+                  <div class="field-value">${submission.description}</div>
+                </div>
+                ${submission.notes ? `
+                <div class="field">
+                  <div class="field-label">Additional Notes</div>
+                  <div class="field-value">${submission.notes}</div>
+                </div>
+                ` : ''}
+                <div class="field">
+                  <div class="field-label">Submitted By</div>
+                  <div class="field-value">${submission.customer.firstName} ${submission.customer.lastName} (${submission.customer.email})</div>
+                </div>
+                <div class="field">
+                  <div class="field-label">Submission ID</div>
+                  <div class="field-value">#${submission.id}</div>
+                </div>
+              </div>
+              <div class="footer">
+                <p>Review this submission in the admin panel.</p>
+                <p style="margin-top: 16px;">© ${new Date().getFullYear()} Find Liquidation. All rights reserved.</p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+      text: `New Listing Submission\n\nCompany: ${submission.companyName}\nContact: ${submission.contactEmail}\nAddress: ${submission.companyAddress}\n${submission.contactPhone ? `Phone: ${submission.contactPhone}\n` : ''}${submission.website ? `Website: ${submission.website}\n` : ''}\nDescription: ${submission.description}\n${submission.notes ? `Notes: ${submission.notes}\n` : ''}\nSubmitted by: ${submission.customer.firstName} ${submission.customer.lastName} (${submission.customer.email})\nSubmission ID: #${submission.id}`,
+    });
+
+    console.log(`✅ Submission email sent to ${adminEmail}`);
+  } catch (error) {
+    console.error('❌ Failed to send submission email:', error);
+    throw error;
+  }
+}
+
 export async function testEmailConnection() {
   try {
     await transporter.verify();

@@ -765,6 +765,16 @@ export const api = {
         },
         cache: 'no-store',
       }),
+    // Admin: Update any submission
+    updateAdmin: (id: number, payload: UpdateSubmissionPayload, token: string) =>
+      fetchFromApi<SubmissionResponse>(`/submissions/${id}/admin`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }),
     // Admin: Delete any submission
     adminDelete: (id: number, token: string) =>
       fetchFromApi<{ message: string }>(`/submissions/${id}/admin`, {

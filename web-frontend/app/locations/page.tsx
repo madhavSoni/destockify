@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { StateSelector } from './state-selector';
 import { InteractiveMap } from './interactive-map';
+import { StateCards } from '@/components/state-cards';
 
 export default async function LocationsPage() {
   return (
@@ -37,6 +38,9 @@ export default async function LocationsPage() {
         {/* Shop by State dropdown */}
         <StateSelector />
       </div>
+
+      {/* State Cards Grid */}
+      <StateCards />
 
       {/* Feature cards section */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:py-16 lg:py-20 sm:px-6 lg:px-8 relative">

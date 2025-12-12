@@ -343,6 +343,7 @@ export async function getAllReviewsAdmin(params: {
       ratingOverall: r.ratingOverall,
       images: r.images,
       isApproved: r.isApproved,
+      isTrending: r.isTrending,
       createdAt: r.createdAt.toISOString(),
       customer: {
         id: r.customer.id,
@@ -412,6 +413,7 @@ export async function getReviewsBySupplierAdmin(supplierId: number) {
     body: r.body, // review_text
     images: r.images, // review_images
     isApproved: r.isApproved,
+    isTrending: r.isTrending,
     createdAt: r.createdAt.toISOString(), // review_date
     updatedAt: r.updatedAt.toISOString(),
     customer: {
@@ -431,6 +433,7 @@ export async function adminUpdateReview(payload: {
   images?: string[];
   createdAt?: string; // ISO date string
   isApproved?: boolean;
+  isTrending?: boolean;
 }) {
   const { reviewId, createdAt, ratingOverall, ...updateData } = payload;
 
@@ -512,6 +515,7 @@ export async function adminCreateReview(payload: {
   body: string; // review_text
   images?: string[]; // review_images
   isApproved?: boolean;
+  isTrending?: boolean;
   createdAt?: string; // ISO date string (review_date)
 }) {
   const {
@@ -522,6 +526,7 @@ export async function adminCreateReview(payload: {
     body,
     images,
     isApproved = true, // Admin-created reviews are approved by default
+    isTrending = false,
     createdAt,
   } = payload;
 
@@ -557,6 +562,7 @@ export async function adminCreateReview(payload: {
     body, // review_text
     images: images || [], // review_images
     isApproved,
+    isTrending,
   };
 
   if (createdAt) {

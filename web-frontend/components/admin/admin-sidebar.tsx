@@ -12,6 +12,7 @@ export function AdminSidebar({ onClose }: { onClose?: () => void }) {
     { href: '/admin', label: 'Dashboard', icon: '📊' },
     { href: '/admin/companies', label: 'Companies', icon: '🏢' },
     { href: '/admin/reviews', label: 'Reviews', icon: '⭐' },
+    { href: '/admin/new-listings', label: 'New Listings', icon: '📝' },
   ];
 
   const handleLinkClick = () => {

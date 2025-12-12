@@ -30,11 +30,7 @@ export default function MyListingsPage() {
   const [submissionToDelete, setSubmissionToDelete] = useState<{ id: number; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, authLoading, router]);
+  // Authentication removed - show message if not logged in
 
   useEffect(() => {
     const fetchData = async () => {
@@ -134,7 +130,26 @@ export default function MyListingsPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-          <p className="mt-4 text-slate-600">Loading your listings...</p>
+          <p className="mt-4 text-slate-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !authToken) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <h2 className="text-2xl font-bold text-slate-900 mb-3">My Listings Not Available</h2>
+          <p className="text-slate-600 mb-6">
+            You need to be logged in to view your listings.
+          </p>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+          >
+            Log In
+          </Link>
         </div>
       </div>
     );

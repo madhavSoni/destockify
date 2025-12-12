@@ -49,16 +49,17 @@ function SubmitListingForm() {
     other: '',
   });
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, authLoading, router]);
+  // Authentication removed - allow anonymous submissions
 
   // Load existing submission data when in edit mode
   useEffect(() => {
     const loadSubmission = async () => {
-      if (!isEditMode || !editId || !authToken) return;
+      if (!isEditMode || !editId || !authToken) {
+        if (isEditMode && !authToken) {
+          setError('You must be logged in to edit a submission');
+        }
+        return;
+      }
 
       try {
         setIsLoadingData(true);
@@ -126,10 +127,8 @@ function SubmitListingForm() {
     e.preventDefault();
     setError(null);
 
-    if (!authToken) {
-      setError('You must be logged in to submit a listing');
-      return;
-    }
+    // Allow submissions without authentication
+    // If authToken exists, use it; otherwise submit anonymously
 
     // Validate required fields
     if (!companyName || !companyAddress || !contactEmail || !description) {
@@ -156,11 +155,23 @@ function SubmitListingForm() {
       };
 
       if (isEditMode && editId) {
-        // Update existing submission
+        // Update existing submission - requires auth
+        if (!authToken) {
+          setError('You must be logged in to edit a submission');
+          return;
+        }
         await api.submissions.update(parseInt(editId), payload, authToken);
       } else {
-        // Create new submission
-        await api.submissions.create(payload, authToken);
+        // Create new submission - try with auth if available, otherwise may need backend support for anonymous
+        if (authToken) {
+          await api.submissions.create(payload, authToken);
+        } else {
+          // For anonymous submissions, we'll need backend support
+          // For now, show an error suggesting they contact directly
+          setError('Please contact listings@findliquidation.com to submit a listing, or log in to submit online.');
+          setIsSubmitting(false);
+          return;
+        }
       }
       
       setSuccess(true);
@@ -170,7 +181,7 @@ function SubmitListingForm() {
     }
   };
 
-  if (authLoading || isLoadingData) {
+  if (isLoadingData) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">

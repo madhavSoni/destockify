@@ -1,4 +1,5 @@
 import prisma from '../../lib/prismaClient';
+import { sendSubmissionEmail } from '../../lib/emailService';
 
 // Helper function to generate slug from company name
 function generateSlug(name: string): string {
@@ -87,6 +88,14 @@ export async function createSubmission(
       },
     },
   });
+
+  // Send email notification about new submission
+  try {
+    await sendSubmissionEmail(submission);
+  } catch (emailError) {
+    // Log error but don't fail the submission creation
+    console.error('Failed to send submission email:', emailError);
+  }
 
   return submission;
 }
@@ -358,6 +367,61 @@ export async function rejectSubmission(submissionId: number, adminNotes: string)
       status: 'rejected',
       adminNotes,
       reviewedAt: new Date(),
+    },
+    include: {
+      customer: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  return updated;
+}
+
+export async function updateSubmissionAdmin(
+  submissionId: number,
+  payload: {
+    companyName?: string;
+    companyAddress?: string;
+    contactEmail?: string;
+    contactPhone?: string;
+    website?: string;
+    description?: string;
+    logoUrl?: string;
+    bannerUrl?: string;
+    socialMedia?: any;
+    ownershipDocuments?: string[];
+    notes?: string;
+  }
+) {
+  const submission = await prisma.supplierSubmission.findUnique({
+    where: { id: submissionId },
+  });
+
+  if (!submission) {
+    throw new Error('Submission not found');
+  }
+
+  // Admins can update any submission regardless of status
+  const updated = await prisma.supplierSubmission.update({
+    where: { id: submissionId },
+    data: {
+      companyName: payload.companyName,
+      companyAddress: payload.companyAddress,
+      contactEmail: payload.contactEmail,
+      contactPhone: payload.contactPhone,
+      website: payload.website,
+      description: payload.description,
+      logoUrl: payload.logoUrl,
+      bannerUrl: payload.bannerUrl,
+      socialMedia: payload.socialMedia,
+      ownershipDocuments: payload.ownershipDocuments,
+      notes: payload.notes,
     },
     include: {
       customer: {

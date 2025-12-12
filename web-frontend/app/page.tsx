@@ -136,7 +136,7 @@ export default async function HomePage() {
 /* --------------------------- HERO --------------------------- */
 function HeroSection() {
   return (
-    <section className="relative min-h-[300px] sm:min-h-[350px]">
+    <section className="relative min-h-[300px] sm:min-h-[350px] scroll-mt-[70px]">
       {/* Background image */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -154,7 +154,7 @@ function HeroSection() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-11 pb-4 sm:py-10 lg:py-12">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-20 pb-4 sm:pt-24 sm:pb-10 lg:pt-28 lg:pb-12">
         {/* Left-anchored content block like Zillow */}
         <div className="max-w-xl space-y-3 sm:space-y-4">
         <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight text-center sm:text-left antialiased m-0">

@@ -8,6 +8,7 @@ import {
   getAllSubmissions,
   approveSubmission,
   rejectSubmission,
+  updateSubmissionAdmin,
   deleteSubmissionAdmin,
 } from './submissions.service';
 import { authenticateToken, AuthRequest } from '../../middleware/authMiddleware';
@@ -88,6 +89,20 @@ router.get('/admin/all', authenticateToken, isAdmin, async (req: AuthRequest, re
     res.json(result);
   } catch (error: any) {
     res.status(500).json({ message: error.message ?? 'Unable to fetch submissions' });
+  }
+});
+
+// Update submission (admin) - can update any submission
+router.put('/:id/admin', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    if (isNaN(submissionId)) {
+      return res.status(400).json({ message: 'Invalid submission ID' });
+    }
+    const updated = await updateSubmissionAdmin(submissionId, req.body);
+    res.json(updated);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message ?? 'Unable to update submission' });
   }
 });
 

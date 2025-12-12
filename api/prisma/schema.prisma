@@ -107,6 +107,7 @@ model Review {
   body          String   // review_text
   images        String[] @default([]) // review_images
   isApproved    Boolean  @default(false)
+  isTrending    Boolean  @default(false)
   createdAt     DateTime @default(now()) // review_date
   updatedAt     DateTime @updatedAt
 
@@ -114,6 +115,7 @@ model Review {
   customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@index([supplierId, isApproved, createdAt])
+  @@index([supplierId, isTrending, isApproved])
   @@index([customerId, createdAt])
 }
 
