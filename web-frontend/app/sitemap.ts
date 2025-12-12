@@ -100,7 +100,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })) || [];
 
     // Location pages (using /locations/[slug] structure)
-    const locationPages: MetadataRoute.Sitemap = regions.map((region: any) => ({
+    const locationPages: MetadataRoute.Sitemap = (Array.isArray(regions) ? regions : []).map((region: any) => ({
       url: `${baseUrl}/locations/${region.slug}`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
