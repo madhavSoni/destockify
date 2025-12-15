@@ -818,12 +818,20 @@ export default function EditCompanyPage() {
             <h2 className="text-xl font-semibold text-slate-900">Reviews</h2>
             <p className="mt-1 text-sm text-slate-600">Manage all reviews for this company</p>
           </div>
-          <button
-            onClick={() => setShowAddReview(!showAddReview)}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            {showAddReview ? 'Cancel' : '+ Add Review'}
-          </button>
+          <div className="flex gap-3">
+            <a
+              href={`/admin/reviews?supplierId=${id}`}
+              className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+            >
+              Create Review (Full Form)
+            </a>
+            <button
+              onClick={() => setShowAddReview(!showAddReview)}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              {showAddReview ? 'Cancel' : '+ Add Review'}
+            </button>
+          </div>
         </div>
 
         {/* Add Review Form */}
