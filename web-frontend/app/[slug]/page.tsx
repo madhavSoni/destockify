@@ -216,15 +216,12 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                 priority
                 quality={90}
               />
-              {/* Enhanced dark overlay with subtle gradient for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/25 to-black/30" />
-              {/* Subtle brand gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-transparent to-primary-800/5" />
+              {/* Dark overlay for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/50" />
             </div>
 
             {/* Content */}
-            <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-11 pb-4 sm:py-10 lg:py-12">
-              {/* Left-anchored content block like Zillow */}
+            <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-16 pb-8 sm:pt-20 sm:pb-10 lg:pt-24 lg:pb-12">
               <div className="max-w-xl space-y-3 sm:space-y-4">
                 {page.heroH1 && (
                   <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight text-center sm:text-left antialiased m-0">
@@ -254,7 +251,7 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
 
         {!page.heroImage && (
           <section className="relative min-h-[300px] sm:min-h-[350px] bg-slate-900">
-            <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-11 pb-4 sm:py-10 lg:py-12">
+            <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-16 pb-8 sm:pt-20 sm:pb-10 lg:pt-24 lg:pb-12">
               <div className="max-w-xl space-y-3 sm:space-y-4">
                 {page.heroH1 && (
                   <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight text-center sm:text-left antialiased m-0">
@@ -335,9 +332,9 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                 const isImageLeft = block.layout_type === 'image_left';
                 return (
                   <div key={index} className={page.enableDivider && index > 0 ? 'border-t border-slate-200 pt-12' : ''}>
-                    <article className={`grid gap-0 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-lift md:grid-cols-2 md:h-[450px] lg:h-[500px] ${isImageLeft ? '' : 'md:flex-row-reverse'}`}>
+                    <article className={`grid gap-0 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-lift md:grid-cols-2 ${isImageLeft ? '' : 'md:flex-row-reverse'}`}>
                       {block.image && (
-                        <div className={`relative h-64 sm:h-80 w-full md:h-full ${isImageLeft ? '' : 'md:order-2'}`}>
+                        <div className={`relative h-64 sm:h-80 md:min-h-[350px] w-full ${isImageLeft ? '' : 'md:order-2'}`}>
                           <Image
                             src={block.image}
                             alt={block.image_alt || block.h2 || 'Content image'}

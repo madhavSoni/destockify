@@ -23,12 +23,20 @@
     "seed:category-pages": "ts-node -r tsconfig-paths/register seed-scripts/seed-category-pages-from-csv.ts",
     "seed:category-pages:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/seed-category-pages-from-csv.ts",
     "upload:images": "ts-node -r tsconfig-paths/register scripts/upload-category-brand-images.ts",
-    "upload:images:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register scripts/upload-category-brand-images.ts"
+    "upload:images:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register scripts/upload-category-brand-images.ts",
+    "seo:generate": "ts-node -r tsconfig-paths/register seed-scripts/seo-content-generator/index.ts",
+    "seo:generate:dry": "ts-node -r tsconfig-paths/register seed-scripts/seo-content-generator/index.ts --dry-run",
+    "seo:generate:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/seo-content-generator/index.ts",
+    "seo:apply": "ts-node -r tsconfig-paths/register seed-scripts/seo-content-generator/apply-generated.ts",
+    "seo:apply:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/seo-content-generator/apply-generated.ts",
+    "set:suppliers": "ts-node -r tsconfig-paths/register seed-scripts/set-consistent-suppliers.ts",
+    "set:suppliers:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/set-consistent-suppliers.ts"
   },
   "prisma": {
     "seed": "ts-node -r tsconfig-paths/register prisma/seed.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
     "@google-cloud/secret-manager": "^6.1.1",
     "@google-cloud/storage": "^7.15.0",
     "@prisma/client": "^6.19.0",

@@ -1,0 +1,62 @@
+[
+  {
+    "slug": "amazon-liquidation",
+    "displayName": "Amazon",
+    "metaDescription": "Amazon liquidation pallets from FBA returns, overstock, and FC warehouse inventory. LPN manifested loads, Smalls/Mediums lots, and HPC truckloads for resellers.",
+    "heroText": "Amazon liquidation inventory offers some of the highest-velocity merchandise in the secondary market. From FBA customer returns to FC overstock, these loads provide diverse product categories with established market demand. Available formats include LPN-tracked pallets, Smalls/Mediums sortable loads, and high piece count truckloads. Our vetted suppliers handle direct Amazon sourcing with proper manifesting and condition coding.",
+    "featuredSuppliersText": "These liquidators specialize in Amazon FC purchasing and provide detailed LPN tracking, accurate condition codes, and consistent lot composition for reliable reseller operations.",
+    "centeredValueH2": "FBA Returns Drive Reseller Profits",
+    "centeredValueText": "Amazon's return policies create substantial liquidation volume, particularly in electronics, home goods, and health/beauty categories. FBA returns typically show 60-80% functionality rates with cosmetic damage driving the liquidation. LPN manifested loads allow precise tracking from FC to final sale, while condition grades help predict refurbishment requirements. Smalls loads concentrate high-value electronics, while Mediums focus on home goods with better freight efficiency.",
+    "contentBlocks": [
+      {
+        "h2": "FBA Returns and FC Overstock Quality",
+        "text": "Amazon's fulfillment centers generate diverse liquidation streams from customer returns, warehouse damage, and seasonal overstock. FBA returns undergo initial inspection with condition codes ranging from sellable to damaged. LPN tracking provides item-level visibility for manifested loads, crucial for electronics and branded merchandise. FC overstock typically maintains original packaging with minimal handling damage. Smalls concentrate electronics and accessories under 18 inches, while Mediums handle larger home goods. Non-sortable pallets offer mixed categories at lower entry costs but require extensive processing.",
+        "image_prompt": "Amazon fulfillment center warehouse with pallets of returned merchandise, boxes labeled with LPN codes, workers sorting items by condition, organized shelving with various consumer goods",
+        "image_alt": "Amazon FC returns pallets with LPN tracking codes in warehouse",
+        "layout_type": "image_left"
+      },
+      {
+        "h2": "Amazon Lot Formats and Buyer Segments",
+        "text": "Amazon liquidation serves distinct buyer segments through specialized lot formats. Bin store operators prefer raw truckloads with mixed condition merchandise for volume-based retail. eBay and Amazon FBA resellers target manifested Smalls for individual item resale with known ASINs and market data. Whatnot sellers focus on customer return pallets with unboxing potential and brand recognition. Sortable truckloads allow category separation for specialized retailers. Freight considerations include dock-high delivery for FC-direct loads and potential liftgate requirements for smaller lots.",
+        "image_prompt": "Loading dock with Amazon liquidation merchandise being loaded into delivery trucks, palletized goods wrapped in plastic, workers using forklifts, various sized boxes and packages",
+        "image_alt": "Amazon liquidation pallets being loaded for freight delivery to resellers",
+        "layout_type": "image_right"
+      }
+    ],
+    "faqSectionH2": "Amazon Liquidation FAQ",
+    "faqs": [
+      {
+        "question": "What's the difference between Amazon Smalls and Mediums lots?",
+        "answer": "Smalls contain items under 18 inches in any dimension, typically electronics, accessories, and health/beauty products. Mediums range 18-24 inches and focus on home goods, kitchen items, and larger electronics. Smalls offer higher per-piece value but require individual processing. Mediums provide better freight efficiency with easier handling. Both offer LPN tracking when manifested, allowing precise inventory identification and market research."
+      },
+      {
+        "question": "How reliable are Amazon LPN manifests for tracking inventory?",
+        "answer": "LPN manifests from established suppliers typically show 85-95% accuracy for item identification and condition codes. Each LPN corresponds to specific Amazon ASINs with market data available. However, condition assessment can vary between FC locations. Customer return LPNs may show different actual conditions than coded. Always verify high-value electronics functionality regardless of manifest condition ratings."
+      },
+      {
+        "question": "What condition grades should I expect in FBA return pallets?",
+        "answer": "FBA returns typically break down as: 40% sellable/like-new condition, 35% minor cosmetic damage, 15% functional with packaging damage, and 10% defective/parts only. Customer return patterns vary by category - electronics show higher defect rates while home goods maintain better condition. Amazon's return policy allows returns without defects, creating opportunities for like-new merchandise at liquidation prices."
+      },
+      {
+        "question": "How do Amazon liquidation prices compare to wholesale costs?",
+        "answer": "Amazon liquidation typically runs 10-25% of retail value depending on condition and category. FBA returns in electronics average 15-20% of retail, while overstock can reach 25-30%. Manifested loads command premium pricing over blind lots but offer predictable ROI. Seasonal timing affects pricing - Q1 returns peak creates buyer opportunities. High piece count loads offer better per-unit pricing but require larger capital investment."
+      },
+      {
+        "question": "What freight considerations apply to Amazon FC pickups?",
+        "answer": "Amazon FC loads typically require dock-high capability for truckload pickups. Pallet loads may need liftgate delivery depending on buyer location. BOL documentation includes LPN references for tracking. Appointment scheduling required for FC pickups with 24-48 hour advance notice. Consider detention charges for delays. LTL shipments work for smaller lots but increase per-unit freight costs significantly."
+      },
+      {
+        "question": "Which Amazon categories offer the best reseller margins?",
+        "answer": "Electronics consistently provide highest margins due to brand recognition and testing capabilities. Health and beauty products maintain steady demand with lower processing requirements. Home goods offer volume opportunities with predictable shipping costs. Avoid clothing returns due to sizing issues and seasonal demand challenges. Books and media show low margins but high velocity for bin store operations."
+      },
+      {
+        "question": "How do I verify Amazon liquidation supplier authenticity?",
+        "answer": "Legitimate Amazon liquidators provide FC pickup documentation and can reference specific warehouse locations. Look for consistent LPN numbering systems and proper Amazon condition codes. Verify business licenses and ask for FC facility relationships. Authentic suppliers offer samples or inspection opportunities. Be cautious of suppliers claiming exclusive Amazon relationships or guaranteed condition ratings."
+      },
+      {
+        "question": "What's the optimal processing strategy for Amazon customer returns?",
+        "answer": "Develop category-specific workflows - test electronics first for immediate resale opportunities. Photography standards should highlight brand names and model numbers for marketplace listings. Research ASINs through Keepa or similar tools for pricing guidance. Sort by condition grade to streamline processing. Consider FBA prep services for high-value items. Batch similar items for efficient listing and shipping workflows."
+      }
+    ]
+  }
+]
