@@ -1,4 +1,15 @@
+# FindLiquidation.com Robots.txt
+
 User-agent: *
 Allow: /
+
+# Block admin and sensitive routes
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+
+# Block query parameters that create duplicate content
+Disallow: /*?*
 
 Sitemap: https://findliquidation.com/sitemap.xml

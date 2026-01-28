@@ -32,6 +32,11 @@ export const metadata: Metadata = {
   title: 'Find Liquidation | Wholesale Liquidation Supplier Directory',
   description:
     'Find Liquidation helps liquidation buyers find vetted wholesale pallet and truckload suppliers with transparent reviews, guides, and buyer insights.',
+  metadataBase: new URL('https://findliquidation.com'),
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+  },
   openGraph: {
     title: 'Find Liquidation | Wholesale Liquidation Supplier Directory',
     description:
@@ -39,6 +44,7 @@ export const metadata: Metadata = {
     url: 'https://findliquidation.com',
     siteName: 'Find Liquidation',
     type: 'website',
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
@@ -46,11 +52,36 @@ export const metadata: Metadata = {
     description:
       'Find vetted liquidation suppliers, read verified buyer reviews, and learn how to scale your wholesale sourcing with confidence.',
   },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Find Liquidation',
+  url: 'https://findliquidation.com',
+  logo: 'https://findliquidation.com/favicon.svg',
+  description: 'Find Liquidation helps liquidation buyers find vetted wholesale pallet and truckload suppliers with transparent reviews, guides, and buyer insights.',
+  sameAs: [],
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'customer service',
+    url: 'https://findliquidation.com/contact',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+      </head>
       <body className={`${plusJakartaSans.variable} ${inter.variable} ${lora.variable} bg-white text-black antialiased`}>
         <Providers>
           <div className="flex min-h-screen flex-col">
