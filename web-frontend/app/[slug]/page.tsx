@@ -229,7 +229,7 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                   </h1>
                 )}
                 {page.heroText && (
-                  <p className="text-sm sm:text-base lg:text-lg leading-relaxed text-white/90 font-normal">
+                  <p className="text-sm sm:text-base lg:text-lg leading-relaxed text-white/90 font-normal line-clamp-2">
                     {page.heroText}
                   </p>
                 )}
@@ -259,7 +259,7 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                   </h1>
                 )}
                 {page.heroText && (
-                  <p className="text-sm sm:text-base lg:text-lg leading-relaxed text-white/90 font-normal">
+                  <p className="text-sm sm:text-base lg:text-lg leading-relaxed text-white/90 font-normal line-clamp-2">
                     {page.heroText}
                   </p>
                 )}
