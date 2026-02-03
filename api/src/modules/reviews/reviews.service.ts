@@ -7,6 +7,7 @@ export async function createReview(payload: {
   ratingOverall: number; // Single 1-5 integer rating
   body: string;
   images?: string[];
+  isAnonymous?: boolean;
 }) {
   const {
     customerId,
@@ -14,6 +15,7 @@ export async function createReview(payload: {
     ratingOverall,
     body,
     images,
+    isAnonymous,
   } = payload;
 
   // Validate rating is between 1 and 5 and is an integer
@@ -45,7 +47,9 @@ export async function createReview(payload: {
 
   // Create review (not approved by default)
   // Note: author field is required by database schema (derived from customer name)
-  const authorName = `${customer.firstName} ${customer.lastName}`.trim() || 'Anonymous';
+  const authorName = isAnonymous
+    ? 'Anonymous'
+    : `${customer.firstName} ${customer.lastName}`.trim() || 'Anonymous';
   const review = await prisma.review.create({
     data: {
       customerId,
