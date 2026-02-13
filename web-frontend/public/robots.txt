@@ -10,6 +10,7 @@ Disallow: /api/
 Disallow: /_next/
 
 # Block query parameters that create duplicate content
-Disallow: /*?*
+Disallow: /*?sort=*
+Disallow: /*?utm_*
 
 Sitemap: https://findliquidation.com/sitemap.xml

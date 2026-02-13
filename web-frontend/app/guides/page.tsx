@@ -1,7 +1,21 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
 import { api } from '@/lib/api';
 import { GuideCard } from '@/components/guide-card';
 import { SectionHeading } from '@/components/section-heading';
+
+export const metadata: Metadata = {
+  title: 'Liquidation Buying Guides',
+  description: 'Practical playbooks from Find Liquidation sourcing strategists covering supplier vetting, truckload modeling, and risk mitigation.',
+  alternates: { canonical: '/guides' },
+  openGraph: {
+    title: 'Liquidation Buying Guides | Find Liquidation',
+    description: 'Practical playbooks covering supplier vetting, truckload modeling, and risk mitigation.',
+    url: 'https://findliquidation.com/guides',
+    siteName: 'Find Liquidation',
+    type: 'website',
+  },
+};
 
 export default async function GuidesPage() {
   // Guides API not yet implemented

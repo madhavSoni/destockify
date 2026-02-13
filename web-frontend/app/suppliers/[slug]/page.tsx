@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   
   if (!detail) {
     return {
-      title: 'Supplier Not Found | Find Liquidation',
+      title: 'Supplier Not Found',
       description: 'The requested supplier could not be found.',
     };
   }
@@ -22,7 +22,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const supplierUrl = `https://findliquidation.com/suppliers/${supplier.slug}`;
 
   return {
-    title: `${companyName} Reviews – Are They Legit? | Truckloads & Pallets Buyer Ratings`,
+    title: {
+      absolute: `${companyName} Reviews – Are They Legit? | Truckloads & Pallets Buyer Ratings`,
+    },
     description: `Is ${companyName} legit? Read real buyer reviews, ratings, and experiences with their liquidation truckloads and pallet sales. See complaints, pricing details, and verified insights before you buy.`,
     alternates: {
       canonical: supplierUrl,
@@ -148,7 +150,7 @@ function SupplierHeader({
         <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
           {supplier.logoImage && (
             <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-slate-200 bg-white">
-              <Image src={supplier.logoImage} alt="" fill className="object-contain p-3" />
+              <Image src={supplier.logoImage} alt={`${supplier.name} logo`} fill className="object-contain p-3" />
             </div>
           )}
           <div className="flex-1 min-w-0 w-full">

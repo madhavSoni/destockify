@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'About Us | Find Liquidation',
+  title: 'About Us',
   description: 'Learn about Find Liquidation - your trusted platform for connecting with verified liquidation and wholesale suppliers across the United States.',
   alternates: {
     canonical: 'https://findliquidation.com/about',

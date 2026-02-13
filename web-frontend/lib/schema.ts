@@ -34,14 +34,8 @@ export function generateOrganizationSchema(): WithContext<Organization> {
     '@type': 'Organization',
     name: 'Find Liquidation',
     url: 'https://findliquidation.com',
-    logo: 'https://findliquidation.com/logo.png', // TODO: Update with actual logo URL
-    description: 'Find Liquidation is a wholesale liquidation supplier directory helping buyers find vetted suppliers with transparent reviews and guides.',
-    sameAs: [
-      // TODO: Add social media URLs when available
-      // 'https://twitter.com/findliquidation',
-      // 'https://facebook.com/findliquidation',
-      // 'https://linkedin.com/company/findliquidation'
-    ]
+    logo: 'https://findliquidation.com/favicon.svg',
+    description: 'Find Liquidation is a wholesale liquidation supplier directory helping buyers find vetted suppliers with transparent reviews and guides.'
   };
 }
 
@@ -144,7 +138,7 @@ export function generateArticleSchema(guide: any): WithContext<Article> {
       name: 'Find Liquidation',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://findliquidation.com/logo.png' // TODO: Update
+        url: 'https://findliquidation.com/favicon.svg'
       }
     },
     ...(guide.imageUrl && {

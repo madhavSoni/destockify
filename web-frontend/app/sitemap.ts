@@ -9,8 +9,8 @@ const RESERVED_ROUTES = new Set([
 ]);
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://findliquidation.com';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.findliquidation.com/api';
 
   try {
     // Fetch dynamic data from your API
@@ -88,6 +88,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(),
         changeFrequency: 'yearly',
         priority: 0.3,
+      },
+      {
+        url: `${baseUrl}/lot-sizes`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.6,
+      },
+      {
+        url: `${baseUrl}/guides`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
       },
     ];
 

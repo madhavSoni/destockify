@@ -10,22 +10,24 @@ import { BrandCarousel } from '@/components/brand-carousel';
 import { CategoryCarousel } from '@/components/category-carousel';
 
 export const metadata: Metadata = {
-  title: 'FindLiquidation – Buy Liquidation Truckloads | Reviews & Supplier Directory',
-  description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the FindLiquidation directory to source returns, overstock, and wholesale inventory with confidence.',
+  title: {
+    absolute: 'Find Liquidation – Buy Liquidation Truckloads | Reviews & Supplier Directory',
+  },
+  description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the Find Liquidation directory to source returns, overstock, and wholesale inventory with confidence.',
   alternates: {
     canonical: 'https://findliquidation.com',
   },
   openGraph: {
-    title: 'FindLiquidation – Buy Liquidation Truckloads | Reviews & Supplier Directory',
-    description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the FindLiquidation directory to source returns, overstock, and wholesale inventory with confidence.',
+    title: 'Find Liquidation – Buy Liquidation Truckloads | Reviews & Supplier Directory',
+    description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the Find Liquidation directory to source returns, overstock, and wholesale inventory with confidence.',
     url: 'https://findliquidation.com',
     siteName: 'Find Liquidation',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FindLiquidation – Buy Liquidation Truckloads | Reviews & Supplier Directory',
-    description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the FindLiquidation directory to source returns, overstock, and wholesale inventory with confidence.',
+    title: 'Find Liquidation – Buy Liquidation Truckloads | Reviews & Supplier Directory',
+    description: 'Find liquidation truckloads and pallets for sale from verified suppliers. Browse reviews, compare liquidators, and use the Find Liquidation directory to source returns, overstock, and wholesale inventory with confidence.',
   },
 };
 
@@ -226,9 +228,9 @@ function QuickActionsBar() {
                 {item.icon}
               </div>
               
-              <h3 className="font-heading relative text-lg sm:text-xl font-bold text-slate-900 transition-colors group-hover:text-blue-600">
+              <h2 className="font-heading relative text-lg sm:text-xl font-bold text-slate-900 transition-colors group-hover:text-blue-600">
                 {item.label}
-              </h3>
+              </h2>
               
               <p className="relative mt-2 sm:mt-3 text-sm leading-relaxed text-slate-600">
                 {item.description}
@@ -254,7 +256,7 @@ function ConnectByState({ regions }: { regions: any[] }) {
     <section className="w-full px-4 py-16 sm:py-20 text-center sm:px-6 lg:px-8 relative bg-white">
       <div className="relative mx-auto max-w-7xl">
         <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">LOCATIONS</p>
-        <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">Top-Rated Liquidation & Wholesale Suppliers Near You</h3>
+        <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">Top-Rated Liquidation & Wholesale Suppliers Near You</h2>
         <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-base sm:text-lg text-slate-600 leading-relaxed">
           Discover wholesale lots of returns, overstock, and liquidation inventory sold by the pallet or by the truckload.
         </p>
@@ -308,9 +310,9 @@ function TwoUpFeatures() {
               />
             </div>
             <div className="flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12">
-              <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
+              <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
                 Buy Truckload Liquidation Direct From Verified Liquidators
-              </h3>
+              </h2>
               <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
                 Source pallets and truckloads for your bin store, discount store, flea market business, or auction house. Buy direct from liquidators handling inventory from Amazon, Walmart, Target, Home Depot, and other major retailers.
               </p>
@@ -329,9 +331,9 @@ function TwoUpFeatures() {
           {/* Feature 2: Split Layout - Content Left, Image Right */}
           <article className="grid gap-0 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-lift md:grid-cols-2 md:h-[450px] lg:h-[500px]">
             <div className="order-2 flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12 md:order-1">
-              <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
+              <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
                 Read Supplier Reviews from Buyers
-              </h3>
+              </h2>
               <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
                 Get honest insights before you buy. Read reviews from real resellers about liquidation pallets, truckloads, wholesale merchandise, and liquidation inventory from suppliers near you.
               </p>
@@ -367,7 +369,7 @@ function ListBusinessCta() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-600/20 to-transparent" />
       <div className="relative mx-auto max-w-6xl rounded-lg bg-black p-6 sm:p-8 lg:p-10 text-white shadow-sm transition-all duration-300 hover:shadow-lift hover:scale-[1.01]">
         <div className="relative">
-          <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">List your Business</h3>
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">List your Business</h2>
           <p className="mt-3 sm:mt-4 text-lg sm:text-xl lg:text-2xl leading-relaxed">
             Get seen by 1M people looking for merchandise from top suppliers.
           </p>

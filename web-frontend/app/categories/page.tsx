@@ -8,7 +8,7 @@ import { generateFAQSchema, generateBreadcrumbSchema, schemaToJsonLd } from '@/l
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Liquidation Categories – Buy Wholesale by Product Type | Find Liquidation',
+  title: 'Liquidation Categories – Buy Wholesale by Product Type',
   description: 'Browse liquidation pallets and truckloads by category. Find wholesale electronics, apparel, home goods, tools, toys, and more from verified suppliers across the United States.',
   keywords: 'liquidation categories, wholesale merchandise, liquidation pallets, truckload liquidation, electronics liquidation, apparel liquidation, home goods liquidation',
   alternates: {
@@ -125,7 +125,7 @@ export default async function CategoriesPage() {
                 ) : (
                   <div className="text-4xl mb-3">🏷️</div>
                 )}
-                <h3 className="font-heading text-sm font-semibold text-slate-900 line-clamp-2 leading-tight px-2">{page.pageTitle}</h3>
+                <h2 className="font-heading text-sm font-semibold text-slate-900 line-clamp-2 leading-tight px-2">{page.pageTitle}</h2>
               </div>
             </Link>
           ))}
@@ -147,9 +147,9 @@ export default async function CategoriesPage() {
                 />
               </div>
               <div className="flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12">
-                <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
+                <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
                   Buy Wholesale Electronics From Trusted Suppliers
-                </h3>
+                </h2>
                 <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
                   The largest directory for truckload liquidation in the United States,
                   featuring returns, overstock, general merchandise, and a wide variety
@@ -170,9 +170,9 @@ export default async function CategoriesPage() {
             {/* Feature 2: Split Layout - Content Left, Image Right */}
             <article className="grid gap-0 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift md:grid-cols-2 md:h-[450px] lg:h-[500px]">
               <div className="order-2 flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12 md:order-1">
-                <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
+                <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
                   Find Wholesale Clothing and Apparel Suppliers Near You
-                </h3>
+                </h2>
                 <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600">
                   Buy wholesale clothing, shoes, and purses in bulk. Find wholesale men's,
                   women's, and kids' apparel from suppliers near you.

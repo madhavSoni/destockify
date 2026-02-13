@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     siteName: 'Find Liquidation',
     type: 'website',
   },
-  title: 'Terms of Service | Find Liquidation',
+  title: 'Terms of Service',
   description: 'Terms and conditions for using Find Liquidation platform.',
 };
 

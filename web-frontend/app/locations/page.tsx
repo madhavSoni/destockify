@@ -1,8 +1,22 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { Metadata } from 'next';
 import { StateSelector } from './state-selector';
 import { InteractiveMap } from './interactive-map';
 import { StateCards } from '@/components/state-cards';
+
+export const metadata: Metadata = {
+  title: 'Liquidation Suppliers by Location',
+  description: 'Find wholesale liquidation pallets and truckloads by state. Browse suppliers across all 50 US states.',
+  alternates: { canonical: '/locations' },
+  openGraph: {
+    title: 'Liquidation Suppliers by Location | Find Liquidation',
+    description: 'Find wholesale liquidation pallets and truckloads by state across all 50 US states.',
+    url: 'https://findliquidation.com/locations',
+    siteName: 'Find Liquidation',
+    type: 'website',
+  },
+};
 
 export default async function LocationsPage() {
   return (

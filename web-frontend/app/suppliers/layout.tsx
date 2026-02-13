@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateFAQSchema, schemaToJsonLd } from '@/lib/schema';
 
 export const metadata: Metadata = {
-  title: 'Buy Liquidation Truckloads & Pallets Near You | Find Liquidation',
+  title: 'Buy Liquidation Truckloads & Pallets Near You',
   description: 'Browse hundreds of verified liquidators and wholesalers across the United States. Connect with suppliers offering returned, overstock, and brand-new merchandise.',
   keywords: 'liquidation suppliers, wholesale liquidators, truckload liquidation, pallet liquidation, verified suppliers, liquidation directory',
   alternates: {

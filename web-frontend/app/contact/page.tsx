@@ -1,4 +1,18 @@
+import { Metadata } from 'next';
 import { SectionHeading } from '@/components/section-heading';
+
+export const metadata: Metadata = {
+  title: 'Contact Us',
+  description: 'Get in touch with the Find Liquidation sourcing team for questions about suppliers, freight, or listing your liquidation program.',
+  alternates: { canonical: '/contact' },
+  openGraph: {
+    title: 'Contact Us | Find Liquidation',
+    description: 'Get in touch with the Find Liquidation sourcing team for questions about suppliers, freight, or listing your liquidation program.',
+    url: 'https://findliquidation.com/contact',
+    siteName: 'Find Liquidation',
+    type: 'website',
+  },
+};
 
 export default function ContactPage() {
   return (

@@ -32,7 +32,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const page = await api.catalog.categoryPages.get(slug);
     
     const metadata: Metadata = {
-      title: page.metaTitle || page.pageTitle,
+      title: {
+        absolute: page.metaTitle || page.pageTitle,
+      },
       description: page.metaDescription,
       alternates: {
         canonical: page.canonicalUrl || `https://findliquidation.com/${page.slug}`,
@@ -45,7 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     if (page.ogTitle || page.ogDescription || page.ogImage) {
       metadata.openGraph = {
-        title: page.ogTitle || page.metaTitle || page.pageTitle,
+        title: page.ogTitle || `${page.metaTitle || page.pageTitle} | Find Liquidation`,
         description: page.ogDescription || page.metaDescription,
         ...(page.ogImage && { images: [{ url: page.ogImage }] }),
         url: `https://findliquidation.com/${page.slug}`,
@@ -57,7 +59,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return metadata;
   } catch {
     return {
-      title: 'Category Page',
+      title: 'Page Not Found',
+      robots: { index: false, follow: true },
     };
   }
 }

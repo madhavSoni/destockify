@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     
     if (!region) {
       return {
-        title: 'Location Not Found | Find Liquidation',
+        title: 'Location Not Found',
         description: 'The requested location could not be found.',
       };
     }
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const locationUrl = `https://findliquidation.com/locations/${slug}`;
 
     return {
-      title: `Liquidation Truckloads in ${regionName} | Find Liquidation`,
+      title: `Liquidation Truckloads in ${regionName}`,
       description: `Find verified liquidation suppliers in ${regionName}. Buy returns, overstock, and wholesale truckloads near you.`,
       alternates: {
         canonical: locationUrl,
@@ -42,8 +42,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
   } catch {
     return {
-      title: 'Location Page | Find Liquidation',
+      title: 'Page Not Found',
       description: 'Find verified liquidation suppliers near you.',
+      robots: { index: false, follow: true },
     };
   }
 }

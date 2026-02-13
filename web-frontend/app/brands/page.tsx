@@ -6,7 +6,7 @@ import { api } from '@/lib/api';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Brand Liquidation Pages – Buy from Major Retailers | Find Liquidation',
+  title: 'Brand Liquidation Pages – Buy from Major Retailers',
   description: 'Browse liquidation pallets and truckloads by retailer brand. Find Amazon, Walmart, Target, Home Depot, and other major retailer liquidation inventory from verified suppliers.',
   alternates: {
     canonical: 'https://findliquidation.com/brands',

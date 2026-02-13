@@ -1,3 +1,11 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description: 'Read the Find Liquidation privacy policy. Learn how we collect, use, and protect your data on our liquidation supplier directory.',
+  alternates: { canonical: '/privacy' },
+};
+
 export default function PrivacyPage() {
   return (
     <div className="bg-slate-50">

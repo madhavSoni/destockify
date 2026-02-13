@@ -1,6 +1,20 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
 import { Patrick_Hand } from 'next/font/google';
 import { api } from '@/lib/api';
+
+export const metadata: Metadata = {
+  title: 'Buy Wholesale Merchandise by Lot Size',
+  description: 'Compare liquidation lot sizes including micro-lots, pallets, partial truckloads, and full truckloads for your resale business.',
+  alternates: { canonical: '/lot-sizes' },
+  openGraph: {
+    title: 'Buy Wholesale Merchandise by Lot Size | Find Liquidation',
+    description: 'Compare liquidation lot sizes from micro-lots to full truckloads.',
+    url: 'https://findliquidation.com/lot-sizes',
+    siteName: 'Find Liquidation',
+    type: 'website',
+  },
+};
 
 const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
