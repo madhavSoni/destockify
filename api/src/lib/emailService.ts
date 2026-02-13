@@ -6,11 +6,11 @@ const transporter = nodemailer.createTransport({
         user: process.env.EMAIL_USER || 'madhav.soni@bazar.earth',
         pass: process.env.EMAIL_PASSWORD || 'emps muyi tgte evmn'
     },
-    from: `"${process.env.EMAIL_FROM_NAME || 'Destockify'}" <${process.env.EMAIL_FROM || 'info@bazar-prime.com'}>`
+    from: `"${process.env.EMAIL_FROM_NAME || 'FindLiquidation'}" <${process.env.EMAIL_FROM || 'noreply@findliquidation.com'}>`
 });
 
-const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@destockify.com';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://destockify-frontend-78602435411.us-central1.run.app';
+const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@findliquidation.com';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://findliquidation.com';
 
 export async function sendVerificationEmail(email: string, verificationToken: string) {
   const verificationUrl = `${FRONTEND_URL}/verify-email?token=${verificationToken}`;
@@ -18,7 +18,7 @@ export async function sendVerificationEmail(email: string, verificationToken: st
   try {
     await transporter.sendMail({
       to: email,
-      subject: 'Verify your Destockify account 🎉',
+      subject: 'Verify your FindLiquidation account 🎉',
       html: `
         <!DOCTYPE html>
         <html>
@@ -125,7 +125,7 @@ export async function sendVerificationEmail(email: string, verificationToken: st
           <body>
             <div class="container">
               <div class="header">
-                <h1>Welcome to Destockify! <span class="emoji">🎉</span></h1>
+                <h1>Welcome to FindLiquidation! <span class="emoji">🎉</span></h1>
               </div>
               <div class="content">
                 <p>Hi there,</p>
@@ -142,13 +142,13 @@ export async function sendVerificationEmail(email: string, verificationToken: st
               </div>
               <div class="footer">
                 <p>If you didn't create an account, you can safely ignore this email.</p>
-                <p style="margin-top: 16px;">© ${new Date().getFullYear()} Destockify. All rights reserved.</p>
+                <p style="margin-top: 16px;">© ${new Date().getFullYear()} FindLiquidation. All rights reserved.</p>
               </div>
             </div>
           </body>
         </html>
       `,
-      text: `Welcome to Destockify! 🎉\n\nThanks for signing up! Please verify your email by visiting: ${verificationUrl}\n\nThis link will expire in 24 hours.\n\nIf you didn't create an account, you can ignore this email.\n\n© ${new Date().getFullYear()} Destockify. All rights reserved.`,
+      text: `Welcome to FindLiquidation! 🎉\n\nThanks for signing up! Please verify your email by visiting: ${verificationUrl}\n\nThis link will expire in 24 hours.\n\nIf you didn't create an account, you can ignore this email.\n\n© ${new Date().getFullYear()} FindLiquidation. All rights reserved.`,
     });
 
     console.log(`✅ Verification email sent to ${email}`);
@@ -165,7 +165,7 @@ export async function sendPasswordResetEmail(email: string, resetToken: string) 
     await transporter.sendMail({
       from: FROM_EMAIL,
       to: email,
-      subject: 'Reset your Destockify password 🔒',
+      subject: 'Reset your FindLiquidation password 🔒',
       html: `
         <!DOCTYPE html>
         <html>
@@ -287,7 +287,7 @@ export async function sendPasswordResetEmail(email: string, resetToken: string) 
               </div>
               <div class="content">
                 <p>Hi there,</p>
-                <p>We received a request to reset your Destockify password. Click the button below to create a new password:</p>
+                <p>We received a request to reset your FindLiquidation password. Click the button below to create a new password:</p>
                 <div class="button-container">
                   <a href="${resetUrl}" class="button">Reset Password</a>
                 </div>
@@ -302,13 +302,13 @@ export async function sendPasswordResetEmail(email: string, resetToken: string) 
               </div>
               <div class="footer">
                 <p>For security reasons, this password reset link can only be used once.</p>
-                <p style="margin-top: 16px;">© ${new Date().getFullYear()} Destockify. All rights reserved.</p>
+                <p style="margin-top: 16px;">© ${new Date().getFullYear()} FindLiquidation. All rights reserved.</p>
               </div>
             </div>
           </body>
         </html>
       `,
-      text: `Reset Your Password 🔒\n\nWe received a request to reset your Destockify password.\n\nVisit this link to create a new password: ${resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you didn't request a password reset, you can safely ignore this email.\n\n© ${new Date().getFullYear()} Destockify. All rights reserved.`,
+      text: `Reset Your Password 🔒\n\nWe received a request to reset your FindLiquidation password.\n\nVisit this link to create a new password: ${resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you didn't request a password reset, you can safely ignore this email.\n\n© ${new Date().getFullYear()} FindLiquidation. All rights reserved.`,
     });
 
     console.log(`✅ Password reset email sent to ${email}`);

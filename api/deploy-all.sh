@@ -4,16 +4,22 @@
 
 set -e
 
-PROJECT_ID="${GCP_PROJECT_ID:-destockify}"
+# Activate destockify gcloud configuration
+GCLOUD_CONFIG="destockify"
+echo "🔧 Activating gcloud configuration: ${GCLOUD_CONFIG}"
+gcloud config configurations activate ${GCLOUD_CONFIG} 2>/dev/null || {
+  echo "❌ gcloud configuration '${GCLOUD_CONFIG}' not found."
+  echo "Run: gcloud config configurations create destockify --account=madhav.soni@bazar.earth --project=destockify"
+  exit 1
+}
+
+PROJECT_ID=$(gcloud config get-value project)
 REGION="us-central1"
-CONNECTION_NAME="destockify:us-central1:destockify-db"
+CONNECTION_NAME="${PROJECT_ID}:${REGION}:destockify-db"
 
 echo "🚀 Deploying Destockify to Google Cloud Platform"
 echo "Project: $PROJECT_ID"
 echo ""
-
-# Set project
-gcloud config set project $PROJECT_ID
 
 # Step 1: Deploy Backend API
 echo "📦 Deploying backend API..."
@@ -53,7 +59,7 @@ gcloud run deploy destockify-frontend \
   --cpu 1 \
   --max-instances 5 \
   --min-instances 0 \
-  --set-env-vars NODE_ENV=production,NEXT_PUBLIC_API_URL=$API_URL/api
+  --set-env-vars NODE_ENV=production,NEXT_PUBLIC_API_URL=https://api.findliquidation.com/api,NEXT_PUBLIC_BASE_URL=https://findliquidation.com
 
 FRONTEND_URL=$(gcloud run services describe destockify-frontend --region $REGION --format 'value(status.url)')
 echo "✅ Frontend deployed: $FRONTEND_URL"
@@ -66,8 +72,8 @@ cd ../api
 # Get frontend URL (already retrieved above, but get it again to be safe)
 FRONTEND_CUSTOM=$(gcloud run services describe destockify-frontend --region $REGION --format 'value(status.url)')
 
-# Build CORS origins list - include frontend URL and localhost for development
-CORS_ORIGINS="${FRONTEND_CUSTOM},http://localhost:3000"
+# Build CORS origins list - include custom domain, Cloud Run URL, and localhost for development
+CORS_ORIGINS="https://findliquidation.com,https://www.findliquidation.com,${FRONTEND_CUSTOM},http://localhost:3000"
 
 # Update CORS_ORIGINS using ^|^ delimiter with --set-env-vars
 # The ^|^ tells gcloud to use | as delimiter for KEY=VALUE pairs instead of comma
@@ -75,7 +81,7 @@ CORS_ORIGINS="${FRONTEND_CUSTOM},http://localhost:3000"
 # Format: --set-env-vars "^|^KEY1=VALUE1|KEY2=VALUE2|KEY3=VALUE3"
 gcloud run services update destockify-api \
   --region $REGION \
-  --set-env-vars "^|^NODE_ENV=production|GCP_PROJECT_ID=${PROJECT_ID}|CORS_ORIGINS=${CORS_ORIGINS}"
+  --set-env-vars "^|^NODE_ENV=production|GCP_PROJECT_ID=${PROJECT_ID}|CORS_ORIGINS=${CORS_ORIGINS}|FRONTEND_URL=https://findliquidation.com"
 
 echo "✅ CORS updated successfully"
 echo "   Allowed origins: ${CORS_ORIGINS}"

@@ -117,7 +117,7 @@ export const config: AppConfig = {
     credentialsPath: process.env.GOOGLE_APPLICATION_CREDENTIALS,
   },
   email: {
-    from: process.env.EMAIL_FROM || 'Destockify <noreply@destockify.app>',
+    from: process.env.EMAIL_FROM || 'FindLiquidation <noreply@findliquidation.com>',
     user: process.env.EMAIL_USER,
     password: process.env.EMAIL_PASSWORD,
   },
