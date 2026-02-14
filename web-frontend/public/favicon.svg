@@ -1,4 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#1e40af"/>
-  <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-weight="700" font-size="18">FL</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0D1117"/>
+      <stop offset="100%" stop-color="#212529"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <text x="240" y="380" text-anchor="middle" fill="white" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="800" font-size="380">F</text>
+  <circle cx="400" cy="130" r="40" fill="#246bfd"/>
 </svg>
