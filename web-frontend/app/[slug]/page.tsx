@@ -2,10 +2,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { api } from '@/lib/api';
+import { api, ApiError } from '@/lib/api';
 import { SupplierCard } from '@/components/supplier-card';
 import { FeaturedSuppliersCarousel } from '@/components/featured-suppliers-carousel';
-import { generateFAQSchema, generateBreadcrumbSchema, schemaToJsonLd } from '@/lib/schema';
+import {
+  generateFAQSchema,
+  generateBreadcrumbSchema,
+  generateCollectionPageSchema,
+  generateItemListSchema,
+  schemaToJsonLd
+} from '@/lib/schema';
 
 // Force dynamic rendering to avoid build-time API calls
 export const dynamic = 'force-dynamic';
@@ -30,37 +36,57 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   
   try {
     const page = await api.catalog.categoryPages.get(slug);
-    
+
+    const canonicalUrl = page.canonicalUrl || `https://findliquidation.com/${page.slug}`;
+    const ogTitle = page.ogTitle || `${page.metaTitle || page.pageTitle} | Find Liquidation`;
+    const ogDescription = page.ogDescription || page.metaDescription;
+    const ogImage = page.ogImage || page.heroImage;
+
     const metadata: Metadata = {
       title: {
         absolute: page.metaTitle || page.pageTitle,
       },
       description: page.metaDescription,
       alternates: {
-        canonical: page.canonicalUrl || `https://findliquidation.com/${page.slug}`,
+        canonical: canonicalUrl,
       },
       robots: {
         index: !page.noindex,
         follow: !page.nofollow,
       },
-    };
-
-    if (page.ogTitle || page.ogDescription || page.ogImage) {
-      metadata.openGraph = {
-        title: page.ogTitle || `${page.metaTitle || page.pageTitle} | Find Liquidation`,
-        description: page.ogDescription || page.metaDescription,
-        ...(page.ogImage && { images: [{ url: page.ogImage }] }),
-        url: `https://findliquidation.com/${page.slug}`,
+      openGraph: {
+        title: ogTitle,
+        description: ogDescription,
+        ...(ogImage && { images: [{ url: ogImage }] }),
+        url: canonicalUrl,
         siteName: 'Find Liquidation',
         type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: ogTitle,
+        description: ogDescription,
+        ...(ogImage && { images: [ogImage] }),
+      },
+    };
+
+    return metadata;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return {
+        title: 'Page Not Found',
+        robots: { index: false, follow: true },
       };
     }
 
-    return metadata;
-  } catch {
+    // Avoid transient noindex if the API is temporarily unavailable
     return {
-      title: 'Page Not Found',
-      robots: { index: false, follow: true },
+      title: 'Find Liquidation | Wholesale Liquidation Supplier Directory',
+      description: 'Find vetted liquidation suppliers, read verified buyer reviews, and learn how to scale your wholesale sourcing with confidence.',
+      alternates: {
+        canonical: `https://findliquidation.com/${slug}`,
+      },
+      robots: { index: true, follow: true },
     };
   }
 }
@@ -149,6 +175,15 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
 
   // Generate schemas
   const schemas: any[] = [];
+  const pageUrl = page.canonicalUrl || `https://findliquidation.com/${page.slug}`;
+
+  schemas.push(
+    generateCollectionPageSchema({
+      name: page.pageTitle,
+      url: pageUrl,
+      description: page.metaDescription || page.headline || null,
+    })
+  );
   
   if (page.enableBreadcrumbSchema) {
     schemas.push(generateBreadcrumbSchema([
@@ -170,6 +205,18 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
     } catch {
       // Invalid JSON, skip
     }
+  }
+
+  if (featuredSuppliers.length > 0) {
+    schemas.push(
+      generateItemListSchema({
+        url: pageUrl,
+        items: featuredSuppliers.map((supplier: any) => ({
+          name: supplier.name,
+          url: `https://findliquidation.com/suppliers/${supplier.slug}`,
+        })),
+      })
+    );
   }
 
   const contentBlocks = Array.isArray(page.contentBlocks) ? page.contentBlocks : [];
@@ -419,4 +466,3 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
     </>
   );
 }
-

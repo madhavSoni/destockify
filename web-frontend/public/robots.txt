@@ -7,7 +7,8 @@ Allow: /
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
-Disallow: /_next/
+# Allow Next.js assets for proper rendering
+Allow: /_next/
 
 # Block query parameters that create duplicate content
 Disallow: /*?sort=*

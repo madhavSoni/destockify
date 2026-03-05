@@ -3,7 +3,18 @@
  * https://schema.org/
  */
 
-import { WithContext, WebSite, Organization, LocalBusiness, Review, BreadcrumbList, FAQPage, Article } from 'schema-dts';
+import {
+  WithContext,
+  WebSite,
+  Organization,
+  LocalBusiness,
+  Review,
+  BreadcrumbList,
+  FAQPage,
+  Article,
+  CollectionPage,
+  ItemList
+} from 'schema-dts';
 
 /**
  * HOMEPAGE SCHEMA
@@ -165,6 +176,45 @@ export function generateFAQSchema(faqs: any[]): WithContext<FAQPage> {
         '@type': 'Answer',
         text: faq.answer
       }
+    }))
+  };
+}
+
+/**
+ * COLLECTION PAGE SCHEMA
+ * Usage: Category/brand pages (e.g. /[slug])
+ */
+export function generateCollectionPageSchema(options: {
+  name: string;
+  url: string;
+  description?: string | null;
+}): WithContext<CollectionPage> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: options.name,
+    url: options.url,
+    ...(options.description ? { description: options.description } : {})
+  };
+}
+
+/**
+ * ITEM LIST SCHEMA
+ * Usage: Lists of suppliers on collection pages
+ */
+export function generateItemListSchema(options: {
+  url: string;
+  items: Array<{ name: string; url: string }>;
+}): WithContext<ItemList> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    url: options.url,
+    itemListElement: options.items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      url: item.url
     }))
   };
 }

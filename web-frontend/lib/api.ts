@@ -40,6 +40,16 @@ function buildQueryString(params?: Record<string, unknown>) {
   return queryString ? `?${queryString}` : '';
 }
 
+export class ApiError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
 async function fetchFromApi<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
   const { revalidate = 60, cache, method = 'GET', body, headers = {} } = options;
 
@@ -58,7 +68,10 @@ async function fetchFromApi<T>(endpoint: string, options: FetchOptions = {}): Pr
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ message: response.statusText }));
-    throw new Error(errorData.message || `API request failed ${response.status}: ${response.statusText}`);
+    throw new ApiError(
+      response.status,
+      errorData.message || `API request failed ${response.status}: ${response.statusText}`
+    );
   }
 
   if (response.status === 204) {
