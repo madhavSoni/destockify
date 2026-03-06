@@ -3,6 +3,11 @@ import { Metadata } from 'next';
 import { api } from '@/lib/api';
 import { GuideCard } from '@/components/guide-card';
 import { SectionHeading } from '@/components/section-heading';
+import {
+  generateCollectionPageSchema,
+  generateBreadcrumbSchema,
+  schemaToJsonLd,
+} from '@/lib/schema';
 
 export const metadata: Metadata = {
   title: 'Liquidation Buying Guides',
@@ -15,13 +20,38 @@ export const metadata: Metadata = {
     siteName: 'Find Liquidation',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Liquidation Buying Guides | Find Liquidation',
+    description: 'Practical playbooks covering supplier vetting, truckload modeling, and risk mitigation.',
+  },
 };
 
 export default async function GuidesPage() {
   // Guides API not yet implemented
   const guides: any[] = [];
 
+  const collectionSchema = generateCollectionPageSchema({
+    name: 'Liquidation Buying Guides',
+    url: 'https://findliquidation.com/guides',
+    description: 'Practical playbooks from Find Liquidation sourcing strategists covering supplier vetting, truckload modeling, and risk mitigation.',
+  });
+
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Guides', url: '/guides' },
+  ]);
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(collectionSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(breadcrumbSchema) }}
+      />
     <div className="bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <SectionHeading
@@ -42,5 +72,6 @@ export default async function GuidesPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

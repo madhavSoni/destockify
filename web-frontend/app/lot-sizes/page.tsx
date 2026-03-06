@@ -2,6 +2,11 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { Patrick_Hand } from 'next/font/google';
 import { api } from '@/lib/api';
+import {
+  generateCollectionPageSchema,
+  generateBreadcrumbSchema,
+  schemaToJsonLd,
+} from '@/lib/schema';
 
 export const metadata: Metadata = {
   title: 'Buy Wholesale Merchandise by Lot Size',
@@ -14,6 +19,11 @@ export const metadata: Metadata = {
     siteName: 'Find Liquidation',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Buy Wholesale Merchandise by Lot Size | Find Liquidation',
+    description: 'Compare liquidation lot sizes from micro-lots to full truckloads.',
+  },
 };
 
 const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
@@ -21,6 +31,17 @@ const hand = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 export default async function LotSizesPage() {
   // Lot sizes API not yet implemented
   const lotSizes: any[] = [];
+
+  const collectionSchema = generateCollectionPageSchema({
+    name: 'Buy Wholesale Merchandise by Lot Size',
+    url: 'https://findliquidation.com/lot-sizes',
+    description: 'Compare liquidation lot sizes including micro-lots, pallets, partial truckloads, and full truckloads for your resale business.',
+  });
+
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Lot Sizes', url: '/lot-sizes' },
+  ]);
 
   // tiny icon map for the sketch cards
   const iconFor = (name: string) => {
@@ -33,6 +54,15 @@ export default async function LotSizesPage() {
   };
 
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(collectionSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(breadcrumbSchema) }}
+      />
     <div className="bg-white">
       <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         {/* Heading like the other hand-drawn pages */}
@@ -87,5 +117,6 @@ export default async function LotSizesPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

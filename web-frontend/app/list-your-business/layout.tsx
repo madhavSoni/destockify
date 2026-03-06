@@ -11,6 +11,11 @@ export const metadata: Metadata = {
     siteName: 'Find Liquidation',
     type: 'website',
   },
+  twitter: {
+    card: 'summary',
+    title: 'List Your Business | Find Liquidation',
+    description: 'Get your liquidation business discovered by buyers on Find Liquidation.',
+  },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

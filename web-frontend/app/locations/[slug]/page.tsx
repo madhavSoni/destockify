@@ -4,6 +4,12 @@ import { Metadata } from 'next';
 import { api } from '@/lib/api';
 import { SupplierCard } from '@/components/supplier-card';
 import { SectionHeading } from '@/components/section-heading';
+import {
+  generateCollectionPageSchema,
+  generateBreadcrumbSchema,
+  generateItemListSchema,
+  schemaToJsonLd,
+} from '@/lib/schema';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -62,7 +68,46 @@ export default async function LocationDetailPage({ params }: { params: Promise<{
     notFound();
   }
 
+  const locationUrl = `https://findliquidation.com/locations/${region.slug}`;
+
+  const collectionSchema = generateCollectionPageSchema({
+    name: `Liquidation Truckloads in ${region.name}`,
+    url: locationUrl,
+    description: `Find verified liquidation suppliers in ${region.name}. Buy returns, overstock, and wholesale truckloads near you.`,
+  });
+
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Locations', url: '/locations' },
+    { name: region.name, url: `/locations/${region.slug}` },
+  ]);
+
+  const itemListSchema = suppliersResult.items.length > 0
+    ? generateItemListSchema({
+        url: locationUrl,
+        items: suppliersResult.items.map((supplier: any) => ({
+          name: supplier.name,
+          url: `https://findliquidation.com/suppliers/${supplier.slug}`,
+        })),
+      })
+    : null;
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(collectionSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(breadcrumbSchema) }}
+      />
+      {itemListSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: schemaToJsonLd(itemListSchema) }}
+        />
+      )}
     <div className="bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
@@ -150,5 +195,6 @@ export default async function LocationDetailPage({ params }: { params: Promise<{
         </section>
       </div>
     </div>
+    </>
   );
 }

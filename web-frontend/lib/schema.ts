@@ -240,6 +240,76 @@ export function generateBreadcrumbSchema(items: Array<{ name: string; url: strin
 }
 
 /**
+ * CATEGORY PAGE ARTICLE SCHEMA
+ * Rich Article schema for content-heavy category pages (e.g. /wholesale-pallets, /amazon-liquidation)
+ * These pages have substantial written content: hero text, content blocks, FAQs
+ */
+export function generateCategoryArticleSchema(page: {
+  pageTitle: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  slug: string;
+  canonicalUrl?: string | null;
+  heroH1?: string | null;
+  heroText?: string | null;
+  heroImage?: string | null;
+  heroImageAlt?: string | null;
+  contentBlocks?: Array<{ h2?: string; text?: string; image?: string; image_alt?: string }>;
+  createdAt?: string;
+  updatedAt?: string;
+  topicCategory?: string | null;
+}): WithContext<Article> {
+  const url = page.canonicalUrl || `https://findliquidation.com/${page.slug}`;
+
+  const images: string[] = [];
+  if (page.heroImage) images.push(page.heroImage);
+  if (page.contentBlocks) {
+    for (const block of page.contentBlocks) {
+      if (block.image) images.push(block.image);
+    }
+  }
+
+  // Build article sections from content blocks for richer indexing
+  const articleSections: string[] = [];
+  if (page.contentBlocks) {
+    for (const block of page.contentBlocks) {
+      if (block.h2) articleSections.push(block.h2);
+    }
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: page.heroH1 || page.metaTitle || page.pageTitle,
+    description: page.metaDescription || page.heroText || '',
+    url,
+    ...(page.createdAt && { datePublished: page.createdAt }),
+    ...(page.updatedAt && { dateModified: page.updatedAt }),
+    author: {
+      '@type': 'Organization',
+      name: 'Find Liquidation',
+      url: 'https://findliquidation.com',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Find Liquidation',
+      url: 'https://findliquidation.com',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://findliquidation.com/favicon.svg',
+      },
+    },
+    ...(images.length > 0 && { image: images }),
+    ...(articleSections.length > 0 && { articleSection: articleSections.join(', ') }),
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
+    inLanguage: 'en-US',
+  };
+}
+
+/**
  * Helper to safely stringify schema for JSON-LD script tag
  */
 export function schemaToJsonLd(schema: WithContext<any>): string {

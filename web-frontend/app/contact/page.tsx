@@ -12,6 +12,11 @@ export const metadata: Metadata = {
     siteName: 'Find Liquidation',
     type: 'website',
   },
+  twitter: {
+    card: 'summary',
+    title: 'Contact Us | Find Liquidation',
+    description: 'Get in touch with the Find Liquidation sourcing team for questions about suppliers, freight, or listing your liquidation program.',
+  },
 };
 
 export default function ContactPage() {

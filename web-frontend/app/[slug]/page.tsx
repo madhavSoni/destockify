@@ -10,6 +10,7 @@ import {
   generateBreadcrumbSchema,
   generateCollectionPageSchema,
   generateItemListSchema,
+  generateCategoryArticleSchema,
   schemaToJsonLd
 } from '@/lib/schema';
 
@@ -184,13 +185,34 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
       description: page.metaDescription || page.headline || null,
     })
   );
-  
-  if (page.enableBreadcrumbSchema) {
-    schemas.push(generateBreadcrumbSchema([
-      { name: 'Home', url: '/' },
-      { name: page.pageTitle, url: `/${page.slug}` },
-    ]));
+
+  // Rich Article schema for content-heavy category pages
+  const hasContent = (page.contentBlocks && Array.isArray(page.contentBlocks) && page.contentBlocks.length > 0) || page.heroText;
+  if (hasContent) {
+    schemas.push(
+      generateCategoryArticleSchema({
+        pageTitle: page.pageTitle,
+        metaTitle: page.metaTitle,
+        metaDescription: page.metaDescription,
+        slug: page.slug,
+        canonicalUrl: page.canonicalUrl,
+        heroH1: page.heroH1,
+        heroText: page.heroText,
+        heroImage: page.heroImage,
+        heroImageAlt: page.heroImageAlt,
+        contentBlocks: page.contentBlocks,
+        createdAt: page.createdAt,
+        updatedAt: page.updatedAt,
+        topicCategory: page.topicCategory,
+      })
+    );
   }
+
+  // Breadcrumb always enabled for SEO
+  schemas.push(generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: page.pageTitle, url: `/${page.slug}` },
+  ]));
 
   if (page.enableFaqSchema && page.faqs && Array.isArray(page.faqs) && page.faqs.length > 0) {
     schemas.push(generateFAQSchema(page.faqs));

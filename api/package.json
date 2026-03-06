@@ -30,7 +30,10 @@
     "seo:apply": "ts-node -r tsconfig-paths/register seed-scripts/seo-content-generator/apply-generated.ts",
     "seo:apply:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/seo-content-generator/apply-generated.ts",
     "set:suppliers": "ts-node -r tsconfig-paths/register seed-scripts/set-consistent-suppliers.ts",
-    "set:suppliers:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/set-consistent-suppliers.ts"
+    "set:suppliers:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register seed-scripts/set-consistent-suppliers.ts",
+    "seo:update": "ts-node -r tsconfig-paths/register scripts/seo-content-updates.ts",
+    "seo:update:dry": "ts-node -r tsconfig-paths/register scripts/seo-content-updates.ts --dry-run",
+    "seo:update:prod": "dotenv -e .env.prod -- ts-node -r tsconfig-paths/register scripts/seo-content-updates.ts"
   },
   "prisma": {
     "seed": "ts-node -r tsconfig-paths/register prisma/seed.ts"

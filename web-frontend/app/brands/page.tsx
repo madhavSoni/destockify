@@ -2,6 +2,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { api } from '@/lib/api';
+import {
+  generateCollectionPageSchema,
+  generateBreadcrumbSchema,
+  generateItemListSchema,
+  schemaToJsonLd,
+} from '@/lib/schema';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +24,11 @@ export const metadata: Metadata = {
     siteName: 'Find Liquidation',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Brand Liquidation Pages – Buy from Major Retailers | Find Liquidation',
+    description: 'Browse liquidation pallets and truckloads by retailer brand. Find Amazon, Walmart, Target, Home Depot, and other major retailer liquidation inventory from verified suppliers.',
+  },
 };
 
 export default async function BrandsPage() {
@@ -25,7 +36,43 @@ export default async function BrandsPage() {
   const brandPages = allPages.filter((page: any) => page.topicCategory === 'retailer');
 
 
+  const collectionSchema = generateCollectionPageSchema({
+    name: 'Brand Liquidation Pages – Buy from Major Retailers',
+    url: 'https://findliquidation.com/brands',
+    description: 'Browse liquidation pallets and truckloads by retailer brand. Find Amazon, Walmart, Target, Home Depot, and other major retailer liquidation inventory from verified suppliers.',
+  });
+
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Brands', url: '/brands' },
+  ]);
+
+  const itemListSchema = brandPages.length > 0
+    ? generateItemListSchema({
+        url: 'https://findliquidation.com/brands',
+        items: brandPages.slice().reverse().map((page: any) => ({
+          name: page.pageTitle,
+          url: `https://findliquidation.com/${page.slug}`,
+        })),
+      })
+    : null;
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(collectionSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(breadcrumbSchema) }}
+      />
+      {itemListSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: schemaToJsonLd(itemListSchema) }}
+        />
+      )}
     <div className="bg-white">
       <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
         {/* Heading */}
@@ -82,6 +129,7 @@ export default async function BrandsPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

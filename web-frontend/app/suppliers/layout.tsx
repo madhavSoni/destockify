@@ -1,5 +1,7 @@
+import Link from 'next/link';
 import { Metadata } from 'next';
-import { generateFAQSchema, schemaToJsonLd } from '@/lib/schema';
+import { api } from '@/lib/api';
+import { generateFAQSchema, generateBreadcrumbSchema, generateCollectionPageSchema, generateItemListSchema, schemaToJsonLd } from '@/lib/schema';
 
 export const metadata: Metadata = {
   title: 'Buy Liquidation Truckloads & Pallets Near You',
@@ -22,11 +24,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SuppliersLayout({
+export default async function SuppliersLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Fetch all suppliers (API caps at 50 per page, so paginate)
+  const firstPage = await api.suppliers.list({ limit: 50 });
+  let allSuppliers = [...firstPage.items];
+  if (firstPage.nextCursor) {
+    const secondPage = await api.suppliers.list({ limit: 50, cursor: firstPage.nextCursor });
+    allSuppliers = [...allSuppliers, ...secondPage.items];
+  }
+  allSuppliers.sort((a, b) => a.name.localeCompare(b.name));
+
   // FAQ data for schema (matches the FAQs in the page component)
   const faqs = [
     {
@@ -51,6 +62,24 @@ export default function SuppliersLayout({
     }
   ];
   const faqSchema = generateFAQSchema(faqs);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Suppliers', url: '/suppliers' },
+  ]);
+  const collectionSchema = generateCollectionPageSchema({
+    name: 'Liquidation Supplier Directory',
+    url: 'https://findliquidation.com/suppliers',
+    description: 'Browse hundreds of verified liquidators and wholesalers across the United States. Connect with suppliers offering returned, overstock, and brand-new merchandise.',
+  });
+  const itemListSchema = allSuppliers.length > 0
+    ? generateItemListSchema({
+        url: 'https://findliquidation.com/suppliers',
+        items: allSuppliers.map((s) => ({
+          name: s.name,
+          url: `https://findliquidation.com/suppliers/${s.slug}`,
+        })),
+      })
+    : null;
 
   return (
     <>
@@ -59,7 +88,41 @@ export default function SuppliersLayout({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: schemaToJsonLd(faqSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(collectionSchema) }}
+      />
+      {itemListSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: schemaToJsonLd(itemListSchema) }}
+        />
+      )}
       {children}
+      {/* Server-rendered supplier links for SEO crawlability */}
+      <nav aria-label="All suppliers" className="border-t border-slate-200 bg-slate-50">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+            All Liquidation Suppliers
+          </h2>
+          <ul className="mt-4 columns-2 gap-x-8 text-sm sm:columns-3 lg:columns-4">
+            {allSuppliers.map((supplier) => (
+              <li key={supplier.slug} className="mb-1">
+                <Link
+                  href={`/suppliers/${supplier.slug}`}
+                  className="text-slate-600 hover:text-blue-600 hover:underline"
+                >
+                  {supplier.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
     </>
   );
 }

@@ -4,6 +4,12 @@ import { Metadata } from 'next';
 import { StateSelector } from './state-selector';
 import { InteractiveMap } from './interactive-map';
 import { StateCards } from '@/components/state-cards';
+import {
+  generateCollectionPageSchema,
+  generateBreadcrumbSchema,
+  generateFAQSchema,
+  schemaToJsonLd,
+} from '@/lib/schema';
 
 export const metadata: Metadata = {
   title: 'Liquidation Suppliers by Location',
@@ -16,10 +22,62 @@ export const metadata: Metadata = {
     siteName: 'Find Liquidation',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Liquidation Suppliers by Location | Find Liquidation',
+    description: 'Find wholesale liquidation pallets and truckloads by state across all 50 US states.',
+  },
 };
 
 export default async function LocationsPage() {
+  const collectionSchema = generateCollectionPageSchema({
+    name: 'Liquidation Suppliers by Location',
+    url: 'https://findliquidation.com/locations',
+    description: 'Find wholesale liquidation pallets and truckloads by state. Browse suppliers across all 50 US states.',
+  });
+
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Locations', url: '/locations' },
+  ]);
+
+  const faqSchema = generateFAQSchema([
+    {
+      question: 'How do I find suppliers in my state?',
+      answer: 'Use the "Shop by State" dropdown above to filter suppliers by location. You can also browse by region or search for specific cities. Each supplier profile shows their warehouse locations and service areas.',
+    },
+    {
+      question: 'What types of products can I buy by location?',
+      answer: 'Suppliers offer a wide variety of liquidation merchandise including clothing, electronics, home goods, toys, and more. Each supplier profile lists their available categories and minimum order requirements. Filter by category to find specific product types in your area.',
+    },
+    {
+      question: 'Do suppliers ship nationwide or only locally?',
+      answer: 'Shipping policies vary by supplier. Some offer nationwide shipping, while others prefer local pickup or have specific service areas. Check each supplier\'s profile for their logistics notes, which detail shipping options, freight costs, and pickup availability.',
+    },
+    {
+      question: "What's the minimum order quantity?",
+      answer: 'Minimum order requirements vary significantly by supplier. Some accept pallet orders (typically 500-1,500 units), while others require full truckloads. Each supplier profile displays their minimum order and lot size options. Contact suppliers directly for specific requirements.',
+    },
+    {
+      question: 'How do I contact suppliers in my area?',
+      answer: 'Each supplier profile includes contact information including email, phone, and website. You can reach out directly through their listed contact methods. Many suppliers also have inquiry forms on their websites for bulk order requests.',
+    },
+  ]);
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(collectionSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schemaToJsonLd(faqSchema) }}
+      />
     <div className="bg-white">
       <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
         {/* Title */}
@@ -222,5 +280,6 @@ export default async function LocationsPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }
