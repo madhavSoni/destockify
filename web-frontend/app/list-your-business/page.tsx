@@ -49,7 +49,7 @@ export default function ListYourBusinessPage() {
         await api.submissions.create(payload, authToken);
       } else {
         // For anonymous submissions, show message to contact directly
-        setError('Please contact listings@findliquidation.com to submit a listing, or log in to submit online.');
+        setError('Please contact findliquidationteam@gmail.com to submit a listing, or log in to submit online.');
         setIsSubmitting(false);
         return;
       }
@@ -313,7 +313,7 @@ export default function ListYourBusinessPage() {
                 Close
               </button>
               <a
-                href="mailto:listings@findliquidation.com?subject=Claim My Listing"
+                href="mailto:findliquidationteam@gmail.com?subject=Claim My Listing"
                 className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
               >
                 Email Us

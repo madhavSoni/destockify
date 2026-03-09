@@ -319,7 +319,7 @@ export async function sendPasswordResetEmail(email: string, resetToken: string) 
 }
 
 export async function sendSubmissionEmail(submission: any) {
-  const adminEmail = process.env.ADMIN_EMAIL || 'listings@findliquidation.com';
+  const adminEmail = process.env.ADMIN_EMAIL || 'findliquidationteam@gmail.com';
   
   try {
     await transporter.sendMail({

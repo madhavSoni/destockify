@@ -168,7 +168,7 @@ function SubmitListingForm() {
         } else {
           // For anonymous submissions, we'll need backend support
           // For now, show an error suggesting they contact directly
-          setError('Please contact listings@findliquidation.com to submit a listing, or log in to submit online.');
+          setError('Please contact findliquidationteam@gmail.com to submit a listing, or log in to submit online.');
           setIsSubmitting(false);
           return;
         }
