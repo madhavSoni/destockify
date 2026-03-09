@@ -197,7 +197,10 @@ router.put('/admin/:reviewId', authenticateToken, isAdmin, async (req: AuthReque
 // Admin: Create review
 router.post('/admin', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
   try {
-    const result = await adminCreateReview(req.body);
+    const result = await adminCreateReview({
+      ...req.body,
+      customerId: req.body.customerId || req.user!.customerId,
+    });
     res.status(201).json(result);
   } catch (error: any) {
     res.status(400).json({ message: error.message ?? 'Unable to create review' });

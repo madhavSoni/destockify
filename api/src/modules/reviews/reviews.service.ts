@@ -560,7 +560,7 @@ export async function adminCreateReview(payload: {
 
   const data: any = {
     supplierId,
-    customerId: customerId || 1, // Use a default customer if none provided (you may want to create a system customer)
+    customerId: customerId, // Provided by route handler (admin's own ID as fallback)
     author, // reviewer_name
     ratingOverall: Math.round(ratingOverall), // Single 1-5 integer rating
     body, // review_text

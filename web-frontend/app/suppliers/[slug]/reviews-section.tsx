@@ -300,7 +300,7 @@ export function ReviewsSection({
               <p className="font-serif text-slate-700 leading-relaxed whitespace-pre-wrap italic">{review.body}</p>
 
               <div className="mt-4 text-sm text-slate-600">
-                By {user?.firstName} {user?.lastName} • {new Date(review.createdAt).toLocaleDateString()}
+                By {review.author} • {new Date(review.createdAt).toLocaleDateString()}
               </div>
             </div>
           )}
