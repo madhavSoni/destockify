@@ -262,22 +262,8 @@ export default function ReviewsPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this review?')) return;
-    if (!authToken) return;
+  const handleDeleteFromState = (id: number) => {
     setReviews((prev) => prev.filter((r) => r.id !== id));
-    try {
-      await api.reviews.adminDelete(id, authToken);
-    } catch (error) {
-      if (authToken) {
-        api.reviews
-          .getAllAdmin(authToken, { status: statusFilter, limit: 100 })
-          .then((result) => setReviews(result.items ?? []))
-          .catch(console.error);
-      }
-      alert('Failed to delete review');
-      console.error(error);
-    }
   };
 
   const handleUpdateReview = (updatedReview: ReviewItem) => {
@@ -532,7 +518,7 @@ export default function ReviewsPage() {
                                 setEditingReviewId(null);
                                 handleUpdateReview(updated);
                               }}
-                              onDelete={handleDelete}
+                              onDelete={handleDeleteFromState}
                               onApprove={handleApprove}
                               onUnapprove={handleUnapprove}
                             />
@@ -571,7 +557,7 @@ export default function ReviewsPage() {
                     setEditingReviewId(null);
                     handleUpdateReview(updated);
                   }}
-                  onDelete={handleDelete}
+                  onDelete={handleDeleteFromState}
                   onApprove={handleApprove}
                   onUnapprove={handleUnapprove}
                 />
@@ -637,6 +623,7 @@ function ReviewCard({
   const handleSave = async () => {
     setLoading(true);
     const dateForAPI = formData.createdAt || localReview.createdAt.split('T')[0];
+    // Force UTC to prevent timezone shifts when converting date string to ISO
     const dateISO = formData.createdAt
       ? new Date(formData.createdAt + 'T00:00:00.000Z').toISOString()
       : localReview.createdAt;
@@ -843,7 +830,7 @@ function ReviewCard({
             <div className="mt-2 flex gap-2">
               {localReview.images.map((img, idx) => (
                 <img
-                  key={idx}
+                  key={img}
                   src={img}
                   alt={`Review image ${idx + 1}`}
                   className="h-16 w-16 rounded-md object-cover ring-1 ring-slate-200"
