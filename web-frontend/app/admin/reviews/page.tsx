@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { SupplierSelector } from '@/components/SupplierSelector';
@@ -26,6 +27,18 @@ type ReviewItem = {
   };
 };
 
+type ViewMode = 'flat' | 'grouped';
+
+type SupplierGroup = {
+  supplierId: number;
+  supplierName: string;
+  supplierSlug: string;
+  reviews: ReviewItem[];
+  totalCount: number;
+  pendingCount: number;
+  averageRating: number;
+};
+
 export default function ReviewsPage() {
   const { authToken } = useAuth();
   const searchParams = useSearchParams();
@@ -38,23 +51,32 @@ export default function ReviewsPage() {
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [suppliersLoading, setSuppliersLoading] = useState(false);
   const [preselectedSupplierId, setPreselectedSupplierId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('grouped');
+  const [supplierSearch, setSupplierSearch] = useState('');
+  const [expandedSuppliers, setExpandedSuppliers] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (authToken) {
       api.reviews
         .getAllAdmin(authToken, { status: statusFilter, limit: 100 })
-        .then((result) => setReviews(result.items))
+        .then((result) => setReviews(result.items ?? []))
         .catch(console.error)
         .finally(() => setLoading(false));
     }
   }, [authToken, statusFilter]);
 
-  // Check for supplier ID in URL params
+  // Check for supplier ID or status in URL params
   useEffect(() => {
     const supplierId = searchParams.get('supplierId');
     if (supplierId) {
       setPreselectedSupplierId(supplierId);
       setIsCreating(true);
+    }
+    const status = searchParams.get('status');
+    if (status === 'pending') {
+      setStatusFilter('pending');
+    } else if (status === 'approved') {
+      setStatusFilter('approved');
     }
   }, [searchParams]);
 
@@ -70,18 +92,88 @@ export default function ReviewsPage() {
     }
   }, [authToken, suppliers.length]);
 
+  // Build grouped data
+  const supplierGroups = useMemo((): SupplierGroup[] => {
+    const groupMap = new Map<number, ReviewItem[]>();
+    for (const review of reviews) {
+      const sid = review.supplier.id;
+      const existing = groupMap.get(sid);
+      if (existing) {
+        existing.push(review);
+      } else {
+        groupMap.set(sid, [review]);
+      }
+    }
+
+    const groups: SupplierGroup[] = [];
+    for (const [supplierId, groupReviews] of groupMap) {
+      const first = groupReviews[0];
+      const pendingCount = groupReviews.filter((r) => !r.isApproved).length;
+      const avgRating = groupReviews.reduce((sum, r) => sum + r.ratingOverall, 0) / groupReviews.length;
+      groups.push({
+        supplierId,
+        supplierName: first.supplier.name,
+        supplierSlug: first.supplier.slug,
+        reviews: groupReviews,
+        totalCount: groupReviews.length,
+        pendingCount,
+        averageRating: Math.round(avgRating * 10) / 10,
+      });
+    }
+
+    // Sort: pending reviews desc, then total reviews desc
+    groups.sort((a, b) => {
+      if (b.pendingCount !== a.pendingCount) return b.pendingCount - a.pendingCount;
+      return b.totalCount - a.totalCount;
+    });
+
+    return groups;
+  }, [reviews]);
+
+  // Filter groups by supplier search
+  const filteredGroups = useMemo(() => {
+    if (!supplierSearch.trim()) return supplierGroups;
+    const term = supplierSearch.toLowerCase();
+    return supplierGroups.filter((g) => g.supplierName.toLowerCase().includes(term));
+  }, [supplierGroups, supplierSearch]);
+
+  // Auto-expand new groups as they appear
+  useEffect(() => {
+    if (supplierGroups.length === 0) return;
+    setExpandedSuppliers((prev) => {
+      const next = new Set(prev);
+      let changed = false;
+      for (const g of supplierGroups) {
+        if (!next.has(g.supplierId)) {
+          next.add(g.supplierId);
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [supplierGroups]);
+
+  const toggleSupplierExpanded = (supplierId: number) => {
+    setExpandedSuppliers((prev) => {
+      const next = new Set(prev);
+      if (next.has(supplierId)) {
+        next.delete(supplierId);
+      } else {
+        next.add(supplierId);
+      }
+      return next;
+    });
+  };
+
   const handleApprove = async (id: number) => {
     if (!authToken) return;
-    // Optimistic update - use functional update to ensure we have latest state
-    setReviews((prevReviews) => {
-      const previousState = prevReviews.find(r => r.id === id);
-      return prevReviews.map((r) => (r.id === id ? { ...r, isApproved: true, approvedAt: new Date().toISOString() } : r));
-    });
+    setReviews((prevReviews) =>
+      prevReviews.map((r) => (r.id === id ? { ...r, isApproved: true } : r))
+    );
     try {
       await api.reviews.approve(id, authToken);
     } catch (error) {
-      // Revert on error
-      setReviews((prevReviews) => prevReviews.map((r) => (r.id === id ? { ...r, isApproved: false, approvedAt: null } : r)));
+      setReviews((prevReviews) => prevReviews.map((r) => (r.id === id ? { ...r, isApproved: false } : r)));
       alert('Failed to approve review');
       console.error(error);
     }
@@ -89,16 +181,14 @@ export default function ReviewsPage() {
 
   const handleUnapprove = async (id: number) => {
     if (!authToken) return;
-    // Optimistic update
-    setReviews((prevReviews) => prevReviews.map((r) => (r.id === id ? { ...r, isApproved: false, approvedAt: null } : r)));
+    setReviews((prevReviews) => prevReviews.map((r) => (r.id === id ? { ...r, isApproved: false } : r)));
     try {
       await api.reviews.unapprove(id, authToken);
     } catch (error) {
-      // Revert on error - we'll need to refetch to get accurate state
       if (authToken) {
         api.reviews
           .getAllAdmin(authToken, { status: statusFilter, limit: 100 })
-          .then((result) => setReviews(result.items))
+          .then((result) => setReviews(result.items ?? []))
           .catch(console.error);
       }
       alert('Failed to unapprove review');
@@ -109,16 +199,14 @@ export default function ReviewsPage() {
   const handleDelete = async (id: number) => {
     if (!confirm('Are you sure you want to delete this review?')) return;
     if (!authToken) return;
-    // Optimistic update
     setReviews((prevReviews) => prevReviews.filter((r) => r.id !== id));
     try {
       await api.reviews.adminDelete(id, authToken);
     } catch (error) {
-      // Revert on error - refetch to get accurate state
       if (authToken) {
         api.reviews
           .getAllAdmin(authToken, { status: statusFilter, limit: 100 })
-          .then((result) => setReviews(result.items))
+          .then((result) => setReviews(result.items ?? []))
           .catch(console.error);
       }
       alert('Failed to delete review');
@@ -146,6 +234,42 @@ export default function ReviewsPage() {
     }
   };
 
+  const openCreateForSupplier = (supplierId: number) => {
+    setPreselectedSupplierId(String(supplierId));
+    setIsCreating(true);
+  };
+
+  const reviewRowProps = (review: ReviewItem) => ({
+    review,
+    authToken: authToken!,
+    isEditing: editingReviewId === review.id,
+    isExpanded: expandedReviewId === review.id,
+    onEdit: () => {
+      setEditingReviewId(review.id);
+      setExpandedReviewId(review.id);
+    },
+    onCancel: () => {
+      setEditingReviewId(null);
+      setExpandedReviewId(null);
+    },
+    onSave: (updatedReview: ReviewItem) => {
+      setEditingReviewId(null);
+      setExpandedReviewId(null);
+      handleUpdateReview(updatedReview);
+    },
+    onDelete: handleDelete,
+    onApprove: handleApprove,
+    onUnapprove: handleUnapprove,
+    onToggleExpand: () => {
+      if (expandedReviewId === review.id) {
+        setExpandedReviewId(null);
+        setEditingReviewId(null);
+      } else {
+        setExpandedReviewId(review.id);
+      }
+    },
+  });
+
   if (loading) {
     return <div className="text-slate-600">Loading reviews...</div>;
   }
@@ -165,34 +289,60 @@ export default function ReviewsPage() {
         </button>
       </div>
 
-      <div className="flex gap-4">
-        <button
-          onClick={() => setStatusFilter(undefined)}
-          className={`rounded-lg px-4 py-2 text-sm font-medium ${statusFilter === undefined
-              ? 'bg-blue-600 text-white'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+      {/* Filters & View Toggle */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setStatusFilter(undefined)}
+            className={`rounded-lg px-4 py-2 text-sm font-medium ${statusFilter === undefined
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setStatusFilter('approved')}
+            className={`rounded-lg px-4 py-2 text-sm font-medium ${statusFilter === 'approved'
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+          >
+            Approved
+          </button>
+          <button
+            onClick={() => setStatusFilter('pending')}
+            className={`rounded-lg px-4 py-2 text-sm font-medium ${statusFilter === 'pending'
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+          >
+            Pending
+          </button>
+        </div>
+
+        <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1">
+          <button
+            onClick={() => setViewMode('grouped')}
+            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              viewMode === 'grouped'
+                ? 'bg-slate-900 text-white'
+                : 'text-slate-600 hover:bg-slate-100'
             }`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setStatusFilter('approved')}
-          className={`rounded-lg px-4 py-2 text-sm font-medium ${statusFilter === 'approved'
-              ? 'bg-blue-600 text-white'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+          >
+            By Supplier
+          </button>
+          <button
+            onClick={() => setViewMode('flat')}
+            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              viewMode === 'flat'
+                ? 'bg-slate-900 text-white'
+                : 'text-slate-600 hover:bg-slate-100'
             }`}
-        >
-          Approved
-        </button>
-        <button
-          onClick={() => setStatusFilter('pending')}
-          className={`rounded-lg px-4 py-2 text-sm font-medium ${statusFilter === 'pending'
-              ? 'bg-blue-600 text-white'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
-        >
-          Pending
-        </button>
+          >
+            Flat List
+          </button>
+        </div>
       </div>
 
       {isCreating && (
@@ -210,74 +360,165 @@ export default function ReviewsPage() {
         />
       )}
 
-      <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-700">
-                  Author
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-700">
-                  Rating
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-700">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-700">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-700">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 bg-white">
-              {reviews.length === 0 && !isCreating ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-slate-500">
-                    No reviews found
-                  </td>
-                </tr>
-              ) : (
-                reviews.map((review) => (
-                  <ReviewRow
-                    key={review.id}
-                    review={review}
-                    authToken={authToken!}
-                    isEditing={editingReviewId === review.id}
-                    isExpanded={expandedReviewId === review.id}
-                    onEdit={() => {
-                      setEditingReviewId(review.id);
-                      setExpandedReviewId(review.id);
-                    }}
-                    onCancel={() => {
-                      setEditingReviewId(null);
-                      setExpandedReviewId(null);
-                    }}
-                    onSave={(updatedReview) => {
-                      setEditingReviewId(null);
-                      setExpandedReviewId(null);
-                      handleUpdateReview(updatedReview);
-                    }}
-                    onDelete={handleDelete}
-                    onApprove={handleApprove}
-                    onUnapprove={handleUnapprove}
-                    onToggleExpand={() => {
-                      if (expandedReviewId === review.id) {
-                        setExpandedReviewId(null);
-                        setEditingReviewId(null);
-                      } else {
-                        setExpandedReviewId(review.id);
-                      }
-                    }}
-                  />
-                ))
-              )}
-            </tbody>
-          </table>
+      {/* Grouped View */}
+      {viewMode === 'grouped' && (
+        <div className="space-y-4">
+          {/* Supplier search */}
+          <div className="relative">
+            <input
+              type="text"
+              value={supplierSearch}
+              onChange={(e) => setSupplierSearch(e.target.value)}
+              placeholder="Filter by supplier name..."
+              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 pl-10 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            />
+            <svg className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          {filteredGroups.length === 0 ? (
+            <div className="rounded-lg border border-slate-200 bg-white px-6 py-12 text-center text-sm text-slate-500">
+              {supplierSearch ? 'No suppliers match your search' : 'No reviews found'}
+            </div>
+          ) : (
+            filteredGroups.map((group) => {
+              const isExpanded = expandedSuppliers.has(group.supplierId);
+              return (
+                <div key={group.supplierId} className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
+                  {/* Supplier group header */}
+                  <button
+                    onClick={() => toggleSupplierExpanded(group.supplierId)}
+                    className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <svg
+                        className={`h-4 w-4 text-slate-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                      <div>
+                        <Link
+                          href={`/admin/companies/${group.supplierId}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-sm font-semibold text-slate-900 hover:text-blue-600 hover:underline"
+                        >
+                          {group.supplierName}
+                        </Link>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-xs text-slate-500">
+                        {group.averageRating}/5 avg
+                      </span>
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                        {group.totalCount} review{group.totalCount !== 1 ? 's' : ''}
+                      </span>
+                      {group.pendingCount > 0 && (
+                        <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
+                          {group.pendingCount} pending
+                        </span>
+                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openCreateForSupplier(group.supplierId);
+                        }}
+                        className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:border-blue-300 hover:text-blue-600 transition-colors"
+                        title={`Add review for ${group.supplierName}`}
+                      >
+                        + Add
+                      </button>
+                    </div>
+                  </button>
+
+                  {/* Expanded reviews table */}
+                  {isExpanded && (
+                    <div className="border-t border-slate-200">
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead className="bg-slate-50">
+                            <tr>
+                              <th className="px-6 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                                Author
+                              </th>
+                              <th className="px-6 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                                Rating
+                              </th>
+                              <th className="px-6 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                                Date
+                              </th>
+                              <th className="px-6 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                                Status
+                              </th>
+                              <th className="px-6 py-2.5 text-right text-xs font-medium uppercase tracking-wider text-slate-500">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 bg-white">
+                            {group.reviews.map((review) => (
+                              <ReviewRow key={review.id} {...reviewRowProps(review)} />
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
-      </div>
+      )}
+
+      {/* Flat View */}
+      {viewMode === 'flat' && (
+        <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-slate-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-700">
+                    Author
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-700">
+                    Supplier
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-700">
+                    Rating
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-700">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-700">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-700">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 bg-white">
+                {reviews.length === 0 && !isCreating ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-8 text-center text-sm text-slate-500">
+                      No reviews found
+                    </td>
+                  </tr>
+                ) : (
+                  reviews.map((review) => (
+                    <ReviewRow key={review.id} {...reviewRowProps(review)} showSupplier />
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -504,7 +745,7 @@ function CreateReviewModal({
                 >
                   {[5, 4, 3, 2, 1].map((r) => (
                     <option key={r} value={r}>
-                      {r} {r === 1 ? '⭐' : '⭐⭐⭐⭐⭐'.slice(0, r)}
+                      {r} {r === 1 ? '\u2B50' : '\u2B50\u2B50\u2B50\u2B50\u2B50'.slice(0, r)}
                     </option>
                   ))}
                 </select>
@@ -599,6 +840,7 @@ function ReviewRow({
   onApprove,
   onUnapprove,
   onToggleExpand,
+  showSupplier = false,
 }: {
   review: ReviewItem;
   authToken: string;
@@ -611,7 +853,9 @@ function ReviewRow({
   onApprove: (id: number) => void;
   onUnapprove: (id: number) => void;
   onToggleExpand: () => void;
+  showSupplier?: boolean;
 }) {
+  const colSpan = showSupplier ? 6 : 5;
   const [loading, setLoading] = useState(false);
   const [localReview, setLocalReview] = useState(review);
   const [formData, setFormData] = useState({
@@ -697,7 +941,7 @@ function ReviewRow({
     return (
       <>
         <tr className="bg-blue-50">
-          <td colSpan={5} className="px-6 py-4">
+          <td colSpan={colSpan} className="px-6 py-4">
             <div className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -717,7 +961,7 @@ function ReviewRow({
                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
                   >
                     {[5, 4, 3, 2, 1].map((r) => (
-                      <option key={r} value={r}>{r} ⭐</option>
+                      <option key={r} value={r}>{r} {'\u2B50'}</option>
                     ))}
                   </select>
                 </div>
@@ -746,7 +990,7 @@ function ReviewRow({
                   <p className="text-xs text-slate-500 mt-1">
                     Current: {localReview.createdAt ? new Date(localReview.createdAt).toLocaleDateString() : 'N/A'}
                     {formData.createdAt !== localReview.createdAt.split('T')[0] && (
-                      <span className="ml-2 text-blue-600">→ {new Date(formData.createdAt + 'T00:00:00').toLocaleDateString()}</span>
+                      <span className="ml-2 text-blue-600">&rarr; {new Date(formData.createdAt + 'T00:00:00').toLocaleDateString()}</span>
                     )}
                   </p>
                 </div>
@@ -781,7 +1025,7 @@ function ReviewRow({
           </td>
         </tr>
         <tr>
-          <td colSpan={5} className="h-2"></td>
+          <td colSpan={colSpan} className="h-2"></td>
         </tr>
       </>
     );
@@ -796,8 +1040,18 @@ function ReviewRow({
             <div className="text-xs text-slate-500">{localReview.customer.email}</div>
           </div>
         </td>
+        {showSupplier && (
+          <td className="whitespace-nowrap px-6 py-4 text-sm">
+            <Link
+              href={`/admin/companies/${localReview.supplier.id}`}
+              className="text-slate-700 hover:text-blue-600 hover:underline"
+            >
+              {localReview.supplier.name}
+            </Link>
+          </td>
+        )}
         <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
-          {localReview.ratingOverall}⭐
+          {localReview.ratingOverall}{'\u2B50'}
         </td>
         <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
           {localReview.createdAt ? new Date(localReview.createdAt).toLocaleDateString() : 'N/A'}
@@ -848,7 +1102,7 @@ function ReviewRow({
       </tr>
       {isExpanded && !isEditing && (
         <tr className="bg-slate-50">
-          <td colSpan={5} className="px-6 py-4">
+          <td colSpan={colSpan} className="px-6 py-4">
             <div className="space-y-2">
               <p className="text-sm text-slate-700 whitespace-pre-wrap">
                 {localReview.body || 'No review text available'}
@@ -873,4 +1127,3 @@ function ReviewRow({
     </>
   );
 }
-

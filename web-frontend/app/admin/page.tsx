@@ -8,7 +8,7 @@ import { US_STATES } from '@/lib/constants/states';
 import { COUNTRIES } from '@/lib/constants/countries';
 import type { SupplierAddress } from '@/lib/api';
 
-type AdminTab = 'dashboard' | 'suppliers' | 'reviews' | 'category-pages';
+type AdminTab = 'dashboard' | 'suppliers' | 'category-pages';
 
 interface Category {
   id: number;
@@ -50,20 +50,6 @@ interface SupplierSummary {
     name: string;
     slug: string;
   } | null;
-}
-
-interface ReviewSummary {
-  id: number;
-  author: string;
-  ratingOverall: number;
-  body: string;
-  isApproved: boolean;
-  createdAt: string;
-  supplier: {
-    id: number;
-    name: string;
-    slug: string;
-  };
 }
 
 // Supplier List Component
@@ -299,10 +285,6 @@ export default function AdminPage() {
   const [loadingSupplierDetails, setLoadingSupplierDetails] = useState(false);
   const selectedSupplier = suppliers.find((s) => s.id === selectedSupplierId) || null;
 
-  // Reviews state
-  const [reviews, setReviews] = useState<ReviewSummary[]>([]);
-  const [reviewsLoading, setReviewsLoading] = useState(false);
-  const [reviewFilter, setReviewFilter] = useState<'all' | 'pending' | 'approved'>('all');
 
   // Categories state
   const [categories, setCategories] = useState<Category[]>([]);
@@ -458,10 +440,6 @@ export default function AdminPage() {
       .then(setRegions)
       .catch(() => setRegions([]));
     
-    // Load reviews for count
-    api.reviews.getAllAdmin(authToken, { limit: 100 })
-      .then((result) => setReviews(result.items || []))
-      .catch(console.error);
   }, [authToken]);
 
   // Load dashboard data
@@ -493,20 +471,6 @@ export default function AdminPage() {
         .finally(() => setSuppliersLoading(false));
     }
   }, [authToken, activeTab, supplierSearch]);
-
-  // Load reviews
-  useEffect(() => {
-    if (authToken && activeTab === 'reviews') {
-      setReviewsLoading(true);
-      const status = reviewFilter === 'all' ? undefined : reviewFilter === 'pending' ? 'pending' : 'approved';
-      api.reviews
-        .getAllAdmin(authToken, { status: status as any, limit: 100 })
-        .then((result) => setReviews(result.items || []))
-        .catch(console.error)
-        .finally(() => setReviewsLoading(false));
-    }
-  }, [authToken, activeTab, reviewFilter]);
-
 
   // Load category pages
   useEffect(() => {
@@ -1204,12 +1168,6 @@ export default function AdminPage() {
                 Suppliers <span className="text-gray-500">({suppliers.length})</span>
               </button>
               <button
-                onClick={() => setActiveTab('reviews')}
-                className={activeTab === 'reviews' ? 'bg-amber-100 text-amber-700 font-medium px-3 py-1.5 rounded-md' : 'text-gray-700 hover:bg-amber-50 hover:text-amber-600 px-3 py-1.5 rounded-md transition-colors'}
-              >
-                Reviews <span className="text-gray-500">({reviews.length})</span>
-              </button>
-              <button
                 onClick={() => setActiveTab('category-pages')}
                 className={activeTab === 'category-pages' ? 'bg-purple-100 text-purple-700 font-medium px-3 py-1.5 rounded-md' : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600 px-3 py-1.5 rounded-md transition-colors'}
               >
@@ -1237,14 +1195,16 @@ export default function AdminPage() {
                     <div className="text-sm font-medium text-gray-600">Total Companies</div>
                     <div className="mt-2 text-3xl font-semibold text-gray-900">{dashboardData.stats.totalSuppliers}</div>
                   </div>
-                  <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+                  <Link href="/admin/reviews" className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm hover:border-blue-300 hover:shadow-md transition-all group">
                     <div className="text-sm font-medium text-gray-600">Total Reviews</div>
                     <div className="mt-2 text-3xl font-semibold text-gray-900">{dashboardData.stats.totalReviews}</div>
-                  </div>
-                  <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+                    <div className="mt-2 text-xs font-medium text-blue-600 group-hover:text-blue-700">Manage Reviews &rarr;</div>
+                  </Link>
+                  <Link href="/admin/reviews?status=pending" className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm hover:border-amber-300 hover:shadow-md transition-all group">
                     <div className="text-sm font-medium text-gray-600">Pending Reviews</div>
                     <div className="mt-2 text-3xl font-semibold text-gray-900">{dashboardData.stats.pendingReviews}</div>
-                  </div>
+                    <div className="mt-2 text-xs font-medium text-amber-600 group-hover:text-amber-700">Review Pending &rarr;</div>
+                  </Link>
                 </div>
 
                 <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
@@ -1773,95 +1733,6 @@ export default function AdminPage() {
             </div>
           </>
         )}
-
-        {activeTab === 'reviews' && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Reviews</h2>
-              <p className="mt-1 text-sm text-gray-600">Manage customer reviews</p>
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                onClick={() => setReviewFilter('all')}
-                className={`rounded-md px-4 py-2 text-sm font-medium ${
-                  reviewFilter === 'all'
-                    ? 'bg-black text-white'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setReviewFilter('pending')}
-                className={`rounded-md px-4 py-2 text-sm font-medium ${
-                  reviewFilter === 'pending'
-                    ? 'bg-black text-white'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                Pending
-              </button>
-              <button
-                onClick={() => setReviewFilter('approved')}
-                className={`rounded-md px-4 py-2 text-sm font-medium ${
-                  reviewFilter === 'approved'
-                    ? 'bg-black text-white'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                Approved
-              </button>
-            </div>
-
-            {reviewsLoading ? (
-              <div className="text-center py-12 text-gray-500">Loading...</div>
-            ) : (
-              <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Author</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Supplier</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Rating</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Status</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white">
-                    {reviews.map((review) => (
-                      <tr key={review.id} className="hover:bg-gray-50">
-                        <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{review.author}</td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{review.supplier.name}</td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{review.ratingOverall}/5</td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm">
-                          {review.isApproved ? (
-                            <span className="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800">
-                              Approved
-                            </span>
-                          ) : (
-                            <span className="inline-flex rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">
-                              Pending
-                            </span>
-                          )}
-                        </td>
-                        <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium">
-                          <Link
-                            href="/admin/reviews"
-                            className="text-blue-600 hover:text-blue-900"
-                          >
-                            View
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-
 
         {activeTab === 'category-pages' && (
           <div className="space-y-6">
