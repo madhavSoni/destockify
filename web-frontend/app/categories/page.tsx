@@ -77,6 +77,19 @@ export default async function CategoriesPage() {
       />
     <div className="bg-white">
       <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="Breadcrumb" className="mb-8">
+          <ol className="flex items-center gap-2 text-sm text-slate-500">
+            <li>
+              <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
+            </li>
+            <li>
+              <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </li>
+            <li className="text-slate-800 font-medium">Categories</li>
+          </ol>
+        </nav>
+
         {/* Heading */}
         <div className="text-center mb-8">
           <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">CATEGORIES</p>
@@ -107,33 +120,41 @@ export default async function CategoriesPage() {
             <Link
               key={page.slug}
               href={`/${page.slug}`}
-              className="group relative flex flex-col h-48 items-center justify-center rounded-md border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift hover:-translate-y-1 overflow-hidden"
+              className="group relative flex flex-col h-56 sm:h-64 rounded-lg border border-slate-200 overflow-hidden shadow-sm transition-all duration-300 hover:shadow-lift hover:-translate-y-1"
               aria-label={page.pageTitle}
               title={page.pageTitle}
             >
-              <div className="flex flex-col items-center justify-center p-6 h-full text-center">
-                {page.heroImage ? (
-                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 mb-3 group-hover:scale-105 transition-transform">
-                    <Image
-                      src={page.heroImage}
-                      alt={page.heroImageAlt || page.pageTitle}
-                      fill
-                      className="object-contain"
-                      sizes="(max-width: 640px) 96px, 112px"
-                    />
+              {page.heroImage ? (
+                <>
+                  <Image
+                    src={page.heroImage}
+                    alt={page.heroImageAlt || page.pageTitle}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="relative z-10 mt-auto p-4 sm:p-5">
+                    <h2 className="font-heading text-sm sm:text-base font-bold text-white line-clamp-2 leading-tight drop-shadow-sm">{page.pageTitle}</h2>
                   </div>
-                ) : (
-                  <div className="text-4xl mb-3">🏷️</div>
-                )}
-                <h2 className="font-heading text-sm font-semibold text-slate-900 line-clamp-2 leading-tight px-2">{page.pageTitle}</h2>
-              </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-100 to-slate-200 p-4 sm:p-5">
+                  <svg className="w-10 h-10 sm:w-12 sm:h-12 text-slate-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                  <h2 className="font-heading text-sm sm:text-base font-bold text-slate-800 line-clamp-2 leading-tight text-center">{page.pageTitle}</h2>
+                </div>
+              )}
             </Link>
           ))}
         </div>
 
+        {/* Section Divider */}
+        <div className="mt-12 sm:mt-16 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
         {/* Feature Cards Section */}
         <section className="mx-auto max-w-7xl px-4 py-12 sm:py-16 lg:py-20 sm:px-6 lg:px-8 relative">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
           <div className="space-y-6 sm:space-y-8">
             {/* Feature 1: Split Layout - Image Left, Content Right */}
             <article className="grid gap-0 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lift md:grid-cols-2 md:h-[450px] lg:h-[500px]">

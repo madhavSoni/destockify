@@ -322,7 +322,9 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
         )}
 
         {!page.heroImage && (
-          <section className="relative min-h-[300px] sm:min-h-[350px] bg-slate-900">
+          <section className="relative min-h-[300px] sm:min-h-[350px] bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950">
+            {/* Dot pattern overlay for visual texture */}
+            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
             <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-16 pb-8 sm:pt-20 sm:pb-10 lg:pt-24 lg:pb-12">
               <div className="max-w-xl space-y-3 sm:space-y-4">
                 {page.heroH1 && (
@@ -351,7 +353,29 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
           </section>
         )}
 
+        {/* Gradient divider between hero and content */}
+        <div className="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
+
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+          {/* Breadcrumb Navigation */}
+          <nav aria-label="Breadcrumb" className="mb-8 sm:mb-10">
+            <ol className="flex items-center gap-2 text-sm text-slate-500">
+              <li>
+                <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
+              </li>
+              <li>
+                <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </li>
+              <li>
+                <Link href="/categories" className="hover:text-blue-600 transition-colors">Categories</Link>
+              </li>
+              <li>
+                <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </li>
+              <li className="text-slate-800 font-medium truncate">{page.pageTitle}</li>
+            </ol>
+          </nav>
+
           {/* Featured Suppliers Section */}
           {page.featuredSuppliersH2 && (
             <FeaturedSuppliersCarousel
@@ -416,16 +440,21 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                         </div>
                       )}
                       <div className={`flex flex-col justify-center bg-white p-6 sm:p-8 lg:p-12 ${isImageLeft ? '' : 'md:order-1'}`}>
-                        {block.h2 && (
-                          <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight mb-4">
-                            {block.h2}
-                          </h2>
-                        )}
-                        {block.text && (
-                          <p className="text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600 whitespace-pre-line">
-                            {block.text}
-                          </p>
-                        )}
+                        <div className="border-l-4 border-blue-600 pl-4 sm:pl-6">
+                          <span className="text-blue-600 font-heading text-sm font-bold tracking-widest">
+                            {String(index + 1).padStart(2, '0')}
+                          </span>
+                          {block.h2 && (
+                            <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight mb-4 mt-2">
+                              {block.h2}
+                            </h2>
+                          )}
+                          {block.text && (
+                            <p className="text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600 whitespace-pre-line">
+                              {block.text}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </article>
                   </div>
@@ -450,7 +479,7 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                 {faqs.map((faq: any, index: number) => (
                   <details
                     key={index}
-                    className="group rounded-md bg-white border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-md"
+                    className="group rounded-md bg-white border border-slate-200 shadow-sm transition-all duration-200 hover:shadow-md border-l-4 border-l-transparent open:border-l-blue-600 open:bg-slate-50"
                   >
                     <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:p-6">
                       <div className="flex-1">
@@ -483,6 +512,27 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
               <div dangerouslySetInnerHTML={{ __html: page.customHtml }} />
             </section>
           )}
+
+          {/* Bottom CTA Banner */}
+          <section className="mt-16 sm:mt-20">
+            <div className="rounded-lg bg-black p-8 sm:p-10 lg:p-12 text-white text-center">
+              <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">
+                Ready to Source Wholesale Inventory?
+              </h2>
+              <p className="mt-4 text-base sm:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
+                Browse our full supplier directory to find vetted liquidation suppliers for your business.
+              </p>
+              <Link
+                href="/suppliers"
+                className="mt-6 sm:mt-8 inline-flex items-center justify-center rounded-md bg-blue-600 px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-blue-700 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-md hover:shadow-lg"
+              >
+                Browse Supplier Directory
+                <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
+          </section>
         </div>
       </div>
     </>
