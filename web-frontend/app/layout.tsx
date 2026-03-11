@@ -35,6 +35,7 @@ export const metadata: Metadata = {
   },
   description:
     'Find Liquidation helps liquidation buyers find vetted wholesale pallet and truckload suppliers with transparent reviews, guides, and buyer insights.',
+  applicationName: 'Find Liquidation',
   metadataBase: new URL('https://findliquidation.com'),
   icons: {
     icon: '/favicon.svg',
