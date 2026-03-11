@@ -47,6 +47,7 @@ export function ReviewsSection({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [showAllReviews, setShowAllReviews] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && authToken) {
@@ -297,7 +298,7 @@ export function ReviewsSection({
 
               {/* highlights not available in ReviewResponse */}
 
-              <p className="font-serif text-slate-700 leading-relaxed whitespace-pre-wrap italic">{review.body}</p>
+              <p className="text-slate-800 leading-relaxed whitespace-pre-wrap">{review.body}</p>
 
               <div className="mt-4 text-sm text-slate-600">
                 By {review.author} • {new Date(review.createdAt).toLocaleDateString()}
@@ -318,7 +319,7 @@ export function ReviewsSection({
           </div>
         )}
 
-        {recentReviews.map((review, index) => (
+        {(showAllReviews ? recentReviews : recentReviews.slice(0, 3)).map((review, index) => (
           <div
             key={index}
             className="rounded-md border-2 border-black/10 bg-white p-6 sm:p-8 hover:border-blue-600 hover:shadow-md transition-all duration-200"
@@ -328,7 +329,7 @@ export function ReviewsSection({
               <span className="text-lg font-bold text-black">{review.ratingOverall.toFixed(1)}</span>
             </div>
 
-            <p className="font-serif text-black/70 leading-relaxed mb-4 italic">{review.body}</p>
+            <p className="text-slate-800 leading-relaxed mb-4">{review.body}</p>
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-black/50">
               <div>
@@ -340,6 +341,21 @@ export function ReviewsSection({
             </div>
           </div>
         ))}
+
+        {recentReviews.length > 3 && (
+          <div className="text-center pt-2">
+            <button
+              onClick={() => setShowAllReviews(prev => !prev)}
+              className="inline-flex items-center gap-2 rounded-md border border-black/10 bg-white px-6 py-3 text-sm font-semibold text-black hover:bg-black/5 transition-all"
+            >
+              {showAllReviews ? (
+                <>Show Less</>
+              ) : (
+                <>Show {recentReviews.length - 3} more review{recentReviews.length - 3 === 1 ? '' : 's'}</>
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Modal */}

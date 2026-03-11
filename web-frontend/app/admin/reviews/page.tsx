@@ -128,7 +128,7 @@ export default function ReviewsPage() {
   useEffect(() => {
     if (authToken) {
       api.reviews
-        .getAllAdmin(authToken, { status: statusFilter, limit: 100 })
+        .getAllAdmin(authToken, { status: statusFilter, limit: 1000 })
         .then((result) => setReviews(result.items ?? []))
         .catch(console.error)
         .finally(() => setLoading(false));
@@ -253,7 +253,7 @@ export default function ReviewsPage() {
     } catch (error) {
       if (authToken) {
         api.reviews
-          .getAllAdmin(authToken, { status: statusFilter, limit: 100 })
+          .getAllAdmin(authToken, { status: statusFilter, limit: 1000 })
           .then((result) => setReviews(result.items ?? []))
           .catch(console.error);
       }
@@ -280,7 +280,7 @@ export default function ReviewsPage() {
   const refreshReviews = () => {
     if (authToken) {
       api.reviews
-        .getAllAdmin(authToken, { status: statusFilter, limit: 100 })
+        .getAllAdmin(authToken, { status: statusFilter, limit: 1000 })
         .then((result) => setReviews(result.items))
         .catch(console.error);
     }

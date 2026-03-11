@@ -301,7 +301,7 @@ export async function getAllReviewsAdmin(params: {
   limit?: number;
 }) {
   const page = params.page || 1;
-  const limit = Math.min(params.limit || 20, 100);
+  const limit = Math.min(params.limit || 20, 1000);
   const skip = (page - 1) * limit;
 
   const where: any = {};

@@ -16,7 +16,6 @@ const supplierDetailInclude = {
   reviews: {
     where: { isApproved: true },
     orderBy: { createdAt: 'desc' },
-    take: 10,
     include: {
       customer: true,
     },
@@ -453,7 +452,7 @@ export async function getSupplierDetail(slug: string) {
 
   const reviewSummary = computeReviewSummary(supplier.reviews);
 
-  const recentReviews = supplier.reviews.slice(0, 4).map((review: (typeof supplier.reviews)[number]) => ({
+  const recentReviews = supplier.reviews.map((review: (typeof supplier.reviews)[number]) => ({
     author: review.author,
     ratingOverall: review.ratingOverall,
     body: review.body,
