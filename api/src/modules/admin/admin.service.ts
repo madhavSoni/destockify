@@ -379,3 +379,121 @@ export async function deleteCategoryPage(id: number) {
   await prisma.categoryPage.delete({ where: { id } });
   return { message: 'Category page deleted successfully' };
 }
+
+// Customer/User management
+export async function listCustomers(params?: { search?: string; page?: number; limit?: number }) {
+  const page = params?.page || 1;
+  const limit = Math.min(params?.limit || 20, 100);
+  const skip = (page - 1) * limit;
+
+  const where: any = {};
+  if (params?.search) {
+    const search = params.search.trim();
+    where.OR = [
+      { firstName: { contains: search, mode: 'insensitive' } },
+      { lastName: { contains: search, mode: 'insensitive' } },
+      { email: { contains: search, mode: 'insensitive' } },
+    ];
+  }
+
+  const [customers, total] = await Promise.all([
+    prisma.customer.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        isVerified: true,
+        isAdmin: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            reviews: true,
+            submissions: true,
+          },
+        },
+      },
+    }),
+    prisma.customer.count({ where }),
+  ]);
+
+  return {
+    items: customers.map((c) => ({
+      ...c,
+      createdAt: c.createdAt.toISOString(),
+      updatedAt: c.updatedAt.toISOString(),
+    })),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+}
+
+export async function getCustomerDetail(customerId: number) {
+  const customer = await prisma.customer.findUnique({
+    where: { id: customerId },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      isVerified: true,
+      isAdmin: true,
+      createdAt: true,
+      updatedAt: true,
+      reviews: {
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          author: true,
+          ratingOverall: true,
+          body: true,
+          isApproved: true,
+          createdAt: true,
+          supplier: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+        },
+      },
+      submissions: {
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          companyName: true,
+          status: true,
+          createdAt: true,
+        },
+      },
+    },
+  });
+
+  if (!customer) {
+    throw new Error('Customer not found');
+  }
+
+  return {
+    ...customer,
+    createdAt: customer.createdAt.toISOString(),
+    updatedAt: customer.updatedAt.toISOString(),
+    reviews: customer.reviews.map((r) => ({
+      ...r,
+      createdAt: r.createdAt.toISOString(),
+    })),
+    submissions: customer.submissions.map((s) => ({
+      ...s,
+      createdAt: s.createdAt.toISOString(),
+    })),
+  };
+}

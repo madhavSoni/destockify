@@ -3,13 +3,13 @@ import nodemailer from 'nodemailer';
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        user: process.env.EMAIL_USER || 'madhav.soni@bazar.earth',
-        pass: process.env.EMAIL_PASSWORD || 'emps muyi tgte evmn'
+        user: process.env.EMAIL_USER || 'findliquidationteam@gmail.com',
+        pass: process.env.EMAIL_PASSWORD || ''
     },
-    from: `"${process.env.EMAIL_FROM_NAME || 'FindLiquidation'}" <${process.env.EMAIL_FROM || 'noreply@findliquidation.com'}>`
+    from: `"${process.env.EMAIL_FROM_NAME || 'FindLiquidation'}" <${process.env.EMAIL_FROM || 'findliquidationteam@gmail.com'}>`
 });
 
-const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@findliquidation.com';
+const FROM_EMAIL = process.env.EMAIL_FROM || 'findliquidationteam@gmail.com';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://findliquidation.com';
 
 export async function sendVerificationEmail(email: string, verificationToken: string) {

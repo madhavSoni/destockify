@@ -1057,6 +1057,23 @@ export const api = {
           cache: 'no-store',
         }),
     },
+    // Users management
+    users: {
+      list: (token: string, params?: { search?: string; page?: number; limit?: number }) =>
+        fetchFromApi<{ items: any[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>(`/admin/users${buildQueryString(params)}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+      get: (id: number, token: string) =>
+        fetchFromApi<any>(`/admin/users/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: 'no-store',
+        }),
+    },
     // Category Pages management
     categoryPages: {
       list: (token: string, params?: { limit?: number; offset?: number }) =>

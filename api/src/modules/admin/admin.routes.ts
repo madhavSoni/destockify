@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getDashboardStats, uploadImage, listCategoryPages, getCategoryPage, createCategoryPage, updateCategoryPage, deleteCategoryPage } from './admin.service';
+import { getDashboardStats, uploadImage, listCategoryPages, getCategoryPage, createCategoryPage, updateCategoryPage, deleteCategoryPage, listCustomers, getCustomerDetail } from './admin.service';
 import { authenticateToken, AuthRequest } from '../../middleware/authMiddleware';
 import { isAdmin } from '../../middleware/adminMiddleware';
 
@@ -80,6 +80,29 @@ router.delete('/category-pages/:id', authenticateToken, isAdmin, async (req: Aut
   } catch (error: any) {
     const statusCode = error.message?.includes('not found') ? 404 : 400;
     res.status(statusCode).json({ message: error.message ?? 'Unable to delete category page' });
+  }
+});
+
+// User/Customer management routes
+router.get('/users', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
+  try {
+    const search = req.query.search as string | undefined;
+    const page = req.query.page ? parseInt(req.query.page as string) : undefined;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+    const result = await listCustomers({ search, page, limit });
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message ?? 'Unable to fetch users' });
+  }
+});
+
+router.get('/users/:id', authenticateToken, isAdmin, async (req: AuthRequest, res) => {
+  try {
+    const customer = await getCustomerDetail(Number(req.params.id));
+    res.json(customer);
+  } catch (error: any) {
+    const statusCode = error.message?.includes('not found') ? 404 : 500;
+    res.status(statusCode).json({ message: error.message ?? 'Unable to fetch user' });
   }
 });
 

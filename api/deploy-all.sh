@@ -37,8 +37,8 @@ gcloud run deploy destockify-api \
   --cpu 1 \
   --max-instances 10 \
   --min-instances 0 \
-  --set-env-vars NODE_ENV=production,GCP_PROJECT_ID=${PROJECT_ID},CORS_ORIGINS="*" \
-  --set-secrets DATABASE_URL=DATABASE_URL:latest,JWT_SECRET=JWT_SECRET:latest,JWT_REFRESH_SECRET=JWT_REFRESH_SECRET:latest,GCS_PROJECT_ID=GCS_PROJECT_ID:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest \
+  --set-env-vars NODE_ENV=production,GCP_PROJECT_ID=${PROJECT_ID},CORS_ORIGINS="*",EMAIL_USER=findliquidationteam@gmail.com \
+  --set-secrets DATABASE_URL=DATABASE_URL:latest,JWT_SECRET=JWT_SECRET:latest,JWT_REFRESH_SECRET=JWT_REFRESH_SECRET:latest,GCS_PROJECT_ID=GCS_PROJECT_ID:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest,EMAIL_PASSWORD=EMAIL_PASSWORD:latest \
   --add-cloudsql-instances "${CONNECTION_NAME}"
 
 API_URL=$(gcloud run services describe destockify-api --region $REGION --format 'value(status.url)')
@@ -81,7 +81,7 @@ CORS_ORIGINS="https://findliquidation.com,https://www.findliquidation.com,${FRON
 # Format: --set-env-vars "^|^KEY1=VALUE1|KEY2=VALUE2|KEY3=VALUE3"
 gcloud run services update destockify-api \
   --region $REGION \
-  --set-env-vars "^|^NODE_ENV=production|GCP_PROJECT_ID=${PROJECT_ID}|CORS_ORIGINS=${CORS_ORIGINS}|FRONTEND_URL=https://findliquidation.com"
+  --set-env-vars "^|^NODE_ENV=production|GCP_PROJECT_ID=${PROJECT_ID}|CORS_ORIGINS=${CORS_ORIGINS}|FRONTEND_URL=https://findliquidation.com|EMAIL_USER=findliquidationteam@gmail.com"
 
 echo "✅ CORS updated successfully"
 echo "   Allowed origins: ${CORS_ORIGINS}"
