@@ -106,7 +106,7 @@ export default function UsersPage() {
   const endItem = pagination ? Math.min(pagination.page * pagination.limit, pagination.total) : 0;
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-semibold text-gray-900">User Accounts</h1>
@@ -155,7 +155,7 @@ export default function UsersPage() {
       ) : (
         <div className="space-y-4">
           {/* User Cards */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             {users.map((user) => (
               <UserCard
                 key={user.id}
@@ -227,14 +227,14 @@ function UserCard({
   const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
 
   return (
-    <div className={`rounded-xl border bg-white shadow-sm transition-all ${isExpanded ? 'border-gray-300 shadow-md' : 'border-gray-200 hover:border-gray-300 hover:shadow'}`}>
+    <div className={`rounded-lg border bg-white shadow-sm transition-all ${isExpanded ? 'border-gray-300 shadow-md' : 'border-gray-200 hover:border-gray-300 hover:shadow'}`}>
       {/* Main row */}
       <button
         onClick={onToggle}
-        className="flex w-full items-center gap-4 px-5 py-4 text-left cursor-pointer"
+        className="flex w-full items-center gap-3 px-4 py-3 text-left cursor-pointer"
       >
         {/* Avatar */}
-        <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold ${user.isAdmin ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'}`}>
+        <div className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold ${user.isAdmin ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'}`}>
           {initials}
         </div>
 
@@ -291,7 +291,7 @@ function UserCard({
 
       {/* Mobile stats (visible below sm) */}
       {!isExpanded && (
-        <div className="flex items-center gap-4 border-t border-gray-100 px-5 py-2.5 sm:hidden">
+        <div className="flex items-center gap-4 border-t border-gray-100 px-4 py-2 sm:hidden">
           <span className="text-xs text-gray-500">{user._count.reviews} reviews</span>
           <span className="text-xs text-gray-300">|</span>
           <span className="text-xs text-gray-500">{user._count.submissions} submissions</span>
@@ -302,7 +302,7 @@ function UserCard({
 
       {/* Expanded Detail */}
       {isExpanded && (
-        <div className="border-t border-gray-100 px-5 py-5">
+        <div className="border-t border-gray-100 px-4 py-4">
           {detailLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="text-sm text-gray-400">Loading details...</div>
