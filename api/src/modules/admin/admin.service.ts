@@ -8,12 +8,14 @@ export async function getDashboardStats() {
     totalSuppliers,
     totalReviews,
     pendingReviews,
+    totalCustomers,
     recentSuppliers,
     recentReviews,
   ] = await Promise.all([
     prisma.supplier.count(),
     prisma.review.count(),
     prisma.review.count({ where: { isApproved: false } }),
+    prisma.customer.count(),
     prisma.supplier.findMany({
       orderBy: { createdAt: 'desc' },
       take: 5,
@@ -50,6 +52,7 @@ export async function getDashboardStats() {
       totalSuppliers,
       totalReviews,
       pendingReviews,
+      totalCustomers,
     },
     recentActivity: {
       suppliers: recentSuppliers.map((s) => ({

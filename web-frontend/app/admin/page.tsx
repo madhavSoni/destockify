@@ -1190,7 +1190,7 @@ export default function AdminPage() {
               <div className="text-center py-12 text-gray-500">Loading...</div>
             ) : dashboardData ? (
               <>
-                <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                   <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
                     <div className="text-sm font-medium text-gray-600">Total Companies</div>
                     <div className="mt-2 text-3xl font-semibold text-gray-900">{dashboardData.stats.totalSuppliers}</div>
@@ -1204,6 +1204,11 @@ export default function AdminPage() {
                     <div className="text-sm font-medium text-gray-600">Pending Reviews</div>
                     <div className="mt-2 text-3xl font-semibold text-gray-900">{dashboardData.stats.pendingReviews}</div>
                     <div className="mt-2 text-xs font-medium text-amber-600 group-hover:text-amber-700">Review Pending &rarr;</div>
+                  </Link>
+                  <Link href="/admin/users" className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm hover:border-indigo-300 hover:shadow-md transition-all group">
+                    <div className="text-sm font-medium text-gray-600">Registered Users</div>
+                    <div className="mt-2 text-3xl font-semibold text-gray-900">{dashboardData.stats.totalCustomers ?? 0}</div>
+                    <div className="mt-2 text-xs font-medium text-indigo-600 group-hover:text-indigo-700">View Users &rarr;</div>
                   </Link>
                 </div>
 
