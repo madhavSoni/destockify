@@ -114,6 +114,44 @@ export default async function LocationsPage() {
       {/* State Cards Grid */}
       <StateCards />
 
+      {/* Browse by Region — SSR crawlable hub */}
+      <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
+        <div className="text-center mb-8">
+          <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">BY REGION</p>
+          <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight">
+            Browse liquidation suppliers by US region
+          </h2>
+          <p className="mt-3 max-w-2xl mx-auto text-base text-slate-600 leading-relaxed">
+            Explore curated directories of wholesale liquidation suppliers grouped by region.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { slug: 'northeast', name: 'Northeast', description: 'NY, NJ, PA, MA, CT, and more' },
+            { slug: 'southeast', name: 'Southeast', description: 'FL, GA, NC, SC, TN, and more' },
+            { slug: 'midwest', name: 'Midwest', description: 'OH, IL, MI, IN, WI, and more' },
+            { slug: 'westcoast', name: 'West Coast', description: 'CA, WA, OR, NV, AZ, and more' },
+          ].map((region) => (
+            <Link
+              key={region.slug}
+              href={`/locations/${region.slug}`}
+              className="group flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-500 hover:shadow-lift"
+            >
+              <h3 className="font-heading text-xl font-bold text-primary-900 group-hover:text-blue-600 transition-colors">
+                {region.name} suppliers
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed">{region.description}</p>
+              <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-semibold text-blue-600">
+                View region
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Feature cards section */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:py-16 lg:py-20 sm:px-6 lg:px-8 relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />

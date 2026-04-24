@@ -61,18 +61,43 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
   const detail = await api.suppliers.get(slug).catch(() => null);
   if (!detail) notFound();
 
-  const { supplier, reviewSummary, recentReviews } = detail;
+  const { supplier, reviewSummary, recentReviews, relatedSuppliers } = detail;
 
   // Generate Schema.org structured data - DYNAMICALLY from database
   // This updates automatically when reviews are added/changed
   const supplierSchema = generateSupplierSchema(supplier, reviewSummary, recentReviews);
-  
+
   // Breadcrumb schema
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: 'Home', url: '/' },
     { name: 'Suppliers', url: '/suppliers' },
     { name: supplier.name, url: `/suppliers/${supplier.slug}` }
   ]);
+
+  // Internal link graph for SEO: only surface category/region links that have a live page
+  const [categoryPagesList, regionsList] = await Promise.all([
+    api.catalog.categoryPages.list().catch(() => [] as any[]),
+    api.catalog.regions().catch(() => [] as any[]),
+  ]);
+
+  const categoryPageSlugs = new Set<string>(
+    (Array.isArray(categoryPagesList) ? categoryPagesList : [])
+      .map((p: any) => p?.slug)
+      .filter((s: unknown): s is string => typeof s === 'string' && s.length > 0)
+  );
+  const regionPageSlugs = new Set<string>(
+    (Array.isArray(regionsList) ? regionsList : [])
+      .map((r: any) => r?.slug)
+      .filter((s: unknown): s is string => typeof s === 'string' && s.length > 0)
+  );
+
+  const linkableCategories = (supplier.categories || [])
+    .filter((c) => categoryPageSlugs.has(c.slug))
+    .slice(0, 8);
+  const regionHasPage = supplier.region?.slug ? regionPageSlugs.has(supplier.region.slug) : false;
+  const similarSuppliers = (relatedSuppliers || [])
+    .filter((s) => s?.slug && s.slug !== supplier.slug)
+    .slice(0, 6);
 
   return (
     <>
@@ -114,6 +139,108 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
             
             {/* Ready to Order Card */}
             <ReadyToOrderCard supplier={supplier} />
+
+            {/* Internal link graph for SEO — cross-links to related pages */}
+            {(linkableCategories.length > 0 || regionHasPage || similarSuppliers.length > 0) && (
+              <section
+                className="rounded-md border border-slate-200 bg-white p-8 sm:p-10 shadow-sm"
+                aria-labelledby="related-supplier-heading"
+              >
+                <h2
+                  id="related-supplier-heading"
+                  className="font-bold text-2xl text-slate-900 mb-6 pb-4 border-b-2 border-slate-200"
+                >
+                  Explore more on Find Liquidation
+                </h2>
+                <div className="grid gap-10 md:grid-cols-3">
+                  {linkableCategories.length > 0 && (
+                    <div>
+                      <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 mb-4">
+                        Categories {supplier.name} covers
+                      </h3>
+                      <ul className="space-y-2">
+                        {linkableCategories.map((c) => (
+                          <li key={c.slug}>
+                            <Link
+                              href={`/${c.slug}`}
+                              className="inline-flex items-center gap-2 text-base text-slate-700 hover:text-blue-600 transition-colors"
+                            >
+                              <span aria-hidden className="text-slate-400">→</span>
+                              <span>{c.name} liquidation</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                      <Link
+                        href="/categories"
+                        className="mt-4 inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        Browse all categories
+                        <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                      </Link>
+                    </div>
+                  )}
+                  {regionHasPage && supplier.region && (
+                    <div>
+                      <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 mb-4">
+                        Region
+                      </h3>
+                      <ul className="space-y-2">
+                        <li>
+                          <Link
+                            href={`/locations/${supplier.region.slug}`}
+                            className="inline-flex items-center gap-2 text-base text-slate-700 hover:text-blue-600 transition-colors"
+                          >
+                            <span aria-hidden className="text-slate-400">→</span>
+                            <span>Liquidation suppliers in the {supplier.region.name}</span>
+                          </Link>
+                        </li>
+                      </ul>
+                      <Link
+                        href="/locations"
+                        className="mt-4 inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        Browse all regions
+                        <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                      </Link>
+                    </div>
+                  )}
+                  {similarSuppliers.length > 0 && (
+                    <div>
+                      <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 mb-4">
+                        Similar liquidation suppliers
+                      </h3>
+                      <ul className="space-y-2">
+                        {similarSuppliers.map((s) => (
+                          <li key={s.slug}>
+                            <Link
+                              href={`/suppliers/${s.slug}`}
+                              className="inline-flex items-center gap-2 text-base text-slate-700 hover:text-blue-600 transition-colors"
+                            >
+                              <span aria-hidden className="text-slate-400">→</span>
+                              <span>{s.name}</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                      <Link
+                        href="/suppliers"
+                        className="mt-4 inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        Browse all suppliers
+                        <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
           </div>
         </div>
       </div>

@@ -146,18 +146,18 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
     try {
       // Normalize IDs to numbers
       const normalizedIds = supplierIdsToFetch.map((id: any) => Number(id)).filter((id: number) => !isNaN(id));
-      
+
       if (normalizedIds.length > 0) {
         // Fetch suppliers by IDs using the new backend endpoint
         const fetchedSuppliers = await api.suppliers.getByIds(normalizedIds);
-        
+
         // Preserve the order of recommended suppliers
         if (page.supplierIds && page.supplierIds.length === 0 && supplierIdsToFetch.length > 0) {
           // Auto-selected: maintain recommended order
           featuredSuppliers = recommendedSupplierNames
             .map(name => {
-              return fetchedSuppliers.find((s: any) => 
-                s.name.toLowerCase().includes(name.toLowerCase()) || 
+              return fetchedSuppliers.find((s: any) =>
+                s.name.toLowerCase().includes(name.toLowerCase()) ||
                 name.toLowerCase().includes(s.name.toLowerCase())
               );
             })
@@ -172,6 +172,34 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
     } catch (error) {
       console.error('[CategoryPage] Error fetching featured suppliers:', error);
     }
+  }
+
+  // Fetch sibling pages (same topicCategory) for cross-linking
+  let relatedPages: Array<{ slug: string; pageTitle: string; topicCategory?: string }> = [];
+  try {
+    const siblings = await api.catalog.categoryPages.list(page.topicCategory || undefined);
+    relatedPages = (Array.isArray(siblings) ? siblings : [])
+      .filter((p: any) => p?.slug && p.slug !== page.slug && (p.pageTitle || p.metaTitle))
+      .map((p: any) => ({
+        slug: p.slug,
+        pageTitle: p.pageTitle || p.metaTitle,
+        topicCategory: p.topicCategory,
+      }))
+      .slice(0, 8);
+  } catch (error) {
+    console.error('[CategoryPage] Error fetching related pages:', error);
+  }
+
+  // Fetch popular supplier slugs for internal link graph
+  let popularSupplierLinks: Array<{ slug: string; name: string }> = [];
+  try {
+    const supplierList = await api.suppliers.list({ limit: 12 });
+    popularSupplierLinks = (supplierList.items || [])
+      .filter((s: any) => s?.slug && s?.name)
+      .map((s: any) => ({ slug: s.slug, name: s.name }))
+      .slice(0, 10);
+  } catch (error) {
+    console.error('[CategoryPage] Error fetching supplier links:', error);
   }
 
   // Generate schemas
@@ -510,6 +538,76 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
             <section className="mb-16 sm:mb-20">
               {page.enableDivider && <div className="border-t border-slate-200 mb-12"></div>}
               <div dangerouslySetInnerHTML={{ __html: page.customHtml }} />
+            </section>
+          )}
+
+          {/* Related pages (internal link graph for SEO + GEO) */}
+          {(relatedPages.length > 0 || popularSupplierLinks.length > 0) && (
+            <section aria-labelledby="related-heading" className="mb-16 sm:mb-20">
+              {page.enableDivider && <div className="border-t border-slate-200 mb-12"></div>}
+              <h2 id="related-heading" className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight mb-8 text-center">
+                Keep exploring Find Liquidation
+              </h2>
+              <div className="grid gap-10 md:grid-cols-2">
+                {relatedPages.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 mb-4">
+                      {page.topicCategory === 'retailer' ? 'More retailer liquidation guides' : page.topicCategory === 'category' ? 'More category liquidation guides' : 'Related liquidation guides'}
+                    </h3>
+                    <ul className="space-y-2">
+                      {relatedPages.map((rp) => (
+                        <li key={rp.slug}>
+                          <Link
+                            href={`/${rp.slug}`}
+                            className="inline-flex items-center gap-2 text-base text-slate-700 hover:text-blue-600 transition-colors"
+                          >
+                            <span aria-hidden className="text-slate-400">→</span>
+                            <span>{rp.pageTitle}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      href={page.topicCategory === 'retailer' ? '/brands' : '/categories'}
+                      className="mt-4 inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      Browse all {page.topicCategory === 'retailer' ? 'retailers' : 'categories'}
+                      <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </Link>
+                  </div>
+                )}
+                {popularSupplierLinks.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 mb-4">
+                      Popular liquidation suppliers
+                    </h3>
+                    <ul className="space-y-2">
+                      {popularSupplierLinks.map((s) => (
+                        <li key={s.slug}>
+                          <Link
+                            href={`/suppliers/${s.slug}`}
+                            className="inline-flex items-center gap-2 text-base text-slate-700 hover:text-blue-600 transition-colors"
+                          >
+                            <span aria-hidden className="text-slate-400">→</span>
+                            <span>{s.name}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      href="/suppliers"
+                      className="mt-4 inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      Browse all suppliers
+                      <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </Link>
+                  </div>
+                )}
+              </div>
             </section>
           )}
 

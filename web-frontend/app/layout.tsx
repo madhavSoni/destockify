@@ -99,7 +99,7 @@ function SiteFooter() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-10 text-sm text-black/70 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-10 text-sm text-black/70 sm:grid-cols-3">
           <div className="space-y-2">
             <p className="font-semibold text-black">Marketplace</p>
             <Link href="/suppliers" className="block hover:text-blue-600 transition-colors duration-200">Supplier directory</Link>
@@ -108,9 +108,15 @@ function SiteFooter() {
             <Link href="/locations" className="block hover:text-blue-600 transition-colors duration-200">Locations</Link>
           </div>
           <div className="space-y-2">
+            <p className="font-semibold text-black">By region</p>
+            <Link href="/locations/northeast" className="block hover:text-blue-600 transition-colors duration-200">Northeast suppliers</Link>
+            <Link href="/locations/southeast" className="block hover:text-blue-600 transition-colors duration-200">Southeast suppliers</Link>
+            <Link href="/locations/midwest" className="block hover:text-blue-600 transition-colors duration-200">Midwest suppliers</Link>
+            <Link href="/locations/westcoast" className="block hover:text-blue-600 transition-colors duration-200">West Coast suppliers</Link>
+          </div>
+          <div className="space-y-2">
             <p className="font-semibold text-black">Company</p>
             <Link href="/about" className="block hover:text-blue-600 transition-colors duration-200">About Us</Link>
-            <Link href="/suppliers" className="block hover:text-blue-600 transition-colors duration-200">Directory</Link>
             <Link href="/list-your-business" className="block hover:text-blue-600 transition-colors duration-200">Become a partner</Link>
             <Link href="/contact" className="block hover:text-blue-600 transition-colors duration-200">Contact</Link>
             <Link href="/privacy" className="block hover:text-blue-600 transition-colors duration-200">Privacy</Link>

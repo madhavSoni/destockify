@@ -37,15 +37,15 @@ export function CategoryCarousel({ categoryPages }: { categoryPages: any[] }) {
   const categoryPagesFiltered = categoryPages
     .filter((page: any) => page.topicCategory === 'category')
     .filter((page: any) => {
-      return categoryOrder.some(cat => 
+      return categoryOrder.some(cat =>
         categorySlugMap[cat]?.some(slug => page.slug.includes(slug))
       );
     })
     .sort((a: any, b: any) => {
-      const aIndex = categoryOrder.findIndex(cat => 
+      const aIndex = categoryOrder.findIndex(cat =>
         categorySlugMap[cat]?.some(slug => a.slug.includes(slug))
       );
-      const bIndex = categoryOrder.findIndex(cat => 
+      const bIndex = categoryOrder.findIndex(cat =>
         categorySlugMap[cat]?.some(slug => b.slug.includes(slug))
       );
       if (aIndex === -1 && bIndex === -1) return 0;
@@ -55,7 +55,16 @@ export function CategoryCarousel({ categoryPages }: { categoryPages: any[] }) {
     })
     .slice(0, 5);
 
-  if (categoryPagesFiltered.length === 0) return null;
+  // SEO fallback: ensure the homepage always exposes crawlable category links even when
+  // the API fails at build time. Items mirror known live /[slug] pages.
+  const fallbackCards = [
+    { slug: 'electronics-pallets', pageTitle: 'Electronics Liquidation' },
+    { slug: 'tools-liquidation', pageTitle: 'Tools Liquidation' },
+    { slug: 'general-merchandise-liquidation', pageTitle: 'General Merchandise Liquidation' },
+    { slug: 'apparel-wholesale', pageTitle: 'Apparel & Clothing Wholesale' },
+    { slug: 'furniture-liquidation', pageTitle: 'Furniture Liquidation' },
+  ];
+  const cardsToRender = categoryPagesFiltered.length > 0 ? categoryPagesFiltered : fallbackCards;
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:py-20 sm:px-6 lg:px-8 bg-slate-50">
@@ -67,7 +76,7 @@ export function CategoryCarousel({ categoryPages }: { categoryPages: any[] }) {
               Explore Liquidation Categories
             </h2>
           </div>
-          {categoryPagesFiltered.length > 0 && (
+          {cardsToRender.length > 0 && (
             <div className="hidden lg:flex items-center gap-2">
               <button
                 type="button"
@@ -116,7 +125,7 @@ export function CategoryCarousel({ categoryPages }: { categoryPages: any[] }) {
             WebkitOverflowScrolling: 'touch'
           }}
         >
-          {categoryPagesFiltered.map((page: any) => (
+          {cardsToRender.map((page: any) => (
             <Link
               key={page.slug}
               href={`/${page.slug}`}

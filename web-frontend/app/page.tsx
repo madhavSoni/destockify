@@ -40,7 +40,8 @@ export default async function HomePage() {
   let data: HomepageData;
   let regions: CategoryList;
   let categoryPages: any[] = [];
-  
+  let allSuppliers: Array<{ slug: string; name: string }> = [];
+
   try {
     data = await api.home.get();
   } catch (error) {
@@ -65,6 +66,25 @@ export default async function HomePage() {
   } catch (error) {
     categoryPages = [];
   }
+
+  try {
+    const suppliersResp = await api.suppliers.list({ limit: 100 });
+    allSuppliers = (suppliersResp?.items || [])
+      .filter((s: any) => s?.slug && s?.name)
+      .map((s: any) => ({ slug: s.slug, name: s.name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  } catch (error) {
+    allSuppliers = [];
+  }
+
+  const retailerPages = (categoryPages || [])
+    .filter((p: any) => p?.slug && (p.pageTitle || p.metaTitle) && p.topicCategory === 'retailer')
+    .map((p: any) => ({ slug: p.slug as string, label: (p.pageTitle || p.metaTitle) as string }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+  const categoryGuidePages = (categoryPages || [])
+    .filter((p: any) => p?.slug && (p.pageTitle || p.metaTitle) && p.topicCategory !== 'retailer')
+    .map((p: any) => ({ slug: p.slug as string, label: (p.pageTitle || p.metaTitle) as string }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   // Generate Schema.org structured data for homepage
   const websiteSchema = generateWebsiteSchema();
@@ -127,6 +147,12 @@ export default async function HomePage() {
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
           <ListBusinessCta />
         </div>
+
+        <BrowseAllSection
+          retailers={retailerPages}
+          categories={categoryGuidePages}
+          suppliers={allSuppliers}
+        />
 
         {/* FAQ Section */}
         <FaqSection />
@@ -380,6 +406,130 @@ function ListBusinessCta() {
             Get Started
           </Link>
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* ----------------------------- BROWSE ALL (SEO INTERNAL LINKING) ---------------------------------- */
+function BrowseAllSection({
+  retailers,
+  categories,
+  suppliers,
+}: {
+  retailers: Array<{ slug: string; label: string }>;
+  categories: Array<{ slug: string; label: string }>;
+  suppliers: Array<{ slug: string; name: string }>;
+}) {
+  if (retailers.length === 0 && categories.length === 0 && suppliers.length === 0) {
+    return null;
+  }
+
+  return (
+    <section
+      className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8"
+      aria-labelledby="browse-all-heading"
+    >
+      <div className="text-center mb-10">
+        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.6em] text-slate-500 mb-2">BROWSE EVERYTHING</p>
+        <h2
+          id="browse-all-heading"
+          className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-900 leading-tight"
+        >
+          Every liquidation supplier, retailer, and category
+        </h2>
+        <p className="mt-3 max-w-2xl mx-auto text-base text-slate-600 leading-relaxed">
+          A full directory of the suppliers, retailer liquidation guides, and product categories indexed on Find Liquidation.
+        </p>
+      </div>
+
+      <div className="grid gap-10 lg:grid-cols-3">
+        {retailers.length > 0 && (
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 mb-4">
+              Retailer liquidation guides
+            </h3>
+            <ul className="flex flex-wrap gap-x-4 gap-y-2">
+              {retailers.map((r) => (
+                <li key={r.slug}>
+                  <Link
+                    href={`/${r.slug}`}
+                    className="text-sm text-slate-700 hover:text-blue-600 hover:underline transition-colors"
+                  >
+                    {r.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/brands"
+              className="mt-4 inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              All retailer guides
+              <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </div>
+        )}
+
+        {categories.length > 0 && (
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 mb-4">
+              Categories & lot sizes
+            </h3>
+            <ul className="flex flex-wrap gap-x-4 gap-y-2">
+              {categories.map((c) => (
+                <li key={c.slug}>
+                  <Link
+                    href={`/${c.slug}`}
+                    className="text-sm text-slate-700 hover:text-blue-600 hover:underline transition-colors"
+                  >
+                    {c.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/categories"
+              className="mt-4 inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              All category guides
+              <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </div>
+        )}
+
+        {suppliers.length > 0 && (
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 mb-4">
+              Verified suppliers
+            </h3>
+            <ul className="flex flex-wrap gap-x-4 gap-y-2">
+              {suppliers.map((s) => (
+                <li key={s.slug}>
+                  <Link
+                    href={`/suppliers/${s.slug}`}
+                    className="text-sm text-slate-700 hover:text-blue-600 hover:underline transition-colors"
+                  >
+                    {s.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/suppliers"
+              className="mt-4 inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              All suppliers
+              <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

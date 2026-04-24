@@ -39,7 +39,17 @@ export function BrandCarousel({ categoryPages }: { categoryPages: any[] }) {
     })
     .slice(0, 6);
 
-  if (brandPages.length === 0) return null;
+  // SEO fallback: ensure the homepage always exposes crawlable retailer links even when
+  // the API fails at build time. Items mirror known live /[slug] pages.
+  const fallbackCards = [
+    { slug: 'amazon-fba-liquidation', pageTitle: 'Amazon FBA Liquidation' },
+    { slug: 'home-depot-liquidation', pageTitle: 'Home Depot Liquidation' },
+    { slug: 'target-liquidation', pageTitle: 'Target Liquidation' },
+    { slug: 'walmart-liquidation', pageTitle: 'Walmart Liquidation' },
+    { slug: 'lowes-liquidation', pageTitle: "Lowe's Liquidation" },
+    { slug: 'kohls-liquidation', pageTitle: "Kohl's Liquidation" },
+  ];
+  const cardsToRender = brandPages.length > 0 ? brandPages : fallbackCards;
 
   return (
     <section className="w-full bg-white">
@@ -52,7 +62,7 @@ export function BrandCarousel({ categoryPages }: { categoryPages: any[] }) {
                 Buy Liquidation Pallets Direct From Major Retailers
               </h2>
             </div>
-            {brandPages.length > 0 && (
+            {cardsToRender.length > 0 && (
               <div className="hidden lg:flex items-center gap-2">
                 <button
                   type="button"
@@ -101,7 +111,7 @@ export function BrandCarousel({ categoryPages }: { categoryPages: any[] }) {
               WebkitOverflowScrolling: 'touch'
             }}
           >
-            {brandPages.map((page: any) => (
+            {cardsToRender.map((page: any) => (
               <Link
                 key={page.slug}
                 href={`/${page.slug}`}
