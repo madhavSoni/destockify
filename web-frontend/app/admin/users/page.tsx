@@ -39,6 +39,11 @@ interface UserDetail {
   submissions: Array<{
     id: number;
     companyName: string;
+    companyAddress?: string | null;
+    contactEmail?: string | null;
+    contactPhone?: string | null;
+    website?: string | null;
+    description?: string | null;
     status: string;
     createdAt: string;
   }>;
@@ -393,12 +398,56 @@ function ExpandedUserDetail({ detail }: { detail: UserDetail }) {
           <div className="space-y-2.5">
             {detail.submissions.map((submission) => (
               <div key={submission.id} className="rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:border-gray-300">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium text-gray-900">{submission.companyName}</span>
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-sm font-semibold text-gray-900">{submission.companyName}</span>
                   <StatusBadge status={submission.status} />
                 </div>
-                <div className="mt-1.5 text-[11px] text-gray-400">
-                  Submitted {new Date(submission.createdAt).toLocaleDateString()}
+                <div className="mt-2 space-y-1 text-xs text-gray-600">
+                  {submission.contactEmail && (
+                    <div className="flex gap-1.5">
+                      <span className="text-gray-400">Email:</span>
+                      <a href={`mailto:${submission.contactEmail}`} className="truncate text-gray-700 hover:text-blue-600" onClick={(e) => e.stopPropagation()}>
+                        {submission.contactEmail}
+                      </a>
+                    </div>
+                  )}
+                  {submission.contactPhone && (
+                    <div className="flex gap-1.5">
+                      <span className="text-gray-400">Phone:</span>
+                      <span className="text-gray-700">{submission.contactPhone}</span>
+                    </div>
+                  )}
+                  {submission.website && (
+                    <div className="flex gap-1.5">
+                      <span className="text-gray-400">Website:</span>
+                      <a href={submission.website} target="_blank" rel="noopener noreferrer" className="truncate text-blue-600 hover:underline" onClick={(e) => e.stopPropagation()}>
+                        {submission.website}
+                      </a>
+                    </div>
+                  )}
+                  {submission.companyAddress && (
+                    <div className="flex gap-1.5">
+                      <span className="text-gray-400">Address:</span>
+                      <span className="truncate text-gray-700">{submission.companyAddress}</span>
+                    </div>
+                  )}
+                </div>
+                {submission.description && (
+                  <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-gray-600">{submission.description}</p>
+                )}
+                <div className="mt-2.5 flex items-center justify-between border-t border-gray-100 pt-2">
+                  <span className="text-[11px] text-gray-400">
+                    Submitted {new Date(submission.createdAt).toLocaleDateString()}
+                  </span>
+                  {submission.status === 'pending' && (
+                    <Link
+                      href="/admin/new-listings"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-[11px] font-medium text-emerald-700 hover:text-emerald-800"
+                    >
+                      Review &amp; approve &rarr;
+                    </Link>
+                  )}
                 </div>
               </div>
             ))}

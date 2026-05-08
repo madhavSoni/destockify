@@ -1190,11 +1190,40 @@ export default function AdminPage() {
               <div className="text-center py-12 text-gray-500">Loading...</div>
             ) : dashboardData ? (
               <>
-                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                {(dashboardData.stats.pendingSubmissions ?? 0) > 0 && (
+                  <Link
+                    href="/admin/new-listings"
+                    className="flex items-center justify-between gap-4 rounded-lg border border-emerald-300 bg-emerald-50 p-4 shadow-sm hover:border-emerald-400 hover:bg-emerald-100 transition-all group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-200 text-emerald-800 text-lg">
+                        📝
+                      </span>
+                      <div>
+                        <div className="text-sm font-semibold text-emerald-900">
+                          {dashboardData.stats.pendingSubmissions} new business {dashboardData.stats.pendingSubmissions === 1 ? 'submission' : 'submissions'} awaiting review
+                        </div>
+                        <div className="text-xs text-emerald-700 mt-0.5">
+                          New companies have signed up and are waiting for approval
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-sm font-medium text-emerald-700 group-hover:text-emerald-900 whitespace-nowrap">
+                      Review now &rarr;
+                    </span>
+                  </Link>
+                )}
+
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
                   <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
                     <div className="text-sm font-medium text-gray-600">Total Companies</div>
                     <div className="mt-2 text-3xl font-semibold text-gray-900">{dashboardData.stats.totalSuppliers}</div>
                   </div>
+                  <Link href="/admin/new-listings" className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm hover:border-emerald-300 hover:shadow-md transition-all group">
+                    <div className="text-sm font-medium text-gray-600">Pending Submissions</div>
+                    <div className="mt-2 text-3xl font-semibold text-gray-900">{dashboardData.stats.pendingSubmissions ?? 0}</div>
+                    <div className="mt-2 text-xs font-medium text-emerald-600 group-hover:text-emerald-700">Review Listings &rarr;</div>
+                  </Link>
                   <Link href="/admin/reviews" className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm hover:border-blue-300 hover:shadow-md transition-all group">
                     <div className="text-sm font-medium text-gray-600">Total Reviews</div>
                     <div className="mt-2 text-3xl font-semibold text-gray-900">{dashboardData.stats.totalReviews}</div>
@@ -1212,7 +1241,33 @@ export default function AdminPage() {
                   </Link>
                 </div>
 
-                <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+                <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
+                  <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                    <div className="mb-4 flex items-center justify-between">
+                      <h2 className="text-lg font-semibold text-gray-900">Recent Pending Submissions</h2>
+                      {(dashboardData.recentActivity.submissions?.length ?? 0) > 0 && (
+                        <Link href="/admin/new-listings" className="text-xs font-medium text-emerald-700 hover:text-emerald-800">
+                          View all &rarr;
+                        </Link>
+                      )}
+                    </div>
+                    {(dashboardData.recentActivity.submissions?.length ?? 0) === 0 ? (
+                      <p className="py-3 text-sm text-gray-400">No pending submissions</p>
+                    ) : (
+                      <ul className="divide-y divide-gray-100">
+                        {dashboardData.recentActivity.submissions.slice(0, 5).map((s: any) => (
+                          <li key={s.id} className="py-3">
+                            <Link href="/admin/new-listings" className="text-sm font-semibold text-gray-900 hover:text-emerald-700">
+                              {s.companyName}
+                            </Link>
+                            <div className="mt-1 text-xs text-gray-500">
+                              {s.submittedBy} • {new Date(s.createdAt).toLocaleDateString()}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                   <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Companies</h2>
                     <ul className="divide-y divide-gray-100">

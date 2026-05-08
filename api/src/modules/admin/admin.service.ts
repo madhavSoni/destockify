@@ -9,13 +9,16 @@ export async function getDashboardStats() {
     totalReviews,
     pendingReviews,
     totalCustomers,
+    pendingSubmissions,
     recentSuppliers,
     recentReviews,
+    recentSubmissions,
   ] = await Promise.all([
     prisma.supplier.count(),
     prisma.review.count(),
     prisma.review.count({ where: { isApproved: false } }),
     prisma.customer.count(),
+    prisma.supplierSubmission.count({ where: { status: 'pending' } }),
     prisma.supplier.findMany({
       orderBy: { createdAt: 'desc' },
       take: 5,
@@ -45,6 +48,24 @@ export async function getDashboardStats() {
         },
       },
     }),
+    prisma.supplierSubmission.findMany({
+      where: { status: 'pending' },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      select: {
+        id: true,
+        companyName: true,
+        contactEmail: true,
+        createdAt: true,
+        customer: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+    }),
   ]);
 
   return {
@@ -53,6 +74,7 @@ export async function getDashboardStats() {
       totalReviews,
       pendingReviews,
       totalCustomers,
+      pendingSubmissions,
     },
     recentActivity: {
       suppliers: recentSuppliers.map((s) => ({
@@ -72,6 +94,13 @@ export async function getDashboardStats() {
           slug: r.supplier.slug,
         },
         reviewer: `${r.customer.firstName} ${r.customer.lastName}`,
+      })),
+      submissions: recentSubmissions.map((s) => ({
+        id: s.id,
+        companyName: s.companyName,
+        contactEmail: s.contactEmail,
+        createdAt: s.createdAt.toISOString(),
+        submittedBy: `${s.customer.firstName} ${s.customer.lastName}`,
       })),
     },
   };
@@ -475,6 +504,11 @@ export async function getCustomerDetail(customerId: number) {
         select: {
           id: true,
           companyName: true,
+          companyAddress: true,
+          contactEmail: true,
+          contactPhone: true,
+          website: true,
+          description: true,
           status: true,
           createdAt: true,
         },

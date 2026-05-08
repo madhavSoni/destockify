@@ -802,8 +802,24 @@ export const api = {
     // Get dashboard stats
     dashboard: (token: string) =>
       fetchFromApi<{
-        stats: { totalSuppliers: number; totalReviews: number; pendingReviews: number };
-        recentActivity: { suppliers: any[]; reviews: any[] };
+        stats: {
+          totalSuppliers: number;
+          totalReviews: number;
+          pendingReviews: number;
+          totalCustomers: number;
+          pendingSubmissions: number;
+        };
+        recentActivity: {
+          suppliers: any[];
+          reviews: any[];
+          submissions: Array<{
+            id: number;
+            companyName: string;
+            contactEmail: string;
+            createdAt: string;
+            submittedBy: string;
+          }>;
+        };
       }>('/admin/dashboard', {
         headers: {
           Authorization: `Bearer ${token}`,
